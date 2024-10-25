@@ -1,0 +1,31 @@
+{
+  "name": "flurrybox/module-patch-assist",
+  "description": "N/A",
+  "type": "magento2-module",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Flurrybox",
+      "email": "info@flurrybox.com"
+    }
+  ],
+  "license": [
+    "GPL-3.0-or-later"
+  ],
+  "require": {
+    "php": "~7.1.3||~7.2.0",
+    "magento/framework": "*",
+    "magento/module-eav": "*",
+    "magento/module-catalog": "*",
+    "magento/module-customer": "*",
+    "magento/module-cms": "*"
+  },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Flurrybox\\PatchAssist\\": ""
+    }
+  }
+}

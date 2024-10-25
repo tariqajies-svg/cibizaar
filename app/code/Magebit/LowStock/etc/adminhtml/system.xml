@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_LowStock package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_LowStock
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="bizaar" translate="label" sortOrder="401">
+            <label>Bizaar</label>
+        </tab>
+        <section id="low_stock" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Low Stock Notifications</label>
+            <tab>bizaar</tab>
+            <resource>Magebit_LowStock::management</resource>
+            <group id="notifications" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Notifications</label>
+                <field id="enable" translate="label" type="select" sortOrder="1" showInDefault="1">
+                    <label>Enable out of stock notifications</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="email" translate="label" type="text" sortOrder="10" showInDefault="1">
+                    <label>Low stock notification email</label>
+                    <comment>All low stock notification emails will be sent to this email address</comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="template" translate="label" type="select" sortOrder="20" showInDefault="1">
+                    <label>Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

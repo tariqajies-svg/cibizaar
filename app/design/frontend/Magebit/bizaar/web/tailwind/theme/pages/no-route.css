@@ -1,0 +1,26 @@
+.cms-no-route {
+    #maincontent {
+        @apply container w-full !p-0 lg:relative lg-max:mt-0;
+
+        .page-title {
+            @apply mb-1 lg:mb-0;
+        }
+
+        .main {
+            [data-content-type='html'] { 
+
+                ul {
+                  
+
+                    li {
+                        
+                    }
+                }
+            }
+        }
+
+        &::before {
+           
+        }
+    }
+}

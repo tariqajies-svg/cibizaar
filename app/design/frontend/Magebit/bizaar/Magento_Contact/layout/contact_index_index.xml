@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_form_validation"/>
+    <update handle="phone-code-component"/>
+    <head>
+        <title>Bizaar Support for Tech Hardware Queries</title>
+        <meta name="description" content="Contact Bizaar support for quick help with tech hardware queries. Get in touch with us easily for all your tech needs! Call now at +971 58 579 0025."/>
+    </head>
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Contact Us</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <referenceBlock name="contactForm">
+                <block class="Magento\Cms\Block\Block" name="contact-us-info">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">contact-us-info</argument>
+                    </arguments>
+                </block>
+                <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,53 @@
+.aw_ca-role-create,
+.aw_ca-role-edit {
+    .fields-wrapper {
+        .field-permissions {
+            @apply pt-2 lg:pt-1;
+
+            & > label {
+                @apply text-3xl md:text-4xl font-bold mt-6 mb-3.5 md:mt-8 md:mb-6.5;
+            }
+
+            .checkbox {
+                @apply my-2.5 md:my-2;
+            }
+
+            .field:not(.field-0) {
+                @apply relative pt-2;
+
+                &::before {
+                    @apply absolute block top-1/2 h-px w-5.75 border-b translate-y-[4px] translate-x-[-27px];
+
+                    content: '';
+                }
+
+                .checkbox {
+                    @apply ml-[25px];
+                }
+            }
+
+            .child-wrapper {
+                @apply border-l ml-2.25 pl-6.5;
+
+                &:not(.field-0) {
+                    @apply ml-[35px];
+                }
+
+                > .child-wrapper {
+                    @apply ml-2.25;
+                }
+            }
+
+            .child-field:last-child::before {
+                @apply visible;
+            }
+        }
+
+        .field-default,
+        .field-permissions {
+            .field {
+                @apply flex items-center;
+            }
+        }
+    }
+}

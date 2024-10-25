@@ -1,0 +1,72 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Wishlist;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Aheadworks\Ca\ViewModel\Company\Customer;
+
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Template $block */
+
+/** @var Wishlist $wishlistViewModel */
+$wishlistViewModel = $viewModels->require(Wishlist::class);
+
+/** @var CustomerInterface $companyUser */
+$companyUser = $viewModels->require(Customer::class)->getCurrentCompanyUser();
+
+$product = $block->getData('product');
+$productId = $product->getId();
+$showAddToWishlist = $wishlistViewModel->isEnabled() && !$companyUser;
+?>
+<div x-data="window.bizaar.initToListButton(
+    {
+        isCompanyUser: <?= !!$companyUser ? 'true' : 'false' ?>,
+        showWishlist: <?= $wishlistViewModel->isEnabled() ? 'true' : 'false' ?>
+    })"
+     @private-content-loaded.window="getData($event.detail.data)"
+     x-init="getData(null)"
+>
+    <div x-show="showWishlist"
+         x-transition:enter="ease-in-out duration-100"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         style="display: none"
+    >
+        <button x-data="initWishlist()"
+                @click.prevent="addToWishlist(<?= (int)$productId ?>)"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>"
+                type="button"
+                class="btn btn-secondary btn-sq !w-[30px] !h-[30px] text-yellow-300">
+            <template x-if="isLoading">
+                <svg class="animate-spin min-w-4 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+            </template>
+            <i class="icon-heart" x-show="!isLoading"></i>
+        </button>
+    </div>
+    <?php if ($saveToBlock = $block->getChildBlock('product.item.addtorlist')): ?>
+        <?= $saveToBlock->setProduct($product)->toHtml() ?>
+    <?php endif; ?>
+</div>

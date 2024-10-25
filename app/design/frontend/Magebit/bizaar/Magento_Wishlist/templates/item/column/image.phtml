@@ -1,0 +1,30 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Wishlist\Block\Customer\Wishlist\Item\Column\Image;
+use Magento\Wishlist\Model\Item;
+
+/** @var Image $block */
+/** @var Escaper $escaper */
+
+/** @var Item $item */
+$item = $block->getItem();
+$product = $item->getProduct();
+?>
+<a class="product-item-photo flex" tabindex="-1"
+   href="<?= $escaper->escapeUrl($block->getProductUrl($item)) ?>"
+   title="<?= $escaper->escapeHtmlAttr($product->getName()) ?>">
+    <?= $block->getImage($block->getProductForThumbnail($item), 'wishlist_thumbnail')->toHtml() ?>
+</a>

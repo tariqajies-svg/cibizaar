@@ -1,0 +1,111 @@
+.wishlist-index-index {
+    .product-item-photo {
+        @screen lg-max {
+            grid-area: box1;
+        }
+
+        .product-image-photo {
+            @apply w-[80px] h-[80px] object-contain lg-max:border lg-max:rounded lg:w-[192px] lg:h-[192px] lg:mx-auto;
+        }
+    }
+
+    .price-box {
+        @apply font-bold text-navy text-sm;
+    }
+
+    .product-item-info {
+        @screen lg-max {
+            grid-template-columns: 80px repeat(2, 1fr);
+
+            /* stylelint-disable */
+            grid-template-areas:
+                'box1 box2 box2'
+                'box1 box3 box3'
+                'box1 box3 box3';
+            /* stylelint-enable */
+        }
+    }
+
+    .product-item-name {
+        img {
+            @apply w-auto mb-2.75 lg:mb-4;
+        }
+    }
+
+    @screen lg-max {
+        .product-item-name {
+            grid-area: box2;
+        }
+
+        .price-box {
+            grid-area: box3;
+        }
+    }
+
+    .product-item-inner {
+        @apply lg:pt-3 lg:border-t mt-3 md:self-end;
+
+        @screen lg-max {
+            grid-area: span 3 / span 3;
+        }
+    }
+
+    .actions-toolbar {
+        button {
+            @apply lg-max:w-full lg:py-1.75;
+        }
+    }
+
+    .wishlist-toolbar-top {
+        .pages-wrapper {
+            @apply invisible h-0;
+        }
+    }
+
+    .product-item {
+        @screen sm-max {
+            &::after {
+                @apply !border-0;
+            }
+        }
+    }
+
+    @screen md-max {
+        .product-item {
+            &::after {
+                @apply hidden;
+            }
+        }
+    }
+
+    @screen xl-max {
+        .product-item {
+            &:first-child {
+                @apply after:rounded-tl;
+            }
+
+            &:first-child:last-child,
+            &:nth-child(2) {
+                @apply after:rounded-tr;
+            }
+
+            &:nth-last-child(-n+2):nth-child(2n+1) {
+                @apply after:rounded-bl;
+            }
+
+            &:last-child {
+                @apply after:rounded-br;
+            }
+
+
+            &:nth-child(-n+3):last-child,
+            &:nth-child(4) {
+                @apply after:rounded-tr-none;
+            }
+
+            &:nth-last-child(-n+4):nth-child(4n+1) {
+                @apply after:rounded-bl-none;
+            }
+        }
+    }
+}

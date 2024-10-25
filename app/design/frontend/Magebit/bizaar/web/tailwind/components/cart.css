@@ -1,0 +1,35 @@
+.price-including-tax + .price-excluding-tax {
+    @apply text-sm;
+
+    &::before {
+        content: attr(data-label) ': ';
+    }
+}
+
+.price-excluding-tax,
+.price-including-tax {
+    @apply block whitespace-nowrap;
+
+    .price {
+        @apply leading-relaxed;
+    }
+}
+.cart-pro-name {
+    /* @apply line-clamp-1; */
+}
+.minicart-price {
+    .price {
+        @apply text-navy font-bold;
+    }
+}
+
+#cart-drawer,
+.cart-wrapper-summary {
+    [data-content-type='row'] {
+        @apply !px-0;
+
+        div {
+            @apply mb-0;
+        }
+    }
+}

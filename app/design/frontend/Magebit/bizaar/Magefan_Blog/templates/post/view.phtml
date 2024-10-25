@@ -1,0 +1,89 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\MagefanBlog\ViewModel\PlaceholderImage;
+use Magefan\Blog\Block\Post\View;
+use Magento\Framework\Escaper;
+use Magebit\ImageResizer\ViewModel\ImageResizer;
+
+/**
+ * Blog post view template
+ *
+ * @var View $block
+ * @var Escaper $escaper
+ * @var ViewModelRegistry $viewModels
+ */
+
+$placeholderViewModel = $viewModels->require(PlaceholderImage::class);
+$imageResizer = $viewModels->require(ImageResizer::class);
+
+$_post = $block->getPost();
+$_postUrl = $_post->getPostUrl();
+$_postName = $escaper->escapeHtml($_post->getTitle(), null);
+$mediaDir = $imageResizer->getMediaDirectoryAbsolutePath();
+?>
+<div class="post-view">
+    <div class="post-holder post-holder-<?= /* @noEscape */ (int)$_post->getId() ?>">
+        <div class="post-content">
+            <div class="post-description mb-5 lg:mb-8">
+                <?php $featuredImage = $_post->getData('featured_img');
+
+                if (!$imageResizer->fileExists($mediaDir . $featuredImage)):
+                    $featuredImage = $placeholderViewModel->getImageSrc();
+                    endif;
+
+                    $featuredImgAlt = $_post->getData('featured_img_alt');
+
+                if (!$featuredImgAlt):
+                    $featuredImgAlt = $_postName;
+                    endif;?>
+                    <div class="post-ftimg-hld relative rounded-[5px] max-h-[170px] lg:max-h-[571px] overflow-hidden before:block before:pt-[100%] before:w-full">
+                        <div class="block mx-auto absolute w-full left-0 top-1/2 -translate-y-1/2 rounded-[5px]">
+                            <?php // Same image sizes must be in preload template Magefan_Blog::page/head/view/preload.phtml?>
+                            <img class="object-cover w-full max-h-[170px] lg:min-w-[1146px] lg:max-h-[571px]"
+                                 srcset="<?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 372, 170, true)) ?> 372w,
+                                         <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 704, 170, true)) ?> 704w,
+                                         <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 970, 571, true)) ?> 970w,
+                                         <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 1146, 571, true)) ?> 1146w"
+                                 sizes="(max-width: 428px) 372px,
+                                        (max-width: 1023px) 704px,
+                                        (max-width: 1366px) 970px,
+                                        (min-width: 1367px) 1146px"
+                                 src="<?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 372, 170, true)) ?>"
+                                 alt="<?= $escaper->escapeHtml($featuredImgAlt) ?>" />
+                        </div>
+                    </div>
+                <div class="post-header">
+                    <?= /* @noEscape */ $block->getInfoHtml() ?>
+
+                    <div class="post-title-holder pt-1 pb-5">
+                        <h1 class="post-title">
+                            <?= $escaper->escapeHtml($_post->getTitle()) ?>
+                        </h1>
+                    </div>
+                </div>
+                <div class="post-text-hld">
+                    <?= /* @noEscape */ $block->getContent() ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="post-bottom">
+            <?= /* @noEscape */ $block->getChildHtml('blog.post.bottom') ?>
+        </div>
+    </div>
+</div>

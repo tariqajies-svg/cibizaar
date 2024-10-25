@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Authorization</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="customer.login.container"
+                            htmlClass="flex flex-col justify-between py-8 md:flex-row pt-2.75 lg:pt-6.75 lg:flex-row gap-3">
+            <container name="aw.new.container" htmlTag="div" htmlClass="block aw-ca-creat-wrapper" after="customer_form_login">
+                <block after="customer.new"
+                       class="Aheadworks\Ca\Block\Customer\CreateCompanyButton"
+                       name="aw_customer_company_create"
+                       template="Magebit_HyvaAheadworksCa::customer/company_create_button.phtml">
+                </block>
+            </container>
+        </referenceContainer>
+        <move element="customer.new" destination="aw.new.container"  before="-"/>
+    </body>
+</page>

@@ -1,0 +1,161 @@
+<?php
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+?>
+<script>
+    "use strict";
+
+    (function () {
+        window.bizaar.initAddToRequisitionList = function (options) {
+            return {
+                ...hyva.modal(),
+                productPageFormId: 'product_addtocart_form' + (options.productId ? options.productId : ''),
+                requisitionList: {},
+                isCompanyUser: false,
+                isMobileScreen: window.innerWidth <= 1024,
+                isOpen: false,
+                isLoading: false,
+                isDisabled: true,
+                error: false,
+                getData(data) {
+                    if (!data) {
+                        const private_content_key = 'mage-cache-storage';
+                        const browserStorage = hyva.getBrowserStorage();
+                        if (!browserStorage || !browserStorage[private_content_key]) {
+                            return;
+                        }
+                        data = JSON.parse(browserStorage[private_content_key]);
+                    }
+
+                    if (data.requisitionlist) {
+                        this.isDisabled = false;
+                        this.requisitionList = data.requisitionlist
+                    }
+                    if (data['company-user']) {
+                        this.isCompanyUser = data['company-user'].isCompanyUser;
+                    }
+                },
+                setList(value) {
+                    if (value === 'add-to-wishlist') {
+                        this.addToWishlist(options.productId);
+                        return;
+                    }
+
+                    if (value === 'create-new-list') {
+                        window.dispatchEvent(new CustomEvent('show-requisition-list-modal'));
+                        return;
+                    } else {
+                        let formObject = document.getElementById(this.productPageFormId);
+
+                        if (!formObject) {
+                            formObject = document.getElementById('product_addtocart_form');
+                        }
+                        this.isLoading = true;
+                        formObject.action = options.addToListUrl + '?isAjax=1';
+                        formObject.appendChild(this.setHiddenElementToForm(value));
+                        const formData = new FormData(formObject);
+                        if (formData.has('form_key')) {
+                            formData.set('form_key', hyva.getFormKey());
+                        }
+
+                        fetch(formObject.action, {
+                            method: formObject.method,
+                            body: formData,
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        }).then(response => {
+                            if (response.redirected) {
+                                window.location.href = response.url;
+                            } else if (response.ok) {
+                                window.dispatchEvent(new CustomEvent('reload-customer-section-data'));
+                                this.isLoading = false;
+                            }
+                        });
+
+                    }
+                },
+                setHiddenElementToForm(listId) {
+                    let input = document.createElement('input');
+                    input.setAttribute('type', 'hidden');
+                    input.setAttribute('name', 'list_id');
+                    input.setAttribute('value', listId);
+                    return input;
+                },
+                toggleButtonClass(cssClass, show) {
+                    const dropdown = this.$refs['list-button'];
+                    if (show) {
+                        dropdown.classList.add(cssClass);
+                    } else {
+                        dropdown.classList.remove(cssClass);
+                        dropdown.classList.remove('active');
+                    }
+                },
+                addToWishlist(productId) {
+                    this.isLoading = true;
+                    const formKey = hyva.getFormKey();
+                    const postUrl = BASE_URL + 'wishlist/index/add/?isAjax=1';
+
+                    fetch(postUrl, {
+                        'headers': {
+                            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        },
+                        'body': 'form_key=' + formKey + '&product=' + productId + '&uenc=' + hyva.getUenc(),
+                        'method': 'POST',
+                        'mode': 'cors',
+                        'credentials': 'include'
+                    }).then((response) => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else if (response.ok) {
+                            return response.json();
+                        } else {
+                            typeof window.dispatchMessages !== 'undefined' && window.dispatchMessages(
+                                [
+                                    {
+                                        type: 'warning',
+                                        text: options.errorMessage
+                                    }], 5000
+                            );
+                        }
+                    }).then((response) => {
+                        if (!response) {
+                            return
+                        }
+                        typeof window.dispatchMessages !== 'undefined' && window.dispatchMessages(
+                            [
+                                {
+                                    type: (response.success) ? 'success' : 'error',
+                                    text: (response.success)
+                                        ? options.successMessage
+                                        : response.error_message
+                                }], 5000);
+                        const reloadCustomerDataEvent = new CustomEvent('reload-customer-section-data');
+                        window.dispatchEvent(reloadCustomerDataEvent);
+                    }).catch(function(error) {
+                        typeof window.dispatchMessages !== 'undefined' && window.dispatchMessages(
+                            [
+                                {
+                                    type: 'error',
+                                    text: error
+                                }], 5000
+                        );
+                    }).finally(() => {
+                        this.isLoading = false;
+                    })
+                },
+                toggleDropdown() {
+                    this.isOpen = !this.isOpen
+
+                    if (this.isOpen) {
+                        this.getData(null);
+                    }
+                }
+            }
+        }
+    })();
+</script>

@@ -1,0 +1,93 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\Block\User\UserList;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Escaper;
+
+/** @var UserList $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$companyUserList = $block->getUserListViewModel()->getSearchResults()->getItems();
+$companyUserViewModel = $block->getUserViewModel();
+?>
+<?php if ($companyUserList && count($companyUserList)): ?>
+    <div class="table-wrapper aw-ca__customer-subscriptions mb-0 md:mb-8 overflow-auto">
+        <table class="data table w-full mb-5">
+            <thead>
+            <tr>
+                <th scope="col"><?= $escaper->escapeHtml(__('Name')) ?></th>
+                <th scope="col"><?= $escaper->escapeHtml(__('Email')) ?></th>
+                <th scope="col"><?= $escaper->escapeHtml(__('Phone Number')) ?></th>
+                <th scope="col"><?= $escaper->escapeHtml(__('Role')) ?></th>
+                <th scope="col"><?= $escaper->escapeHtml(__('Job Position')) ?></th>
+                <th scope="col"><?= $escaper->escapeHtml(__('Status')) ?></th>
+                <th scope="col"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php /** @var CustomerInterface $companyUser */  ?>
+            <?php foreach ($companyUserList as $companyUser): ?>
+                <tr>
+                    <td data-th="<?= $escaper->escapeHtml(__('Name')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getFirstname() . ' ' . $companyUser->getLastname()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Email')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getEmail()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Phone Number')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getExtensionAttributes()->getAwCaCompanyUser()->getTelephone()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Role')) ?>" class="role">
+                        <?= $escaper->escapeHtml($companyUserViewModel->getRoleName($companyUser->getExtensionAttributes()->getAwCaCompanyUser()->getCompanyRoleId())) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Job Position')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getExtensionAttributes()->getAwCaCompanyUser()->getJobTitle()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Status')) ?>">
+                        <?= $escaper->escapeHtml($companyUserViewModel->getStatusLabel($companyUser->getExtensionAttributes()->getAwCaCompanyUser()->getStatus())) ?>
+                    </td>
+                    <td>
+                        <div>
+                            <a class="action edit inline-block text-sm hover:no-underline"
+                               title="<?= $escaper->escapeHtmlAttr(__('Edit')) ?>"
+                               href="<?= $escaper->escapeUrl($companyUserViewModel->getEditUrl($companyUser->getId())) ?>">
+                                <?= $escaper->escapeHtml(__('Edit')) ?>
+                            </a>
+                            <a class="action delete inline-block ml-2 text-sm hover:no-underline"
+                               title="<?= $escaper->escapeHtmlAttr(__('Delete')) ?>"
+                               href="<?= $escaper->escapeUrl($companyUserViewModel->getChangeStatusUrl($companyUser->getId(), 0)) ?>">
+                                <?= $escaper->escapeHtml(__('Delete')) ?>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            <?php if ($block->getChildHtml('pager')): ?>
+                <tr class="aw-ca__customer-toolbar toolbar bottom col-span-2">
+                    <td colspan="7" class="clear !p-0"><?= $block->getChildHtml('pager') ?></td>
+                </tr>
+            <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+<?php else: ?>
+    <div class="message info empty">
+        <span><?= $escaper->escapeHtml(__('You have created no users.')) ?></span>
+    </div>
+<?php endif ?>

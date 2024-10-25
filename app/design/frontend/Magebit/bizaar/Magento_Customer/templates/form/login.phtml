@@ -1,0 +1,197 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\ReCaptcha;
+use Magento\Customer\Block\Form\Login;
+use Magento\Framework\Escaper;
+use Magento\Cms\Block\BlockByIdentifier;
+
+/** @var Escaper $escaper */
+/** @var Login $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var ReCaptcha $recaptcha */
+/** @var HeroiconsOutline $heroicons */
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+// Do not replace this with $viewModels->require(ReCaptcha::class); that might break the dependency
+// on the Magento_ReCaptchaCustomer module
+$recaptcha = $block->getData('viewModelRecaptcha');
+?>
+<div class="w-full lg:w-1/2 login-card lg:mr-6">
+    <div aria-labelledby="block-customer-login-heading">
+        <form class="form form-login"
+              action="<?= $escaper->escapeUrl($block->getPostActionUrl()) ?>"
+              method="post"
+              x-ref="form"
+              x-data="{...initCustomerLoginForm(), ...hyva.formValidation($el)}"
+              @submit.prevent="submitForm()"
+              id="customer-login-form">
+            <?= $block->getBlockHtml('formkey') ?>
+            <fieldset class="fieldset login">
+                <legend class="mb-1.75">
+                    <h3>
+                        <?= $escaper->escapeHtml(__('Login')) ?>
+                    </h3>
+                </legend>
+                <p class="mb-4.75 lg:mb-7">
+                    <?= $escaper->escapeHtml(
+                        __('If you have an account, sign in with your email address.')
+) ?>
+                </p>
+                <div class="field field-reserved">
+                    <label class="label" for="email"><span><?= $escaper->escapeHtml(__('E-mail address')) ?></span></label>
+                    <div class="control">
+                        <input name="login[username]"
+                               class="form-input"
+                               value="<?= $escaper->escapeHtmlAttr($block->getUsername()) ?>"
+                            <?php if ($block->isAutocompleteDisabled()): ?>
+                                autocomplete="off"
+                            <?php endif; ?>
+                               id="email"
+                               type="email"
+                               data-validate='{"required": true}'
+                               title="<?= $escaper->escapeHtmlAttr(__('E-mail address')) ?>"/>
+                    </div>
+                </div>
+                <div class="field field-reserved">
+                    <label for="pass" class="label"><span><?= $escaper->escapeHtml(__('Password')) ?></span></label>
+                    <div class="control relative">
+                        <input name="login[password]"
+                               class="form-input"
+                               :type="showPassword ? 'text' : 'password'"
+                            <?php if ($block->isAutocompleteDisabled()): ?>
+                                autocomplete="off"
+                            <?php endif; ?>
+                               id="pass"
+                               data-validate='{"required": true, "password": true}'
+                               title="<?= $escaper->escapeHtmlAttr(__('Password')) ?>"/>
+                        <button type="button"
+                                @click.prevent="showPassword = !showPassword" class="absolute flex items-center h-full top-0 right-0 py-3 px-5 lg:px-6 text-gray">
+                            <i class="icon icon-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="field field-reserved field-pagebuilder">
+                    <label class="inline-label items-start">
+                        <input name="terms-and-conditions"
+                               class="checkbox flex-shrink-0 mt-1.5"
+                               data-validate='{"required": true}'
+                               id="terms-and-conditions"
+                               type="checkbox"
+                               title="<?= $escaper->escapeHtmlAttr(__('Terms and Conditions agreement')) ?>"/>
+                        <?= $block->getLayout()->createBlock(BlockByIdentifier::class)->setIdentifier('terms-and-conditions-notice')->toHtml() ?>
+                    </label>
+                </div>
+
+                <?= $recaptcha ? $recaptcha->getInputHtml('customer_login') : '' ?>
+                <?= $block->getChildHtml('form_additional_info') ?>
+                <div class="actions-toolbar lg-max:flex-wrap flex justify-between pt-6 lg:pb-2 items-center">
+                        <button type="submit" class="btn btn-primary" name="send">
+                            <span><?= $escaper->escapeHtml(__('Sign In')) ?></span></button>
+                        <a class="link text-secondary font-bold" href="<?= $escaper->escapeUrl(
+                            $block->getForgotPasswordUrl()
+                        ) ?>"><span><?= $escaper->escapeHtml(__('Forgot your password?')) ?></span>
+                        </a>
+                </div>
+                <div>
+                    <template x-if="displayErrorMessage">
+                        <p class="text-red flex items-center">
+                            <span class="inline-block w-8 h-8 mr-3">
+                                <?= $heroicons->exclamationCircleHtml(); ?>
+                            </span>
+                            <template x-for="errorMessage in errorMessages">
+                                <span x-html="errorMessage"></span>
+                            </template>
+                        </p>
+                    </template>
+                </div>
+              </fieldset>
+            <?= /** @noEscape */ $block->getChildHtml('login_loading') ?>
+        </form>
+    </div>
+    <div class="w-full">
+        <?= $recaptcha ? $recaptcha->getLegalNoticeHtml('customer_login') : '' ?>
+    </div>
+    <script>
+        function initCustomerLoginForm() {
+            return {
+                errors: 0,
+                isLoading: false,
+                hasCaptchaToken: 0,
+                showPassword: false,
+                displayErrorMessage: false,
+                errorMessages: [],
+                setErrorMessages(messages) {
+                    this.errorMessages = [messages]
+                    this.displayErrorMessage = this.errorMessages.length
+                },
+                submitAjax() {
+                    const form = this.$refs.form;
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                        },
+                        mode: "cors",
+                        credentials: "include",
+                        body: new FormData(form)
+                    }).then(result => {
+                        if (result.redirected) {
+                            window.location.href = result.url;
+                        } else if (result.ok) {
+                            return result.json();
+                        }
+                    }).then(data => {
+                        if (data.success) {
+                            window.dispatchEvent(new CustomEvent('show-two-fa', { detail: {
+                                    email: data.email,
+                                    allowedMethods: data.allowedMethods
+                                }
+                            }));
+                            this.isLoading = false;
+                        }
+                    }).catch(error => {
+                        console.error(error);
+                        this.isLoading = false;
+                    })
+                },
+                submitForm() {
+                    this.isLoading = true;
+                    // do not rename $form, the variable is the expected name in the recaptcha output
+                    const $form = this.$refs.form;
+                    this.validate().then(() => {
+                        <?= $recaptcha ? $recaptcha->getValidationJsHtml('customer_login') : '' ?>
+
+                        if (this.errors === 0) {
+                            this.submitAjax();
+                        }
+                    }).catch((invalid) => {
+                        this.isLoading = false;
+                        if (invalid.length > 0) {
+                            invalid[0].focus();
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</div>
+

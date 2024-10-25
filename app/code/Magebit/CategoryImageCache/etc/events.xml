@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_CategoryImageCache package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="clean_catalog_images_cache_after">
+        <observer
+                name="magebit_categoryimagecache_observer_clean_catalogimagescacheafter_clean_catalog_images_cache_after"
+                instance="Magebit\CategoryImageCache\Observer\Clean\CatalogImagesCacheAfter"/>
+    </event>
+</config>

@@ -1,0 +1,20 @@
+--- /dev/null
++++ ../Observer/SibCartObserver.php
+@@ -64,7 +64,7 @@
+                     'LASTNAME' =>  !empty($customer['customer_lastname']) ? $customer['customer_lastname'] : ''
+                 ),
+                 'eventdata' => array(
+-                    'id' => "cart:".$customer['entity_id'],
++                    'id' => "cart:".$customer['customer_id'],
+                     'data' => array("items" => array())
+                 )
+             );
+@@ -84,7 +84,7 @@
+                     'LASTNAME' =>  !empty($customer['customer_lastname']) ? $customer['customer_lastname'] : ''
+                 ),
+                 'eventdata' => array(
+-                    'id' => "cart:".$customer['entity_id'],
++                    'id' => "cart:".$customer['customer_id'],
+                     'data' => array()
+                 )
+             );

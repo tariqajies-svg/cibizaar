@@ -1,0 +1,57 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Framework\Pricing\Render;
+use Magento\ProductAlert\Block\Email\Stock;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Stock $block */
+?>
+<?php if ($_products = $block->getProducts()): ?>
+    <p><?= $escaper->escapeHtml(__('In stock alert! We wanted you to know that these products are now available:')) ?></p>
+    <table>
+        <?php foreach ($_products as $_product): ?>
+            <tr>
+                <td class="col photo" style="padding-right: 25px">
+                    <a href="<?= $escaper->escapeUrl($_product->getProductUrl()) ?>" title="<?= $escaper->escapeHtml($_product->getName()) ?>" class="product photo">
+                        <?= $block->getImage($_product, 'product_page_image_small', ['class' => 'photo image'])->toHtml() ?>
+                    </a>
+                </td>
+                <td class="col item">
+                    <p>
+                        <strong class="product name">
+                            <a href="<?= $escaper->escapeUrl($_product->getProductUrl()) ?>"><?= $escaper->escapeHtml($_product->getName()) ?></a>
+                        </strong>
+                    </p>
+                    <?php if ($shortDescription = $block->getFilteredContent($_product->getShortDescription())): ?>
+                        <p><small><?= /* @noEscape */  $shortDescription ?></small></p>
+                    <?php endif; ?>
+                    <?= $block->getProductPriceHtml($_product, FinalPrice::PRICE_CODE, Render::ZONE_EMAIL, [
+                        'display_label' => __('Price:')
+                    ]); ?>
+                    <p>
+                        <small>
+                            <a href="<?= $escaper->escapeUrl($block->getProductUnsubscribeUrl($_product->getId())) ?>">
+                                <?= $escaper->escapeHtml(__('Click here to stop alerts for this product.')) ?>
+                            </a>
+                        </small>
+                    </p>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+    <p><a href="<?= $escaper->escapeUrl($block->getUnsubscribeUrl()) ?>"><?= $escaper->escapeHtml(__('Unsubscribe from all stock alerts')) ?></a></p>
+<?php endif; ?>

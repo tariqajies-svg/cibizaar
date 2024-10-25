@@ -1,0 +1,45 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Catalog\Block\Product\ProductList\Toolbar;
+use Magento\Framework\Escaper;
+
+// phpcs:disable Magento2.Security.IncludeFile.FoundIncludeFile
+
+/** @var Escaper $escaper */
+/** @var Toolbar $block */
+
+$uniqueId = '_' . uniqid();
+$additionalOptions = ['page' => 'p'];
+?>
+<?php if ($block->getCollection()->getSize()): ?>
+    <div x-data='window.bizaar.initToolbar(<?= /* @noEscape */ $block->getWidgetOptionsJson($additionalOptions) ?>)'
+         class="flex justify-between mb-5 pb-[15px] border-b-[#EDEDED] border-b border-solid plp-toolbar">
+        <?php if ($block->getIsPager()): ?>
+            
+            <?= $block->getPagerHtml() ?>
+            <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/limiter.phtml') ?>
+        <?php else: ?>
+            <?php if ($block->isExpanded()): ?>
+                <div class="sl flex items-center gap-5">
+                    <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/sorter.phtml') ?>
+                    <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/limiter.phtml') ?>
+                </div>
+                <?php include $block->getTemplateFile('Magento_Catalog::product/list/toolbar/viewmode.phtml') ?>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+<?php endif ?>

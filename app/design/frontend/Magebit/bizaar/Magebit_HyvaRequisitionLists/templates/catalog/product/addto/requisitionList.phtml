@@ -1,0 +1,144 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\RequisitionLists\ViewModel\Catalog\Product\View\RequisitionListProvider;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaRequisitionLists\ViewModel\RequisitionList;
+use Magento\Framework\Escaper;
+
+/** @var RequisitionList $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+/** @var RequisitionListProvider $viewModel */
+$viewModel = $block->getListViewModel();
+$isRequisitionEnabled = $viewModel->getIsEnabled();
+
+$addToListUrl = $viewModel->getAddToListUrl();
+$product = $block->getProduct();
+$productId = $block->getProductId();
+
+if (!$product && $productId) {
+    $product = $block->getProductById((int) $productId);
+}
+
+if ($product && !$productId) {
+    $productId = $product->getId();
+}
+
+if (!$productId || !$product) {
+    return;
+}
+?>
+<div x-data="window.bizaar.initAddToRequisitionList(
+    {
+        productId: <?= /** @noEscape */ (int) $productId ?>,
+        addToListUrl: '<?= $escaper->escapeUrl($addToListUrl) ?>',
+        errorMessage: '<?= $escaper->escapeHtmlAttr(__('Could not add item to wishlist.')) ?>',
+        successMessage: '<?= $escaper->escapeHtmlAttr(
+            __(
+                '%1 has been added to your Wish List.',
+                __('Product')
+            )
+        ) ?>'
+    })"
+     @private-content-loaded.window="getData($event.detail.data)"
+     x-init="getData(null)"
+     class="relative 2xl-max:w-full"
+     @resize.window="isMobileScreen = window.innerWidth <= 1024"
+     x-show="isCompanyUser"
+     x-transition:enter="ease-in-out duration-100"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     style="display: none"
+>
+    <button class="add-to-requisition-list btn btn-secondary p-1.75 text-yellow-300"
+            :class="{'active': isOpen}"
+            type="button"
+            x-ref="list-button"
+            @click="toggleDropdown()"
+            @click.away="isOpen = false"
+            title="<?= $escaper->escapeHtmlAttr(__('Add to wishlist')) ?>"
+    >
+        <template x-if="isLoading">
+            <svg class="animate-spin min-w-4 p-0.5 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+            </svg>
+        </template>
+        <i class="icon-heart" x-show="!isLoading"></i>
+    </button>
+    <label for="requisitionLists<?= $escaper->escapeHtmlAttr($productId) ?>" class="sr-only">
+        <span><?= $escaper->escapeHtml(__('Add to list')) ?></span>
+    </label>
+    <template x-if="isMobileScreen">
+        <select
+                id="requisitionLists<?= $escaper->escapeHtmlAttr($productId) ?>"
+                @change="setList($event.target.value)"
+                :disabled="isDisabled"
+                title="<?= $escaper->escapeHtmlAttr(__('Add to list')) ?>"
+                class="list-select cursor-pointer absolute top-0 left-0 opacity-0 disabled:opacity-0 p-3 w-full h-12 z-10"
+                @mousedown="toggleButtonClass('active', true)"
+                @click.away="toggleButtonClass('active', false)"
+                @mouseup="toggleButtonClass('active', false)"
+        >
+            <?php /* select hidden option on load to trigger change event if first list is selected */ ?>
+            <option hidden selected><?= $escaper->escapeHtml(__('-- Select option --')) ?></option>
+            <option value="add-to-wishlist">
+                <?= $escaper->escapeHtml(__('Add to wishlist')) ?>
+            </option>
+            <template x-if="requisitionList.lists?.length">
+                <template x-for="list in requisitionList.lists">
+                    <option :value="list.list_id"
+                            x-html="list.name"
+                            <?php if (!$product->isSaleable()): ?>
+                                disabled
+                            <?php endif; ?>
+                            ></option>
+                </template>
+            </template>
+            <option value="create-new-list">
+                <?= $escaper->escapeHtml(__('Create New List')) ?>
+            </option>
+        </select>
+    </template>
+    <template x-if="!isMobileScreen">
+        <div x-show="isOpen"
+             x-ref="list-dropdown"
+             x-transition.origin.top.left
+             class="aw_rl-dropdown">
+            <ul class="clear">
+                <li @click="setList('add-to-wishlist')" @mouseover="toggleButtonClass('active', true)">
+                    <span class="label"><?= $escaper->escapeHtml(__('Add To Wishlist')) ?></span>
+                </li>
+                <template x-if="requisitionList.lists?.length">
+                    <template x-for="list in requisitionList.lists">
+                        <li  @click="setList(list.list_id)"
+                             :class="{'pointer-events-none text-gray/70' : <?= (int)!$product->isSaleable() ?>}">
+                            <span class="label" x-html="list.name"></span>
+                        </li>
+                    </template>
+                </template>
+                <li @click="setList('create-new-list')">
+                    <span class="label"><?= $escaper->escapeHtml(__('Create New List')) ?></span>
+                </li>
+            </ul>
+        </div>
+    </template>
+</div>

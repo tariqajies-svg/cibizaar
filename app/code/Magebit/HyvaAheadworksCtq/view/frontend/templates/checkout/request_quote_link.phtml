@@ -1,0 +1,92 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\Checkout\RequestQuoteLink;
+use Aheadworks\Ctq\ViewModel\Checkout\RequestQuoteLink as RequestQuoteLinkViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCtq\Helper\Data;
+use Magebit\HyvaAheadworksCtq\ViewModel\TooltipText;
+use Magento\Framework\Escaper;
+
+/** @var RequestQuoteLink $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var RequestQuoteLinkViewModel $viewModel */
+/** @var TooltipText $tooltipTextViewModel */
+
+$viewModel = $viewModels->require(RequestQuoteLinkViewModel::class);
+$tooltipTextViewModel = $viewModels->require(TooltipText::class);
+$tooltipText = $tooltipTextViewModel->getQuoteInfoTooltipMessage();
+?>
+<div x-data="QuoteButtonInit()"
+     x-init="init()"
+     class="relative">
+    <template x-if="isAvailable">
+        <div>
+            <?php if ($tooltipText): ?>
+                <div class="absolute w-full z-50 bubble-bottom"
+                     x-cloak
+                     x-show="tooltip"
+                     :style="'bottom:' + (bottom + 8) + 'px'"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 scale-90"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-90">
+                    <?= $escaper->escapeHtml($tooltipText) ?>
+                </div>
+            <?php endif; ?>
+            <button class="btn btn-secondary w-full"
+                    @click="$dispatch('<?= $escaper->escapeHtmlAttr(Data::TOGGLE_REQUEST_QUOTE_MODAL_EVENT) ?>')">
+                <?= $escaper->escapeHtml(__('Request a quote')) ?>
+                <?php if ($tooltipText): ?>
+                    <i class="icon icon-info px-2.25 lg-max:hidden"
+                       x-on:mouseover=" bottom = $el.getBoundingClientRect().height; tooltip = true;"
+                       x-on:mouseleave="tooltip = false"></i>
+                <?php endif; ?>
+            </button>
+        </div>
+    </template>
+    <?php if ($block->getIsSignInText()): ?>
+        <template x-if="!isAvailable && !isLoggedIn">
+            <span>
+                <?= /** @noEscape */ __('<a href="%1">Sign In</a> to request a quote', $escaper->escapeUrl($viewModel->getSignInUrl())) ?>
+            </span>
+        </template>
+    <?php endif; ?>
+</div>
+<script>
+    function QuoteButtonInit() {
+        return {
+            tooltip: false,
+            bottom: 0,
+            isAvailable: false,
+            isLoggedIn: false,
+            init() {
+                <?php // This element is hidden initially and regular alpine event listeners doesnt work?>
+                window.addEventListener('private-content-loaded', event => this.getData(event.detail.data));
+            },
+            getData(data) {
+                if (data['company-user']) {
+                    this.isAvailable = data['company-user'].isQuoteAvailable;
+                }
+
+                if (data.loggedAsCustomer) {
+                    this.isLoggedIn = true;
+                }
+            }
+        }
+    }
+</script>

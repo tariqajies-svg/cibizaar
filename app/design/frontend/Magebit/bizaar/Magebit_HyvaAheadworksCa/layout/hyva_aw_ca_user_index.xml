@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="aw_ca.customer.user.list.add.container" htmlClass="aw-ca__customer-btn-wrapper">
+            <referenceBlock name="aw_ca.customer.user.list.add">
+                <arguments>
+                    <argument name="additional_classes" xsi:type="string">btn btn-primary btn-sm</argument>
+                </arguments>
+            </referenceBlock>
+            <referenceBlock name="aw_ca.customer.user.list">
+                <arguments>
+                    <argument name="title" translate="true" xsi:type="string">Company Users</argument>
+                </arguments>
+            </referenceBlock>
+        </referenceContainer>
+        <move element="aw_ca.customer.user.list.add" destination="aw_ca.customer.user.list"/>
+    </body>
+</page>

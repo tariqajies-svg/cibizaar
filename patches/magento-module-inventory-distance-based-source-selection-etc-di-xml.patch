@@ -1,0 +1,11 @@
+--- /dev/null
++++ ../etc/di.xml
+@@ -76,7 +76,7 @@
+ 
+     <type name="Magento\InventoryDistanceBasedSourceSelection\Model\ImportGeoNames">
+         <arguments>
+-            <argument name="geoNamesBaseUrl" xsi:type="string">http://download.geonames.org/export/zip/</argument>
++            <argument name="geoNamesBaseUrl" xsi:type="string">http://download.geonames.org/export/dump/</argument>
+         </arguments>
+     </type>
+ 

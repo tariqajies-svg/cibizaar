@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="2columns-left">
+    <update handle="customer_account"/>
+    <body>
+        <referenceBlock name="aw_ca.role.list.add">
+            <arguments>
+                <argument name="additional_classes" xsi:type="string">btn btn-primary btn-sm</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="aw_ca.role.list">
+            <arguments>
+                <argument name="title" xsi:type="string">Roles and Permissions</argument>
+            </arguments>
+        </referenceBlock>
+        <move element="aw_ca.role.list.add" destination="aw_ca.role.list"/>
+    </body>
+</page>

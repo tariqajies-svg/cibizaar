@@ -1,0 +1,35 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+declare(strict_types=1);
+
+/* @var Template $block */
+/** @var Modal $modalViewModel */
+/** @var Escaper $escaper */
+
+/** @var  ViewModelRegistry $viewModels */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+$modalViewModel = $viewModels->require(Modal::class);
+?>
+<?= /** @noEscape */
+$modalViewModel
+    ->createModal()
+    ->addContainerClass('bg-opacity-50')
+    ->withContent($block->getChildHtml('aw_rl.configure-item-content'))
+    ->withDialogRefName('popup-configure')
+?>

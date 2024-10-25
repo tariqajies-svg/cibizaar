@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="ktpl_quote_email_template" label="Ktpl Quote Admin Notification" file="ktpl_quote_form.html" type="html" module="Ktpl_Quote" area="frontend"/>
+</config>

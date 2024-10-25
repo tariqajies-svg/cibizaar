@@ -1,0 +1,213 @@
+global:
+  - path: catalog/price/scope
+    value: 1
+  - path: general/locale/timezone
+    value: Asia/Dubai
+  - path: general/locale/firstday
+    value: 1
+  - path: currency/options/default
+    value: AED
+  - path: currency/options/allow
+    value: USD,AED
+  - path: general/country/default
+    value: AE
+  - path: currency/options/base
+    value: AED
+  - path: general/locale/weight_unit
+    value: kgs
+  - path: general/locale/code
+    value: en_GB
+  - path: checkout/options/guest_checkout
+    value: 0
+  - path: catalog/search/engine
+    value: elasticsuite
+  - path: catalog/productalert/allow_price
+    value: 0
+  - path: aw_credit_limit/general/is_allowed_to_update_credit_balance
+    value: 1
+  - path: payment/aw_credit_limit/active
+    value: 1
+  - path: catalog/review/active
+    value: 0
+  - path: hyva_theme_fallback/general/enable
+    value: 1
+  - path: hyva_theme_fallback/general/theme_full_path
+    value: frontend/Magebit/bizaar_fallback
+  - path: hyva_theme_fallback/general/list_part_of_url
+    value: '{"_1662093794334_334":{"path":"checkout/index"}}'
+  - path: aw_quick_order/general/enabled
+    value: 1
+  - path: payment/banktransfer/active
+    value: 1
+  - path: payment/banktransfer/title
+    value: 'Bank Transfer Payment'
+  - path: payment/banktransfer/order_status
+    value: 'pending'
+  - path: payment/banktransfer/instructions
+    value: ''
+  - path: payment/banktransfer/allowspecific
+    value: 0
+  - path: customer/address/street_lines
+    value: 1
+  - path: design/footer/copyright
+    value: '© 2023 Bizaar, All Rights Reserved'
+  - path: design/header/logo_height
+    value: '40'
+  - path: design/header/logo_src
+    value: 'default/logo_bizaar-2x.png'
+  - path: sales/identity/logo
+    value: 'default/logo_bizaar.png'
+  - path: sales/identity/logo_html
+    value: 'default/logo_bizaar.png'
+  - path: design/header/logo_width
+    value: '184'
+  - path: login_as_customer/general/enabled
+    value: 0
+  - path: 'carriers/fedex/active'
+    value: 0
+  - path: 'carriers/fedex/title'
+    value: 'Federal Express'
+  - path: 'carriers/fedex/sandbox_mode'
+    value: 1
+  - path: 'carriers/fedex/shipment_requesttype'
+    value: 1
+  - path: 'carriers/fedex/dropoff'
+    value: 'BUSINESS_SERVICE_CENTER'
+  - path: 'carriers/fedex/unit_of_measure'
+    value: 'KG'
+  - path: 'carriers/fedex/max_package_weight'
+    value: 60
+  - path: 'carriers/fedex/residence_delivery'
+    value: 0
+  - path: 'carriers/fedex/free_shipping_enable'
+    value: 0
+  - path: 'carriers/fedex/showmethod'
+    value: 0
+  - path: 'aw_requisition_lists/general/enabled'
+    value: 1
+  - path: 'amxnotif/stock/placeholder'
+    value: 'Enter e-mail address'
+  - path: 'carriers/tablerate/active'
+    value: 0
+  - path: 'carriers/flatrate/active'
+    value: 0
+  - path: 'carriers/instore/active'
+    value: 0
+  - path: 'sales_email/credit_reminder_email_days/days'
+    value: '{"_1675262896470_470":{"value":"2"},"_1675262898929_929":{"value":"5"}}'
+  - path: 'sales_email/credit_reminder_email_days/enabled'
+    value: 1
+  - path: 'carriers/amstorepick/active'
+    value: 1
+  - path: 'carriers/amstorepick/title'
+    value: ''
+  - path: 'carriers/amstorepick/specificerrmsg'
+    value: 'In-Store Delivery is not available. To use this delivery method, please contact us.'
+  - path: 'carriers/amstorepick/showmethod'
+    value: 0
+  - path: akeneo_connector/akeneo_api/base_url
+    value: https://akeneo.stgin.com/
+  - path: akeneo_connector/akeneo_api/edition
+    value: greater_or_five
+  - path: akeneo_connector/akeneo_api/website_mapping
+    value: '{"_1675243507948_948":{"website":"base","channel":"ecommerce"}}'
+  - path: akeneo_connector/akeneo_api/admin_channel
+    value: ecommerce
+  - path: akeneo_connector/category/categories
+    value: 'master,sales,print,suppliers'
+  - path: 'contact_us/subject/options'
+    value: '{"_1675246253647_647":{"name":"General Inquiry"},"_1675246269561_561":{"name":"Order & Product Support "},"_1675246280589_589":{"name":"Book a Sales Meeting"}}'
+  - path: 'design/email/logo'
+    value: 'default/logo_bizaar.png'
+  - path: 'design/email/logo_height'
+    value: '32'
+  - path: 'design/email/logo_width'
+    value: '148'
+  - path: 'shipping/origin/city'
+    value: 'Dubai'
+  - path: 'shipping/origin/street_line1'
+    value: 'TLM International FZE'
+  - path: 'shipping/origin/country_id'
+    value: 'AE'
+  - path: 'shipping/origin/region_id'
+    value: 'Jebel Ali Free Zone'
+  - path: 'shipping/origin/postcode'
+    value: 'S6-1306'
+  - path: 'design/head/shortcut_icon'
+    value: 'default/bizaar_favicon_128.png'
+  - path: 'general/store_information/name'
+    value: 'Bizaar'
+  - path: 'web/default_layouts/default_product_layout'
+    value: NULL
+  - path: 'currency/options/customsymbol'
+    value: '{"USD":"$ "}'
+  - path: akeneo_connector/product/metrics
+    value: '{"_1679986715929_929":{"akeneo_metrics":"weight","is_variant":"0","is_concat":"0"}}'
+  - path: akeneo_connector/product/configurable_attributes
+    value: '[]'
+  - path: akeneo_connector/product/media_enabled
+    value: 1
+  - path: akeneo_connector/product/media_gallery
+    value: '{"_1679998630292_292":{"attribute":"image"},"_1682002439684_684":{"attribute":"image_2"},"_1682002446720_720":{"attribute":"image_3"},"_1682415739495_495":{"attribute":"image_4"},"_1682415743770_770":{"attribute":"image_5"},"_1682415752927_927":{"attribute":"image_6"},"_1682415756598_598":{"attribute":"image_7"}}'
+  - path: akeneo_connector/product/media_gallery_variant
+    value: '{"_1680597796173_173":{"attribute":"image_variant"}}'
+  - path: akeneo_connector/product/media_images
+    value: '{"_1679997646412_412":{"attribute":"87","column":"image"},"_1679997674273_273":{"attribute":"88","column":"image"},"_1679997676442_442":{"attribute":"89","column":"image"},"_1682423051711_711":{"attribute":"87","column":"image_variant"},"_1682423081173_173":{"attribute":"88","column":"image_variant"},"_1682423082314_314":{"attribute":"89","column":"image_variant"}}'
+  - path: checkout/options/enable_agreements
+    value: 1
+  - path: design/head/includes
+    value: '<link  rel="stylesheet" type="text/css"  media="all" href="{{MEDIA_URL}}styles.css" />'
+  - path: jivochat/general/enable
+    value: 0
+  - path: jivochat/general/source
+    value: '//code.jivosite.com/widget/s0oF9QmJAm'
+  - path: customer/captcha/enable
+    value: 0
+  - path: recaptcha_frontend/type_for/aw_ca_company_creation
+    value: recaptcha_v3
+  - path: recaptcha_frontend/type_for/newsletter
+    value: recaptcha_v3
+  - path: recaptcha_frontend/type_for/contact
+    value: recaptcha_v3
+  - path: recaptcha_frontend/type_for/customer_create
+    value: recaptcha_v3
+  - path: recaptcha_frontend/type_for/customer_forgot_password
+    value: recaptcha_v3
+  - path: recaptcha_frontend/type_for/customer_login
+    value: recaptcha_v3
+  - path: recaptcha_frontend/type_recaptcha_v3/position
+    value: bottomright
+  - path: carriers/freeshipping/active
+    value: 1
+  - path: carriers/freeshipping/title
+    value: 'Let us contact you to discuss alternative shipping methods.'
+  - path: carriers/freeshipping/name
+    value: 'Request LCL or Air Freight Quote'
+  - path: catalog/frontend/oos_tooltip
+    value: 'You will receive an email notification when the product gets back in stock.'
+  - path: mfblog/general/enabled
+    value: 1
+  - path: mfblog/sidebar/featured_posts/enabled
+    value: 1
+  - path: mfblog/sidebar/popular_posts/enabled
+    value: 1
+  - path: mfblog/sidebar/rss_feed/enabled
+    value: 1
+  - path: mfblog/post_list/template
+    value: ''
+  - path: mfblog/author/enabled
+    value: 0
+  - path: mfblog/social/add_this_enabled
+    value: 0
+  - path: mfblog/placeholder/placeholder_upload
+    value: 'image_bizaar-cat-1_1.png'
+  - path: mfblog/post_view/design/template
+    value: ''
+  - path: amseorichdata/product/enabled
+    value: 1
+  - path: amseorichdata/product/availability
+    value: 1
+  - path: amseorichdata/product/brand
+    value: 'manufacturer'
+  - path: catalog/frontend/bulk_price_text
+    value: '<p>Are you B2B customer?</p><p>Please <a href="/customer/account/login">login</a> to see your price.</p>'

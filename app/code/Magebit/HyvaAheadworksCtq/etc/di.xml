@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Aheadworks\Ctq\Model\Quote\Action\Pool">
+        <arguments>
+            <argument name="actions" xsi:type="array">
+                <!-- Seller actions -->
+                <item name="approve" xsi:type="array">
+                    <item name="name" xsi:type="string">Approve</item>
+                    <item name="url_path" xsi:type="string">aw_ctq/quote/approve</item>
+                    <item name="sort_order" xsi:type="number">10</item>
+                </item>
+                <item name="save" xsi:type="array">
+                    <item name="type" xsi:type="const">Aheadworks\Ctq\Model\Source\Quote\Action\Type::EDIT</item>
+                    <item name="name" xsi:type="string">Save</item>
+                    <item name="url_path" xsi:type="string">aw_ctq/quote/save</item>
+                    <item name="sort_order" xsi:type="number">40</item>
+                </item>
+                <item name="sell" xsi:type="array">
+                    <item name="name" xsi:type="string">Sell</item>
+                    <item name="url_path" xsi:type="string">aw_ctq/quote/sell</item>
+                    <item name="sort_order" xsi:type="number">30</item>
+                </item>
+
+                <!-- Buyer actions -->
+                <item name="export" xsi:type="array">
+                    <item name="type" xsi:type="const">Aheadworks\Ctq\Model\Source\Quote\Action\Type::EXPORT</item>
+                    <item name="name" xsi:type="string">Export to .doc</item>
+                    <item name="url_path" xsi:type="string">aw_ctq/quote/export</item>
+                    <item name="external_url_path" xsi:type="string">aw_ctq/quote/external_export</item>
+                    <item name="sort_order" xsi:type="number">10</item>
+                </item>
+                <item name="decline" xsi:type="array">
+                    <item name="name" xsi:type="string">Decline</item>
+                    <item name="url_path" xsi:type="string">aw_ctq/quote/decline</item>
+                    <item name="external_url_path" xsi:type="string">aw_ctq/quote/external_decline</item>
+                    <item name="sort_order" xsi:type="number">20</item>
+                </item>
+                <item name="requote" xsi:type="array">
+                    <item name="type" xsi:type="string">requote</item>
+                    <item name="name" xsi:type="string">ReQuote</item>
+                    <item name="url_path" xsi:type="string">aw_ctq/quote/requote</item>
+                    <item name="external_url_path" xsi:type="string">aw_ctq/quote/external_requote</item>
+                    <item name="sort_order" xsi:type="number">90</item>
+                    <item name="class" xsi:type="string">btn btn-secondary btn-sm</item>
+                </item>
+                <item name="submit_for_approval" xsi:type="array">
+                    <item name="type" xsi:type="const">Aheadworks\Ctq\Model\Source\Quote\Action\Type::EDIT</item>
+                    <item name="name" xsi:type="string">Submit for Approval</item>
+                    <item name="url_path" xsi:type="string">aw_ctq/quote/save</item>
+                    <item name="external_url_path" xsi:type="string">aw_ctq/quote/external_save</item>
+                    <item name="sort_order" xsi:type="number">100</item>
+                    <item name="class" xsi:type="string">btn btn-secondary btn-sm</item>
+                </item>
+                <item name="buy" xsi:type="array">
+                    <item name="type" xsi:type="const">Aheadworks\Ctq\Model\Source\Quote\Action\Type::BUY</item>
+                    <item name="name" xsi:type="string">Buy</item>
+                    <item name="url_path" xsi:type="string">aw_ctq/quote/buy</item>
+                    <item name="external_url_path" xsi:type="string">aw_ctq/quote/external_buy</item>
+                    <item name="sort_order" xsi:type="number">110</item>
+                    <item name="class" xsi:type="string">btn btn-primary btn-sm</item>
+                </item>
+                <item name="sort" xsi:type="array">
+                    <item name="is_disabled" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

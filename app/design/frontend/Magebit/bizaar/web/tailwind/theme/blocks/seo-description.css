@@ -1,0 +1,65 @@
+.seo-description {
+    @apply pb-7 lg:pb-12;
+
+    h2 {
+        @apply mb-1;
+    }
+
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply text-gray mt-4 mb-1 lg:mt-6 lg:mb-3;
+    }
+    h4 {
+        @apply m-0 text-[#747474] text-sm leading-6;
+    }
+    ul {
+        @apply mb-2.5 pl-6 text-[#797979] list-disc text-xs;
+    }
+
+    div[data-content-type='row'] {
+        /* @apply p-0; */
+
+        & > div {
+            @apply p-0 m-0;
+        }
+
+        p {
+            @apply mb-0;
+        }
+    }
+
+    & > [data-content-type='heading'],
+    & > [data-content-type='text'],
+    & > [data-content-type='column-group'],
+    & > [data-content-type='row'] {
+        @apply !container w-full;
+    }
+
+    & > [data-content-type='heading'] {
+        @apply !mb-1;
+    }
+
+    & > [data-content-type='text']:first-of-type,
+    & > [data-content-type='row']:first-of-type {
+        @apply !mb-1 lg:!mb-3;
+    }
+
+    .pagebuilder-column-line {
+        @apply flex-col md:flex-row md:space-x-6;
+
+        .pagebuilder-column {
+            @apply !w-full md:!w-1/2;
+
+            p {
+                @apply text-xs lg:text-sm mb-0;
+            }
+        }
+    }
+}
+.custom_seo_description_footer {
+    ul {
+        @apply pl-[30px] list-disc;
+    }
+}

@@ -1,0 +1,68 @@
+diff --git a/vendor/magento/module-inventory-configurable-product/Plugin/InventoryApi/UpdateParentStockStatusInLegacyStockPlugin.php b/vendor/magento/module-inventory-configurable-product/Plugin/InventoryApi/UpdateParentStockStatusInLegacyStockPlugin.php
+--- a/vendor/magento/module-inventory-configurable-product/Plugin/InventoryApi/UpdateParentStockStatusInLegacyStockPlugin.php	2022-12-02 19:02:58.532000000 +0000
++++ b/vendor/magento/module-inventory-configurable-product/Plugin/InventoryApi/UpdateParentStockStatusInLegacyStockPlugin.php	2022-12-02 19:28:46.590014159 +0000
+@@ -7,6 +7,9 @@
+
+ namespace Magento\InventoryConfigurableProduct\Plugin\InventoryApi;
+
++use Magento\Catalog\Api\ProductRepositoryInterface;
++use Magento\ConfigurableProduct\Model\Inventory\ParentItemProcessor;
++use Magento\Framework\Api\SearchCriteriaBuilder;
+ use Magento\Inventory\Model\SourceItem\Command\DecrementSourceItemQty;
+ use Magento\InventoryApi\Api\Data\SourceItemInterface;
+ use Magento\InventoryCatalogApi\Model\GetProductIdsBySkusInterface;
+@@ -27,16 +30,27 @@
+      */
+     private $getProductIdsBySkus;
+
++
++    private ProductRepositoryInterface $productRepository;
++    private ParentItemProcessor $parentItemProcessor;
++    private SearchCriteriaBuilder $searchCriteriaBuilder;
++
+     /**
+      * @param GetProductIdsBySkusInterface $getProductIdsBySkus
+      * @param ChangeParentStockStatus $changeParentStockStatus
+      */
+     public function __construct(
+         GetProductIdsBySkusInterface $getProductIdsBySkus,
+-        ChangeParentStockStatus $changeParentStockStatus
++        ChangeParentStockStatus $changeParentStockStatus,
++        ProductRepositoryInterface $productRepository,
++        ParentItemProcessor $parentItemProcessor,
++        SearchCriteriaBuilder $searchCriteriaBuilder
+     ) {
+         $this->getProductIdsBySkus = $getProductIdsBySkus;
+         $this->changeParentStockStatus = $changeParentStockStatus;
++        $this->productRepository = $productRepository;
++        $this->parentItemProcessor = $parentItemProcessor;
++        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+     }
+
+     /**
+@@ -50,14 +64,20 @@
+      */
+     public function afterExecute(DecrementSourceItemQty $subject, $result, array $sourceItemDecrementData): void
+     {
+-        $productIds = [];
++        $skus = [];
+         $sourceItems = array_column($sourceItemDecrementData, 'source_item');
++
+         foreach ($sourceItems as $sourceItem) {
+-            $sku = $sourceItem->getSku();
+-            $productIds[] = (int)$this->getProductIdsBySkus->execute([$sku])[$sku];
++            $skus[] = $sourceItem->getSku();
+         }
+-        if ($productIds) {
+-            $this->changeParentStockStatus->execute($productIds);
++
++        if ($skus) {
++            $searchCriteria = $this->searchCriteriaBuilder->addFilter('sku', $skus, 'in')->create();
++            $productResult = $this->productRepository->getList($searchCriteria);
++
++            foreach ($productResult->getItems() as $product) {
++                $this->parentItemProcessor->process($product);
++            }
+         }
+     }
+ }

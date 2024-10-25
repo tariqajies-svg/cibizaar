@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * This file is part of the Magebit_PageBuilder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget id="slide_block"
+            class="Magebit\PageBuilder\Block\Slide" is_email_compatible="true"
+            placeholder_image="Magento_CatalogWidget::images/products_list.png" ttl="86400">
+        <label translate="true">Slide Block (do not use)</label>
+        <description>This block is used internally for PageBuilder slider element only. Do not use it standalone.</description>
+        <parameters>
+            <parameter name="background_image" xsi:type="text" required="false" visible="false">
+                <label translate="true">background_image</label>
+            </parameter>
+            <parameter name="mobile_image" xsi:type="text" required="false" visible="false">
+                <label translate="true">mobile_image</label>
+            </parameter>
+            <parameter name="video_fallback_image" xsi:type="text" required="false" visible="false">
+                <label translate="true">video_fallback_image</label>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

@@ -1,0 +1,77 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Magento\Customer\Block\Widget\Telephone;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Telephone $block */
+
+if ($block->getPhoneRequired() === false) {
+    $phoneRequired = $block->getPhoneRequired();
+} else {
+    $phoneRequired = $block->isRequired();
+}
+?>
+
+<div x-data="window.bizaar.telephone({fullNumber: '<?= $escaper->escapeJs($block->getTelephone()) ?>'})"
+     x-init="init()"
+     class="field field-reserved w-full field-phone !mb-5 lg:!mb-7 <?= $phoneRequired ? 'required' : '' ?>">
+    <label for="telephone" class="label">
+        <span>
+            <?= $escaper->escapeHtml(__('Phone Number')) ?>
+        </span>
+    </label>
+    <div class="control flex gap-2 relative">
+        <div>
+            <input
+                <?php if ($phoneRequired): ?>
+                    required
+                <?php endif; ?>
+                type="text"
+                name="code"
+                autocomplete="off"
+                @input="dropdownOpened = true"
+                x-model="phoneCode"
+                @click="dropdownOpened = true"
+                class="form-input phone-code-selector w-[106px]"
+                @click.away="dropdownOpened = false; validateCode()">
+            <template x-if="dropdownOpened">
+                <div class="absolute bg-white border overflow-y-auto max-h-[200px] z-10 mt-1 w-full shadow-lg">
+                    <template x-for="item of filteredOptions()">
+                        <div
+                            class="cursor-pointer py-0.25 px-2.75"
+                            @click="phoneCode = item.data.dial_code; dropdownOpened = false; generateFullNumber()"
+                            x-text="item.data.flag + ' ' + item.data.dial_code + ' ' + item.data.name"></div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <input type="tel"
+               name="phone"
+               id="telephone"
+            <?php if ($phoneRequired): ?>
+                required
+            <?php endif ?>
+               @input="generateFullNumber"
+               x-model="phoneNumber"
+               title="<?= $escaper->escapeHtmlAttr(__('Phone Number')) ?>"
+               class="form-input <?= $escaper->escapeHtmlAttr(
+                   $block->getAttributeValidationClass('telephone')
+               ) ?>"
+        >
+        <input type="hidden" :value="fullNumber" name="telephone" >
+    </div>
+</div>

@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksQuickOrder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksQuickOrder
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_modal"/>
+    <body>
+        <referenceContainer name="content">
+            <block name="aw-co.quick-order.container" template="Magebit_HyvaAheadworksQuickOrder::quick-order/container.phtml" >
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Magebit\HyvaAheadworksQuickOrder\ViewModel\Config</argument>
+                </arguments>
+                <block class="Aheadworks\QuickOrder\Block\QuickOrder\Toolbar"
+                       name="aw-co.quick-order.toolbar"
+                       template="Magebit_HyvaAheadworksQuickOrder::quick-order/toolbar.phtml">
+                    <arguments>
+                        <argument name="view_model" xsi:type="object">Magebit\HyvaAheadworksQuickOrder\ViewModel\Config</argument>
+                        <argument name="jsLayout" xsi:type="array">
+                            <item name="types" xsi:type="array"/>
+                            <item name="components" xsi:type="array">
+                                <item name="aw_quick_order_toolbar" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiCollection</item>
+                                    <item name="template" xsi:type="string">Aheadworks_QuickOrder/ui/quick-order/toolbar</item>
+                                    <item name="toolbarId" xsi:type="string">aw-qo-toolbar</item>
+                                    <item name="children" xsi:type="array">
+                                        <item name="individual_sku_tab" xsi:type="array">
+                                            <item name="tabId" xsi:type="string">individual_sku</item>
+                                            <item name="component" xsi:type="string">uiCollection</item>
+                                            <item name="label" xsi:type="string" translate="true">Enter Individual SKU</item>
+                                            <item name="template" xsi:type="string">Aheadworks_QuickOrder/ui/quick-order/toolbar/tab</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="single-sku" xsi:type="array">
+                                                    <item name="component" xsi:type="string">Aheadworks_QuickOrder/js/ui/quick-order/toolbar/tab/single-sku</item>
+                                                    <item name="template" xsi:type="string">Aheadworks_QuickOrder/ui/quick-order/toolbar/tab/single-sku-form</item>
+                                                    <item name="searchUrl" xsi:type="url" path="aw_quick_order/index/search"/>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="multiple_sku_tab" xsi:type="array">
+                                            <item name="tabId" xsi:type="string">multiple_sku</item>
+                                            <item name="component" xsi:type="string">uiCollection</item>
+                                            <item name="label" xsi:type="string" translate="true">Enter Multiple SKUs</item>
+                                            <item name="template" xsi:type="string">Aheadworks_QuickOrder/ui/quick-order/toolbar/tab</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="multiple-sku" xsi:type="array">
+                                                    <item name="component" xsi:type="string">Aheadworks_QuickOrder/js/ui/quick-order/toolbar/tab/multiple-sku</item>
+                                                    <item name="template" xsi:type="string">Aheadworks_QuickOrder/ui/quick-order/toolbar/tab/multiple-sku-form</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="import_sku_tab" xsi:type="array">
+                                            <item name="tabId" xsi:type="string">import_sku</item>
+                                            <item name="component" xsi:type="string">uiCollection</item>
+                                            <item name="label" xsi:type="string" translate="true">Import SKUs</item>
+                                            <item name="template" xsi:type="string">Aheadworks_QuickOrder/ui/quick-order/toolbar/tab</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="import-sku" xsi:type="array">
+                                                    <item name="component" xsi:type="string">Aheadworks_QuickOrder/js/ui/quick-order/toolbar/tab/import-sku</item>
+                                                    <item name="template" xsi:type="string">Aheadworks_QuickOrder/ui/quick-order/toolbar/tab/import-sku-form</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="tab_initializer" xsi:type="array">
+                                            <item name="tabId" xsi:type="boolean">false</item>
+                                            <item name="component" xsi:type="string">Aheadworks_QuickOrder/js/ui/quick-order/toolbar/initializer</item>
+                                            <item name="template" xsi:type="string">Aheadworks_QuickOrder/ui/quick-order/toolbar/initializer</item>
+                                            <item name="deps" xsi:type="array">
+                                                <item name="0" xsi:type="string">aw_quick_order_toolbar.individual_sku_tab.single-sku</item>
+                                                <item name="1" xsi:type="string">aw_quick_order_toolbar.multiple_sku_tab.multiple-sku</item>
+                                                <item name="2" xsi:type="string">aw_quick_order_toolbar.import_sku_tab.import-sku</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="aw_quick_order_config" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiElement</item>
+                                </item>
+                            </item>
+                        </argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Ui\Block\Wrapper"
+                       name="aw_qo.item_listing"
+                       template="Magebit_HyvaAheadworksQuickOrder::quick-order/item-listing.phtml"
+                       cacheable="false">
+                    <arguments>
+                        <argument name="view_model" xsi:type="object">Magebit\HyvaAheadworksQuickOrder\ViewModel\Config</argument>
+                        <argument name="uiComponent" xsi:type="string">aw_quick_order_item_listing</argument>
+                    </arguments>
+                    <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+                </block>
+                <block name="aw_qo.popup-wrapper" template="Magebit_HyvaAheadworksQuickOrder::quick-order/popup-wrapper.phtml" >
+                    <block name="aw_qo.configure-item-content" template="Magebit_HyvaAheadworksQuickOrder::quick-order/popup/configure-item.phtml" />
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

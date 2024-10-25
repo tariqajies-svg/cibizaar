@@ -1,0 +1,626 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\ViewModel\ReCaptcha;
+use Magebit\Aheadworks\ViewModel\Ca\Company\Form as FormViewModel;
+use Magebit\HyvaAheadworksCa\Block\Company\Form;
+use Magento\Framework\Escaper;
+
+/** @var Form $block */
+/** @var Escaper $escaper */
+/** @var \Hyva\Theme\Model\ViewModelRegistry $viewModels */
+
+$formViewModel = $viewModels->require(FormViewModel::class)
+?>
+
+<script>
+    function initEditForm() {
+        const JsLayout = JSON.parse('<?= $escaper->escapeJs($block->getJsLayout()) ?>');
+        const dictionaries = JsLayout.components.awCaCompanyProvider.dictionaries;
+        return {
+            ...window.bizaar.telephone(),
+            saveUrl: '',
+            errors: 0,
+            isLoading: false,
+            fieldsets: {},
+            formData: {},
+            activeRegNr: 'taxid',
+            isEdit: true,
+            sentData: {},
+
+            getComponentData: function () {
+                this.saveUrl = JsLayout.components.awCaCompanyProvider.clientConfig.urls.save;
+                if (JsLayout.components.awCaCompanyProvider.data) {
+                    this.sentData = JsLayout.components.awCaCompanyProvider.data;
+                } else {
+                    this.isEdit = false;
+                }
+
+                // Collecting fields from xml file
+                this.fieldsets = Object.values(JsLayout.components.awCaForm.children).map(fieldset => {
+                    if (fieldset.children && fieldset.component === 'Magento_Ui/js/form/components/fieldset') {
+                        for (let i in fieldset.children) {
+
+                            if (fieldset.children[i].component) {
+                                // Prepare scope and values
+                                let dataScope = fieldset.children[i].dataScope.split('.'),
+                                    val = '';
+
+                                if (this.isEdit) {
+                                    val = this.sentData;
+                                }
+
+                                if (fieldset.dataScope.split('.').length === 2) {
+                                    dataScope.unshift(fieldset.dataScope.split('.')[1]);
+                                }
+
+                                // Give children a name
+                                fieldset.children[i].name = '';
+                                dataScope.forEach((slug, k) => {
+                                    fieldset.children[i].name += k === 0 ? slug : '[' + slug + ']';
+                                    if (this.isEdit) {
+                                        val = val[slug];
+                                    }
+                                });
+
+                                // Populate with values
+                                fieldset.children[i].val = val;
+                                this.formData[fieldset.children[i].name] = val;
+
+                                // If element type is select - add options
+                                if (fieldset.children[i].elementTmpl === 'ui/form/element/select') {
+                                    if (dictionaries[fieldset.children[i].dataScope]) {
+                                        if (fieldset.children[i].dataScope === 'region_id') {
+                                            fieldset.children[i].options = dictionaries[fieldset.children[i].dataScope]
+                                                .filter(item => !!this.formData['company[country_id]'] &&  item.country_id === this.formData['company[country_id]']);
+                                        } else {
+                                            fieldset.children[i].options = dictionaries[fieldset.children[i].dataScope];
+                                            if (fieldset.children[i].dataScope === 'country_id') {
+                                                if (fieldset.children[i].options[0].value === '') {
+                                                    // If first value already is empty change label
+                                                    fieldset.children[i].options[0].label = '<?= $escaper->escapeHtmlAttr(__('Select country')) ?>'
+                                                } else {
+                                                    // Otherwise just add new placeholder option at start
+                                                    fieldset.children[i].options.unshift({
+                                                        label: '<?= $escaper->escapeHtmlAttr(__('Select country')) ?>',
+                                                        value: ''
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                // Delete empty elements
+                                delete fieldset.children[i];
+                            }
+                        }
+                        fieldset.children = Object.values(fieldset.children);
+                    }
+
+                    return fieldset;
+                });
+
+                this.formData['company_extend'] = this.sentData.company_extend;
+                if (!this.sentData.company.tax_id && this.sentData.company_extend.tln) {
+                    this.activeRegNr = 'tln';
+                }
+
+                if (this.formData['company[telephone]']) {
+                    const splittedNumber = this.formData['company[telephone]'].split(' ');
+
+                    if (splittedNumber.length > 1) {
+                        this.phoneCode = splittedNumber[0];
+                        this.phoneNumber = splittedNumber[1];
+                    } else {
+                        this.phoneNumber = this.fullNumber;
+                    }
+                }
+            },
+
+            // Sort field by sort order attribute
+            getSortingFields: function (fields) {
+                let fieldsValues = Object.values(fields);
+
+                fieldsValues.sort(function (a, b) {
+                    var keyA = new Date(parseInt(a.sortOrder)),
+                        keyB = new Date(parseInt(b.sortOrder));
+
+                    if (keyA < keyB) {
+                        return -1;
+                    }
+                    if (keyA > keyB) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                return fieldsValues;
+            },
+
+            // Change value
+            changeValue: function (event) {
+                this.formData[event.target.name] = event.target.value;
+
+                if (event.target.name === 'company[country_id]') {
+                    this.updateRegionList(event.target.value);
+                }
+            },
+
+            updateRegionList: function(country_id) {
+                let baseIndex, regionIndex;
+
+                this.fieldsets.forEach((data, index) => {
+                    if (data.children && Array.isArray(data.children)) {
+                        const i = data.children.findIndex(item => item.dataScope === 'region_id');
+                        if (i >= 0) {
+                            baseIndex = index;
+                            regionIndex = i;
+                        }
+                    }
+                });
+
+                if (baseIndex && regionIndex) {
+                    const options = dictionaries.region_id
+                        .filter(item => item.country_id === country_id || (!!country_id && item.value === ''));
+                    this.fieldsets[baseIndex].children[regionIndex].options = options.length > 1 ? options : [];
+                }
+            },
+
+            // Submit form
+            submitForm: function () {
+                this.isLoading = true;
+                const formKey = document.querySelector('input[name=form_key]').value;
+                const $form = document.getElementById('editform');
+                const dataForm = new FormData($form);
+                let data = {};
+                let request_data = '';
+                <?= /** @noEscape */ $block->getChildHtml(ReCaptcha::RECAPTCHA_SCRIPT_TOKEN_BLOCK); ?>
+
+                this.validate()
+                    .then(() => {
+                        if (this.errors === 0) {
+                            if (this.isEdit) {
+                                for (let i in this.sentData) {
+                                    if (typeof this.sentData[i] === 'string'
+                                        || typeof this.sentData[i] === 'number'
+                                        || typeof this.sentData[i] === 'boolean') {
+
+                                        data[i] = this.sentData[i];
+                                    } else {
+                                        if (i === 'extension_attributes') {
+                                            if ("is_subscribed" in this.sentData[i]) {
+                                                data['extension_attributes[is_subscribed]'] = this.sentData[i].is_subscribed;
+                                            }
+                                            for (let k in this.sentData[i]['aw_ca_company_user']) {
+                                                data['extension_attributes[aw_ca_company_user][' + k + ']'] = this.sentData[i]['aw_ca_company_user'][k];
+                                            }
+                                        }
+
+                                        if (i === 'company_extend') {
+                                            for (let k in this.sentData[i]) {
+                                                data['company_extend[' + k + ']'] = this.sentData[i][k];
+                                            }
+                                        }
+
+                                        if (i === 'company') {
+                                            for (let k in this.sentData[i]) {
+                                                data['company[' + k + ']'] = this.sentData[i][k];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            for (let [name, value] of dataForm) {
+                                data[name] = value;
+                            }
+
+                            for (let fieldName in data) {
+                                if (request_data) {
+                                    request_data += '&'
+                                }
+                                request_data += fieldName + '=' + encodeURIComponent(data[fieldName]);
+                            }
+
+                            request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                            fetch(this.saveUrl, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    },
+                                    body: request_data
+                                }
+                            ).then(response => {
+                                    return response
+                                }
+                            ).then(data => {
+                                this.isLoading = false;
+                                if (data.errors) {
+                                    dispatchMessages([{
+                                        type: 'error',
+                                        text: data.message
+                                    }], 5000);
+                                } else {
+                                    window.location.href = data.url
+                                }
+                            });
+                        }
+                    }).catch((invalid) => {
+                        this.isLoading = false;
+                        if (invalid.length > 0) {
+                            invalid[0].focus();
+                        }
+                    });
+            },
+            directoryData: {},
+            availableRegions: {},
+            isZipRequired: true,
+            isRegionRequired: true,
+            onPrivateContentLoaded(data) {
+                this.directoryData = data['directory-data'] || {};
+
+                if (this.sentData.company.country_id) {
+                    this.$nextTick(() => {
+                        this.changeCountry(this.$refs['country_id']);
+                    })
+                }
+
+                this.setInitialRegionSelectValue();
+                this.setRegionInputValue('<?= $escaper->escapeHtmlAttr($block->getRegion()) ?>');
+
+            },
+            setInitialRegionSelectValue(value) {
+                this.$nextTick(() => {
+                    const regionSelectorElement = this.$refs['region_id'];
+                    if (regionSelectorElement) {
+
+                        const regionOptionByValue = regionSelectorElement
+                            .querySelector("[name='<?= /** @noEscape */ $block->getRegion() ?>']");
+
+                        if (regionOptionByValue) {
+                            this.$refs['region_id'].value = regionOptionByValue.value;
+                        }
+                    }
+                })
+            },
+            setRegionInputValue(value) {
+                this.$nextTick(() => {
+                    const regionInputElement = this.$refs['region'];
+                    if (regionInputElement) {
+                        regionInputElement.value = value;
+                    }
+                })
+            },
+            changeCountry(countrySelectElement) {
+                const selectedOption = countrySelectElement.options[countrySelectElement.selectedIndex];
+                const countryCode = countrySelectElement.value;
+                const countryData = this.directoryData[countryCode] || false;
+
+                this.setRegionInputValue('');
+
+                if (!countryData) {
+                    return;
+                }
+
+                this.isZipRequired = selectedOption.dataset.isZipRequired === "1";
+                this.isRegionRequired = selectedOption.dataset.isRegionRequired === "1";
+
+                this.availableRegions = countryData.regions || {};
+            },
+            hasAvailableRegions() {
+                return Object.keys(this.availableRegions).length > 0;
+            },
+            generateFullNumber() {
+                this.formData['company[telephone]'] = this.phoneCode + ' ' + this.phoneNumber.replace(/\s+/g, '');
+            },
+        }
+    }
+</script>
+<section class="mt-3.75 md:mt-0">
+    <h2 class="pb-5 lg:pb-8 mb-8 border-b border-container-lighter"><?= $escaper->escapeHtml(__('Edit "%1" company', $block->getCompanyName())) ?></h2>
+    <div class="block form">
+        <form id="editform"
+              x-data="{...initEditForm(), ...hyva.formValidation($el)}"
+              x-init="getComponentData(); init()"
+              @private-content-loaded.window="onPrivateContentLoaded(event.detail.data)"
+              method="post"
+              x-ref="registration-form"
+              @submit.prevent="submitForm();"
+              class="w-full"
+        >
+            <div class="fieldset-wrapper">
+                <fieldset>
+                    <legend class="mb-5 lg:mb-6.75">
+                        <h3>
+                            <?= $escaper->escapeHtml(__('Company Information')) ?>
+                        </h3>
+                    </legend>
+                    <div class="grid grid-cols-1 lg:gap-x-7 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                        <div class="field field-reserved required">
+                            <label for="company-name" class="label"><?= $escaper->escapeHtml(__('Company Name (As per Trade License)')) ?></label>
+                            <input name="company[name]"
+                                   id="company-name"
+                                   x-model="formData['company[name]']"
+                                   class="form-input required-entry"
+                                   data-validate='{"required": true}'
+                                   placeholder="<?= $escaper->escapeHtmlAttr(__('Enter Company Name')) ?>" />
+                        </div>
+                        <div class="field field-reserved required">
+                            <label for="company-description"
+                                   class="label">
+                                <?= $escaper->escapeHtml(__('What Best Describes Your Business?')) ?>
+                            </label>
+                            <select name="company_extend[description]"
+                                    id="company-description"
+                                    x-model="formData.company_extend.description"
+                                    class="form-select required-entry"
+                                    data-validate='{"required": true}'
+                            >
+                                <?php foreach ($formViewModel->getCompanyDescriptionOptions() as $option): ?>
+                                    <option
+                                        value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"><?= $escaper->escapeHtml($option['label']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input
+                                x-show="formData.company_extend.description === '<?= $escaper->escapeJs(__('Other')) ?>'"
+                                name="company_extend[description_other]"
+                                class="form-input mt-2"
+                                x-model="formData.company_extend.description_other"
+                                data-validate='{"required": true}'
+                                placeholder="<?= $escaper->escapeHtmlAttr(__('Other')) ?>"
+                            />
+                        </div>
+                        <div class="field field-reserved">
+                            <label for="company-website" class="label"><?= $escaper->escapeHtml(__('Company Website')) ?></label>
+                            <input name="company_extend[website]"
+                                   class="form-input"
+                                   id="company-website"
+                                   data-validate='{"website": true}'
+                                   x-model="formData.company_extend.website"
+                                   placeholder="<?= $escaper->escapeHtmlAttr(__('Enter Company Website')) ?>" />
+                        </div>
+                        <div class="field field-reserved country required">
+                            <label for="company-country" class="label">
+                                <span>
+                                    <?= $escaper->escapeHtml(__('Country of Company Registration')) ?>
+                                </span>
+                            </label>
+                            <?php $countries = $formViewModel->getCountryCollection()
+                                ->setForegroundCountries($block->getTopDestinations())
+                                ->toOptionArray();
+                            ?>
+                            <select name="company[country_id]"
+                                    id="company-country"
+                                    title="Country"
+                                    required="required"
+                                    class="form-select required-entry"
+                                    x-ref="country_id"
+                                    x-model="formData['company[country_id]']"
+                                    @change="changeCountry($event.target)"
+                            >
+                                <?php foreach ($countries as $country): ?>
+                                    <option name="<?= /** @noEscape */ $country['label'] ?>"
+                                            value="<?= /** @noEscape */ $country['value'] ?>"
+                                            data-is-zip-required="<?= (isset($country['is_zipcode_optional'])) ? '0' : '1' ?>"
+                                            data-is-region-required="<?= (isset($country['is_region_required'])) ? '1' : '0' ?>"
+                                        <?= ($block->getCountryId() ===  $country['value']) ? 'selected="selected"' : '' ?>
+                                    >
+                                        <?= /** @noEscape */ $country['label'] ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="required" :class="{'mb-7': activeRegNr === 'tln'}">
+                                <input type="radio"
+                                       name="company[reg_nr_type]"
+                                       value="taxid"
+                                       id="company-taxid"
+                                       x-model="activeRegNr"
+                                />
+                                <label for="company-taxid" class="inline-label after:ml-1">
+                                    <span><?= $escaper->escapeHtml(__('Tax ID')) ?></span>
+                                </label>
+                            </div>
+                            <div class="field field-reserved" x-cloak x-show="activeRegNr === 'taxid'">
+                                <input name="company[tax_id]"
+                                       class="form-input"
+                                       id="company-tax-id"
+                                       x-model="formData['company[tax_id]']"
+                                       data-validate='{"required": true}'
+                                       placeholder="<?= $escaper->escapeHtmlAttr(__('Enter Tax ID')) ?>" />
+                            </div>
+                            <div class="required">
+                                <input type="radio"
+                                       name="company[reg_nr_type]"
+                                       value="tln"
+                                       id="company-tln"
+                                       x-model="activeRegNr"
+                                />
+                                <label for="company-tln" class="inline-label after:ml-1">
+                                    <span><?= $escaper->escapeHtml(__('Trade License Number')) ?></span>
+                                </label>
+                            </div>
+                            <div class="field field-reserved" x-cloak x-show="activeRegNr === 'tln'">
+                                <input name="company_extend[tln]"
+                                       class="form-input"
+                                       id="company-tln"
+                                       x-model="formData.company_extend.tln"
+                                       data-validate='{"required": true}'
+                                       placeholder="<?= $escaper->escapeHtmlAttr(__('Enter Trade License Number')) ?>" />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend class="mb-5 lg:mb-6.75">
+                        <h3>
+                            <?= $escaper->escapeHtml(__('Registered Address (as per Govt Documents)')) ?>
+                        </h3>
+                    </legend>
+                    <div class="grid grid-cols-1 lg:gap-x-7 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                        <div class="field field-reserved required">
+                            <label for="company-street" class="label"><?= $escaper->escapeHtml(__('Street Address')) ?></label>
+                            <input name="company[street]"
+                                   id="company-street"
+                                   x-model="formData['company[street]']"
+                                   class="form-input required-entry"
+                                   data-validate='{"required": true}'
+                                   placeholder="<?= $escaper->escapeHtmlAttr(__('Enter Street Address')) ?>" />
+                        </div>
+                        <div class="field field-reserved required">
+                            <label for="company-street" class="label"><?= $escaper->escapeHtml(__('City')) ?></label>
+                            <input name="company[city]"
+                                   id="company-city"
+                                   x-model="formData['company[city]']"
+                                   class="form-input required-entry"
+                                   data-validate='{"required": true}'
+                                   placeholder="<?= $escaper->escapeHtmlAttr(__('Enter City')) ?>" />
+                        </div>
+                        <div class="field field-reserved required"
+                             x-cloak
+                             x-show="(hasAvailableRegions() && isRegionRequired)"
+                        >
+                            <label class="label" for="company[region_id]">
+                                <span><?= $escaper->escapeHtml(__('State/Province')) ?></span>
+                            </label>
+                            <div class="control">
+                                <template x-if="hasAvailableRegions() && isRegionRequired">
+                                    <select id="company[region_id]" name="company[region_id]"
+                                            title="<?= $escaper->escapeHtml(__('State/Province')) ?>"
+                                            class="form-select validate-select region_id"
+                                            :required="isRegionRequired"
+                                            x-ref="region_id"
+                                            x-model="formData['company[region_id]']"
+                                    >
+                                        <option value=""><?= $escaper->escapeHtml(__('Please select a region, state or province.')) ?></option>
+                                        <template x-for="regionId in Object.keys(availableRegions)">
+                                            <option :value="regionId"
+                                                    :name="availableRegions[regionId].name"
+                                                    x-text="availableRegions[regionId].name"
+                                                    :selected="formData['company[region_id]'] === regionId"
+                                            >
+                                            </option>
+                                        </template>
+                                    </select>
+                                </template>
+                                <template x-if="!hasAvailableRegions()">
+                                    <input type="text"
+                                           id="region"
+                                           name="company[region]"
+                                           x-ref="region"
+                                           x-model="formData['company[region]']"
+                                           value="<?= $escaper->escapeHtmlAttr($block->getRegion()) ?>"
+                                           title="<?= $escaper->escapeHtml(__('State/Province')) ?>"
+                                           class="form-input"
+                                           :required="isRegionRequired"
+                                    />
+                                </template>
+                            </div>
+                        </div>
+                        <div class="field field-reserved zip required">
+                            <label for="zip" class="label"><span><?= $escaper->escapeHtml(__('ZIP/Postal Code')) ?></span></label>
+                            <div class="control">
+                                <input type="text"
+                                       name="company[postcode]"
+                                       title="<?= $escaper->escapeHtml(__('ZIP/Postal Code')) ?>"
+                                       x-model="formData['company[postcode]']"
+                                       id="zip"
+                                       class="form-input validate-zip-international">
+                            </div>
+                        </div>
+                        <div class="field field-reserved required field-phone">
+                            <label for="company[telephone]" class="label">
+                                <span>
+                                    <?= $escaper->escapeHtml(__('Mobile Number')) ?>
+                                </span>
+                            </label>
+                            <div class="control flex gap-2 relative">
+                                <div>
+                                    <input
+                                        type="text"
+                                        required
+                                        name="code"
+                                        autocomplete="off"
+                                        @input="dropdownOpened = true"
+                                        x-model="phoneCode"
+                                        @click="dropdownOpened = true"
+                                        class="form-input phone-code-selector w-[106px]"
+                                        @click.away="dropdownOpened = false; validateCode()">
+                                    <template x-if="dropdownOpened">
+                                        <div
+                                            class="absolute bg-white border overflow-y-auto max-h-[200px] z-10 mt-1 w-full shadow-lg">
+                                            <template x-for="item of filteredOptions()">
+                                                <div
+                                                    class="cursor-pointer py-0.25 px-2.75"
+                                                    @click="phoneCode = item.data.dial_code; dropdownOpened = false; generateFullNumber()"
+                                                    x-text="item.data.flag + ' ' + item.data.dial_code + ' ' + item.data.name"></div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <input type="tel"
+                                       name="phone"
+                                       required
+                                       id="telephone"
+                                       @input="generateFullNumber"
+                                       x-model="phoneNumber"
+                                       title="<?= $escaper->escapeHtmlAttr(__('Phone Number')) ?>"
+                                       class="form-input <?= $escaper->escapeHtmlAttr(
+                                           $block->getAttributeValidationClass('telephone')
+                                       ) ?>">
+                                <input type="hidden" :value="formData['company[telephone]']" name="company[telephone]">
+                            </div>
+                        </div>
+                </fieldset>
+                <fieldset>
+                    <legend class="mb-5 lg:mb-6.75">
+                        <h3>
+                            <?= $escaper->escapeHtml(__('Company Administrator')) ?>
+                        </h3>
+                    </legend>
+                    <div class="grid grid-cols-1 lg:gap-x-7 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                        <div class="field field-reserved">
+                            <label for="company-street" class="label"><?= $escaper->escapeHtml(__('Designation')) ?></label>
+                            <input name="extension_attributes[aw_ca_company_user][job_title]"
+                                   id="company-street"
+                                   class="form-input required-entry"
+                                   x-model="formData['extension_attributes[aw_ca_company_user][job_title]']"
+                                   placeholder="<?= $escaper->escapeHtmlAttr(__('Designation')) ?>" />
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="flex justify-between items-center flex-wrap pt-0 lg:pt-4">
+                    <button type="submit"
+                            class="inline-flex flex-shrink-0 xl:mt-0 btn btn-primary px-10 py-3 md:py-3.5 w-full md:w-auto">
+                        <span><?= $escaper->escapeHtml(__('Save')) ?></span>
+                    </button>
+                    <a class="back-btn no-underline" href="<?= $escaper->escapeUrl($block->getUrl('aw_ca/company')) ?>">
+                        <i class="icon-arrow-left"></i>
+                        <span><?= $escaper->escapeHtml(__('Back')) ?></span>
+                    </a>
+                </div>
+            </div>
+            <?= /** @noEscape */ $block->getBlockHtml(ReCaptcha::RECAPTCHA_INPUT_FIELD_BLOCK) ?>
+            <?= /** @noEscape */ $block->getChildHtml('company_edit_loading') ?>
+        </form>
+    </div>
+</section>
+

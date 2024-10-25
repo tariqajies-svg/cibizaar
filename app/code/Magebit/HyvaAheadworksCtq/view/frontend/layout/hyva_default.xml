@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_modal"/>
+    <update handle="hyva_form_validation"/>
+    <body>
+        <referenceBlock name="cart-drawer">
+            <block class="Aheadworks\Ctq\Block\Checkout\RequestQuoteLink"
+                   name="cart-drawer.aw.ctq.create.request"
+                   template="Magebit_HyvaAheadworksCtq::checkout/request_quote_link.phtml">
+                <arguments>
+                    <argument name="is_sign_in_text" xsi:type="boolean">false</argument>
+                    <argument name="layout_modifier" xsi:type="object">Aheadworks\Ctq\ViewModel\RequestQuoteLinkLayoutModifier</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceContainer name="before.body.end">
+            <block class="Aheadworks\Ctq\Block\Checkout\RequestQuoteLink"
+                   name="aw.ctq.create.request.modal"
+                   template="Magebit_HyvaAheadworksCtq::checkout/request_quote_modal.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Checkout\RequestQuoteLink</argument>
+                </arguments>
+                <block name="aw.ctq.create.request.modal.loading" template="Hyva_Theme::ui/loading.phtml"/>
+                <block class="Aheadworks\Ctq\Block\Customer\FileUploader"
+                       name="aw.ctq.create.request.modal.file_uploader"
+                       template="Magebit_HyvaAheadworksCtq::checkout/request_quote_modal_file_uploader.phtml">
+                    <block name="aw.ctq.create.request.modal.file_uploader.loading" template="Hyva_Theme::ui/loading.phtml"/>
+                    <arguments>
+                        <argument name="view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\FileUploader</argument>
+                        <argument name="jsLayout" xsi:type="array">
+                            <item name="components" xsi:type="array">
+                                <item name="awCtqFileUploader" xsi:type="array">
+                                    <item name="component" xsi:type="string">Aheadworks_Ctq/js/ui/form/element/file-uploader</item>
+                                    <item name="template" xsi:type="string">Aheadworks_Ctq/form/element/uploader/uploader</item>
+                                    <item name="previewTmpl" xsi:type="string">Aheadworks_Ctq/form/element/uploader/preview</item>
+                                    <item name="isMultipleFiles" xsi:type="boolean">true</item>
+                                    <item name="dataScope" xsi:type="string">uploader.attachments</item>
+                                    <item name="elementToDisable" xsi:type="string">button[data-role=aw-ctq-submit-comment-button]</item>
+                                </item>
+                            </item>
+                        </argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

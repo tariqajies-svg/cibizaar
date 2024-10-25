@@ -1,0 +1,175 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksQuickOrder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksQuickOrder
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magebit\HyvaAheadworksQuickOrder\ViewModel\Config;
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+
+/** @var Wrapper $block */
+/** @var Escaper $escaper */
+/** @var Config $viewModel */
+/** @var ViewModelRegistry $viewModels */
+/** @var HeroiconsOutline $heroicons */
+
+$viewModel = $block->getData('view_model');
+$config =  $viewModel->getConfig();
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<div>
+    <div class="admin__data-grid-wrap">
+        <?= $block->getChildHtml('loading') ?>
+        <table class="table w-full mt-3 lg:mt-7.75" id="quick_order_table">
+            <thead>
+                <tr>
+                    <th class="cursor-pointer" x-on:click="changeSorting('product_name')">
+                        <span class="inline-block"><?= $escaper->escapeHtml(__('Product')) ?></span>
+                    </th>
+                    <th class="cursor-pointer" x-on:click="changeSorting('product_qty')">
+                        <span class="inline-block"><?= $escaper->escapeHtml(__('Quantity')) ?></span>
+                    </th>
+                    <th>
+                        <span class="inline-block"><?= $escaper->escapeHtml(__('Price')) ?></span>
+                    </th>
+                    <th class="w-0 text-right">
+                        <span><?= $escaper->escapeHtml(__('Action')) ?></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="[key, item] of Object.entries(items)">
+                    <tr>
+                        <td class="no-colons gap-x-4 lg-max:!pb-3 lg:flex lg:gap-x-6.25">
+                            <div class="min-w-[80px]">
+                                <img class="w-[80px] border rounded" :src="item.product_image_url" :alt="item.product_image_label" />
+                            </div>
+                            <div>
+                                <span class="block mb-2 lg:text-base lg:mb-1.25" x-html="item.product_name"></span>
+                                <div class="flex gap-x-1 text-2xs lg:text-sm">
+                                    <span class="block mb-1"> <?= $escaper->escapeHtml(__('SKU:')) ?> </span>
+                                    <span class="font-bold text-navy" x-html="item.product_sku"></span>
+                                </div>
+                                <p class="text-error font-bold" x-html="item.preparation_error" x-show="!!item.preparation_error"></p>
+                                <p class="text-error font-bold" x-html="item.qty_salable_message" x-show="!!item.qty_salable_message"></p>
+                                <template x-for="productOption of item.product_attributes.product_options">
+                                    <div class="flex gap-x-1 text-sm">
+                                        <span x-text="productOption.label + ':'"></span>
+                                        <span class="font-bold" x-text="productOption.value"></span>
+                                    </div>
+                                </template>
+                                <template x-for="customOption of item.product_attributes.custom_options">
+                                    <p class="text-sm">
+                                        <span x-text="customOption.label"></span>:<span class="font-bold" x-text="customOption.value"></span>
+                                    </p>
+                                </template>
+                            </div>
+                        </td>
+                        <td class="before:!self-center" data-th="<?= $escaper->escapeHtml(__('Qty')) ?>">
+                            <?php if ($config['isQtyInputDisplayed']): ?>
+                                <div class="product-qty">
+                                    <div class="flex">
+                                        <input
+                                            type="number"
+                                            name="single-qty"
+                                            class="form-input form-input-sm w-full text-center invalid:border-error max-w-[121px]"
+                                            x-model="item.product_qty"
+                                            title="<?= $escaper->escapeHtmlAttr(__('Quantity')) ?>"
+                                            @change.debounce="updateQty(item, $event.target.value)"
+                                        />
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <span x-html="item.product_qty"></span>
+                            <?php endif; ?>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtml(__('Price')) ?>" class="font-bold" x-html="item.price"></td>
+                        <td class="table-actions lg-max:!pt-2.25 text-right">
+                            <button @click="deleteItem(item)" class="btn lg-max:!border-r-0 btn-secondary btn-sq"><i class="icon-delete"></i></button>
+                            <button @click="configureItem(item)" class="btn lg-max:!border-l btn-secondary btn-sq" x-show="!!item.is_editable">
+                                <i class="icon-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </template>
+                <tr class="lg-max:!border-r-0 lg-max:!border-l-0 lg-max:!rounded-none" x-show="Object.entries(items).length === 0">
+                    <td class="no-colons lg-max:!px-0 !text-base">
+                        <span><?= $escaper->escapeHtml(__("We couldn't find any records.")) ?></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <template x-if="!isLoading && pagination.totalRecords">
+            <div class="mt-5">
+                <div>
+                    <div class="pager grid-cols-4 sm:grid-cols-8 md:grid-cols-4 lg:grid-cols-8
+                    grid-flow-row grid gap-3.25 items-center">
+                        <span class="toolbar-amount text-gray font-semibold order-3 sm:order-2 md:order-3
+    lg:order-2 col-span-2 gap-x-1 lg:text-base" x-html="counterText"></span>
+                        <div class="pages-wrapper">
+
+                            <template x-if="pages.length > 1 && pagination.totalPages > 1">
+                                <nav class="pages">
+                                    <ol class="pages-items clear">
+                                        <template x-for="page in pages">
+                                            <li
+                                                class="item"
+                                                :class="{
+                                                    'pages-item-next' : page.btnType === 'arrow',
+                                                     '!ml-0' : page.arrowType === 'first'
+                                                 }">
+                                                <button class="page btn btn-sq"
+                                                        :class="{
+                                                            'btn-primary' : page.currentPage,
+                                                            'pointer-events-none': page.currentPage || page.disabled,
+                                                            'btn-secondary': !page.currentPage,
+                                                            'next' : page.btnType === 'arrow' && page.disabled,
+                                                            'lg-max:!w-full': page.btnType === 'arrow'
+                                                        }"
+                                                        x-html="page.pageLabel"
+                                                        @click="{if(!page.currentPage){setPageNumber(page.pageNumber)}}"></button>
+                                            </li>
+                                        </template>
+                                    </ol>
+                                </nav>
+                            </template>
+                        </div>
+                        <div class="field limiter">
+                            <label class="inline-label">
+                                <span><?= $escaper->escapeHtml(__('Show:')) ?></span>
+                            </label>
+                            <select x-ref="limiter" class="form-select form-select-sm limiter-options
+                                w-fit lg:w-[5.71rem] lg:pl-5.75"
+                                    @change="changePageSize()">
+                                <option value="10" :selected="pagination.itemsPerPage == 10">10</option>
+                                <option value="20" :selected="pagination.itemsPerPage == 20">20</option>
+                                <option value="50" :selected="pagination.itemsPerPage == 50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+
+        <div class="flex flex-col mt-5 gap-y-2 lg:flex-row gap-x-2.25" x-show="Object.entries(items).length > 0">
+            <button class="btn btn-primary" @click="addToCart"><?= $escaper->escapeHtml('Add to Cart') ?></button>
+            <button class="btn btn-secondary" @click="resetList"><?= $escaper->escapeHtml('Reset List') ?></button>
+        </div>
+    </div>
+</div>

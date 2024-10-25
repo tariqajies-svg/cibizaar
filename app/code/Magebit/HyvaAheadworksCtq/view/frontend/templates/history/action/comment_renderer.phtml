@@ -1,0 +1,62 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\History\Action\DefaultRenderer;
+use Magento\Framework\Escaper;
+
+/** @var DefaultRenderer $block */
+/** @var Escaper $escaper */
+
+$action = $block->getAction();
+$quoteId = $block->getHistory()->getQuoteId();
+$commentId = $action->getValue();
+?>
+<div>
+    <div class="text-xs text-navy font-bold mb-1.75 lg:text-sm">
+        <?= $escaper->escapeHtml($block->getHistoryViewModel()->getActionTypeFormatted($action->getType())) ?>
+    </div>
+    <div class="mb-4.25 lg:mb-5.25">
+        <div>
+            <span class="leading-7 mr-1.25 lg:mr-0.75">
+                <?= $escaper->escapeHtml($action->getOldValue()) ?>
+            </span>
+        </div>
+        <div class="mt-1.75">
+            <?php if ($action->getActions()): ?>
+                <?php foreach ($action->getActions() as $commentAction): ?>
+                    <?php if ($commentId): ?>
+                        <div>
+                            <a target="_blank"
+                               class="no-underline text-xs"
+                               href="<?= $escaper->escapeUrl(
+                                   $block->resolveCommentViewModel($quoteId, $block->getIsEmailForSeller())
+                                      ->getDownloadUrl(
+                                          $commentAction->getValue(),
+                                          $quoteId,
+                                          $commentId,
+                                          $block->getIsEmailForSeller()
+                                      )
+                               ) // @codingStandardsIgnoreLine ?>">
+                                <i class="icon-file align-text-bottom mr-0.75"></i>
+                                <span class="lg:hover:underline"><?= $escaper->escapeHtml($commentAction->getName()) ?></span>
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <?= $escaper->escapeHtml($commentAction->getName()) ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

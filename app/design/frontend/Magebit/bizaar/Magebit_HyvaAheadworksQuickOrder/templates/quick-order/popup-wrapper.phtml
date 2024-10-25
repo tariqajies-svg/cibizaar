@@ -1,0 +1,30 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksQuickOrder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksQuickOrder
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/* @var Template $block */
+/** @var Modal $modalViewModel */
+/** @var Escaper $escaper */
+
+/** @var  ViewModelRegistry $viewModels */
+
+$modalViewModel = $viewModels->require(Modal::class);
+?>
+<?= /** @noEscape */ $modalViewModel->createModal()->addContainerClass('bg-opacity-50')->withContent($block->getChildHtml('aw_qo.configure-item-content'))->withDialogRefName('popup-configure') ?>

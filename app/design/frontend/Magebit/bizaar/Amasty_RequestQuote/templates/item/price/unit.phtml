@@ -1,0 +1,58 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Item\Price\Renderer;
+use Magento\Framework\Escaper;
+
+/** @var Renderer $block */
+/** @var Escaper $escaper */
+
+
+$item = $block->getItem();
+?>
+<?php if ($block->canCustomizePrice()): ?>
+    <div class="field price">
+        <div class="control price flex lg:justify-end">
+            <label for="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-price"
+                class="flex flex-row clear">
+                <span class="cu-sign label flex items-center mr-2 font-medium">
+                    <?= $escaper->escapeHtml($block->getCurrencySymbol()) ?>
+                </span>
+                <input id="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-price"
+                       name="cart[<?= $escaper->escapeHtmlAttr($item->getId()) ?>][price]"
+                       value="<?= $escaper->escapeHtmlAttr($block->getInputPrice()) ?>"
+                       type="number"
+                       size="4"
+                       title="<?= $escaper->escapeHtmlAttr(__('Price')) ?>"
+                       class="form-input price w-32 p-2 text-sm font-medium text-center"
+                       required
+                       min="0"
+                       step=".01"/>
+            </label>
+        </div>
+    </div>
+<?php else: ?>
+    <?php if ((float)$item->getPrice()): ?>
+        <?php if ($block->displayCartPriceInclTax()): ?>
+            <?php $_incl = $block->getCheckoutHelper()->getPriceInclTax($item); ?>
+            <span class="cart-price">
+                <?= $escaper->escapeHtml($block->formatPrice($_incl), ['span']) ?>
+            </span>
+        <?php endif; ?>
+        <?php if ($block->displayCartPriceExclTax()): ?>
+            <span class="price-including-tax" data-label="<?= $escaper->escapeHtmlAttr(__('Excl. Tax')) ?>">
+                <span class="cart-price">
+                    <?= $escaper->escapeHtml($block->formatPrice($item->getCalculationPrice()), ['span']) ?>
+                </span>
+            </span>
+        <?php endif; ?>
+    <?php else: ?>
+        <span class="cart-price">
+            <?= $escaper->escapeHtml(__('N/A')) ?>
+        </span>
+    <?php endif; ?>
+<?php endif; ?>

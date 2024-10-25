@@ -1,0 +1,198 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\Block\Form;
+use Magento\Framework\Escaper;
+
+/** @var Form $block */
+/** @var Escaper $escaper */
+?>
+<script>
+    function initDomain() {
+        return {
+            open: false,
+            saveUrl: '<?= $escaper->escapeUrl($block->getUrl('aw_ca/company_domain/save')) ?>',
+            errors: 0,
+            displayErrorMessage: false,
+            errorMessages: [],
+            isLoading: false,
+            layoutData:  JSON.parse('<?= $block->getJsLayout() ?>'),
+            defaultStatus: 'pending',
+            setErrorMessages: function setErrorMessages(messages) {
+                this.errorMessages = [messages];
+                this.displayErrorMessage = this.errorMessages.length;
+            },
+            submitForm: function () {
+                const $form = document.querySelector('#add-domain-form');
+
+                if (this.errors === 0) {
+                    this.dispatchAddDomainRequest($form);
+                }
+            },
+            getStatus: function(domain) {
+                if (domain && domain.status) {
+                    return domain.status;
+                }
+
+                return this.defaultStatus;
+            },
+            addDomain: function () {
+                this.open = true;
+            },
+            closeDomainPopup: function () {
+                document.querySelector('#domain-name').value = '';
+                this.open = false;
+            },
+            dispatchAddDomainRequest: function() {
+                this.isLoading = true;
+                const name = this.$refs['domain-name'].value;
+                const data = this.layoutData.components.awCaDomainProvider.data;
+                const companyId = data.company.id;
+                const status = this.getStatus(data.domain);
+                const formKey = document.querySelector('input[name=form_key]').value;
+
+                const request_data = 'name=' + encodeURIComponent(name) +
+                    '&company_id=' + encodeURIComponent(companyId) +
+                    '&status=' + encodeURIComponent(status) +
+                    '&formKey=' + encodeURIComponent(formKey);
+
+                fetch(this.saveUrl, {
+                    method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: request_data
+                    }
+                ).then(response => {
+                        return response.json()
+                    }
+                ).then(data => {
+                    if (data.errors) {
+                        this.isLoading = false;
+                        dispatchMessages([{
+                            type: 'error',
+                            text: data.message
+                        }], 5000);
+                        this.errors = 1;
+                    } else {
+                        dispatchMessages([{
+                            type: 'success',
+                            text: '<?= $escaper->escapeHtml(__("Domain added successfully")) ?>'
+                        }], 5000);
+
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+    }
+</script>
+
+<div data-role="aw-ca-domain-management" class="aw-ca__domain-management"
+        id="add-domain"
+        x-data="initDomain()"
+        @keydown.window.escape="open = false">
+    <button type="button" @click="addDomain" class="action-basic flex-shrink-0 ml-auto xl:mt-0 btn btn-primary">
+        <span><?= $escaper->escapeHtml(__('Add New Domain')) ?></span>
+    </button>
+
+    <div role="dialog"
+            aria-modal="true"
+            @click.away="open = false"
+            class="hidden inset-y-0 right-0 z-30 flex max-w-full"
+            :class="{ 'hidden': !open, 'fixed': open }"
+    >
+        <div class="relative w-screen max-w-md pt-16 bg-container-lighter"
+                x-show="open"
+                x-cloak=""
+                x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
+                x-transition:enter-start="translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
+                x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="translate-x-full"
+        >
+            <div
+                x-show="open"
+                x-cloak=""
+                x-transition:enter="ease-in-out duration-500"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in-out duration-500"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" class="absolute top-0 right-0 flex p-2 mt-2">
+                <button @click="open = false;" aria-label="Close panel"
+                        class="p-2 text-gray-300 transition duration-150 ease-in-out hover:text-black">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <?= $block->getChildHtml() ?>
+
+            <div class="flex flex-col h-full py-6 space-y-6 bg-white shadow-xl overflow-y-auto">
+                <div class="block-customer-login bg-container border border-container mx-4 p-4 shadow-sm">
+                    <h2 id="authenticate-customer-login" class="text-lg font-medium leading-7 text-gray-900">
+                        <?= $escaper->escapeHtml(__('Configure Domain')) ?>
+                    </h2>
+
+                    <form class="form form-add-domain"
+                            method="post"
+                            @submit.prevent="submitForm();"
+                            id="add-domain-form"
+                    >
+                        <div class="fieldset domain">
+                            <div class="field required">
+                                <label class="label" for="domain-name">
+                                    <span><?= $escaper->escapeHtml(__('Domain Name')) ?></span>
+                                </label>
+                                <div class="control">
+                                    <input name="domain[name]"
+                                            x-ref="domain-name"
+                                            @change="errors = 0"
+                                            type="text"
+                                            required
+                                            id="domain-name"
+                                            pattern="^[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,3})$"
+                                            class="form-input input-text w-full"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="actions-toolbar flex justify-between pt-6 pb-2 items-center">
+                                <button type="submit"
+                                        class="inline-flex btn btn-primary"
+                                >
+                                    <?= $escaper->escapeHtml(__('Send for Approval')) ?>
+                                </button>
+
+                                <button type="button" @click="closeDomainPopup"
+                                        class="inline-flex btn btn-secondary"
+                                >
+                                    <?= $escaper->escapeHtml(__('Cancel')) ?>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

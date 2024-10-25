@@ -1,0 +1,171 @@
+<?php
+/**
+ * This file is part of the Magebit_Catalog package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Magebit\Catalog\ViewModel\Stock;
+use Magebit\Sales\ViewModel\ReservedOrders;
+use Magento\Catalog\Model\Product;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var CurrentProduct $currentProduct */
+$currentProduct = $viewModels->require(CurrentProduct::class);
+/** @var ReservedOrders $reservedOrders */
+$reservedOrders = $viewModels->require(ReservedOrders::class);
+/** @var Stock $stock */
+$stock = $viewModels->require(Stock::class);
+
+/** @var Product $product */
+$product = $this->hasData('product')
+    ? $this->getData('product')
+    : $currentProduct->get();
+
+if (!$product || !$product->getId()) {
+    return;
+}
+$reservedQty = $reservedOrders->getReservedProductCount($product);
+?>
+<script>
+    function initStockStatus() {
+        return {
+            stockColor: '#0AD443',
+            currentReservedQty: <?= /* @noEscape */ $reservedQty ?>,
+            reservedQty: JSON.parse('<?= /* @noEscape */ json_encode($reservedOrders->getProductReservedQty((int) $product->getId())) ?>'),
+            stockData: JSON.parse('<?= /* @noEscape */ json_encode($stock->getStockData($product)) ?>'),
+            currentProduct: null,
+            getStockColor() {
+                const statuses = [{
+                    'percent': <?= /* @noEscape */ Stock::LOW_STOCK_PERCENT ?>,
+                    'color': '#E11313'
+                }, {
+                    'percent': <?= /* @noEscape */ Stock::MEDIUM_STOCK_PERCENT ?>,
+                    'color': '#DCB900'
+                }, {
+                    'percent': 1,
+                    'color': '#0AD443'
+                }];
+
+                <?php // If it is more than one, always use green?>
+                if (this.currentProduct.stockLoad > 1) {
+                    this.stockColor = statuses[2].color;
+                } else {
+                    statuses.every(({percent, color}) => {
+                        if (this.currentProduct.stockLoad <= percent) {
+                            this.stockColor = color;
+                            return false;
+                        }
+                        return true;
+                    });
+                }
+            },
+            setStockIndicator() {
+                if (!this.currentProduct) {
+                    this.currentProduct = this.stockData[<?= /* @noEscape */ $product->getId() ?>];
+                }
+                const units = [...this.$refs.stockIndicator.children];
+
+                // calculate number of sections with color
+                const count = this.currentProduct.stockLoad ? Math.ceil(this.currentProduct.stockLoad/0.25) : 4;
+                this.getStockColor();
+
+                units.forEach((unit, index) => {
+                    if (++index <= count) {
+                        unit.style.background = this.stockColor;
+                    } else {
+                        unit.style.background = null;
+                    }
+                });
+            },
+            updateOnConfigurable(details) {
+                this.currentReservedQty = this.reservedQty[details.productIndex] || 0;
+                this.currentProduct = this.stockData[details.productIndex] || null;
+                this.setStockIndicator();
+            },
+            setDefaultStockValue() {
+                let tmpStock = null;
+                let tmpStockLoad = null;
+                const parentProductId = <?= /** @noEscape */ $product->getTypeId() === Configurable::TYPE_CODE ? (int)$product->getId() : '-1' ?>;
+
+                for (const [index, item] of Object.entries(this.stockData)) {
+                    if (index != parentProductId) {
+                        if (tmpStock === null || item.qty > tmpStock) tmpStock = item.qty
+                        if (tmpStockLoad === null || item.stockLoad > tmpStockLoad) tmpStockLoad = item.stockLoad
+                    }
+                }
+
+                if (tmpStock !== null && this.stockData[<?= /* @noEscape */ $product->getId() ?>].qty !== tmpStock) {
+                    this.stockData[<?= /* @noEscape */ $product->getId() ?>].qty = tmpStock;
+                }
+                if (tmpStockLoad !== null && this.stockData[<?= /* @noEscape */ $product->getId() ?>].stockLoad !== tmpStockLoad) {
+                    this.stockData[<?= /* @noEscape */ $product->getId() ?>].stockLoad = tmpStockLoad;
+                }
+            }
+        }
+    }
+</script>
+<div x-data="initStockStatus()"
+     x-init="setDefaultStockValue(); setStockIndicator()"
+     @configurable-selection-changed.window="updateOnConfigurable(event.detail)"
+     class="grid grid-cols-3 gap-2 lg:gap-3 w-full"
+>
+    <div class="flex items-center">
+        <span class="text-xs font-bold lg:text-sm text-navy"><?= $escaper->escapeHtml(__('Availability')) ?></span>
+    </div>
+    <div x-ref="stockIndicator" class="grid grid-cols-4 col-span-3 gap-0.5">
+        <?php for ($i = 0; $i < 4; $i++): ?>
+            <span class="stock-indicator h-2 w-full bg-gray-e6
+                <?= !$product->getIsSalable() ? 'bg-error' : ''?>
+                <?= $i === 0 ? 'rounded-l' : ''?>
+                <?= $i === 3 ? 'rounded-r' : ''?>"></span>
+        <?php endfor; ?>
+    </div>
+    <div class="flex items-center gap-1 col-span-3 text-right text-xs font-bold lg:text-sm" :style="`color: ${stockColor}`">
+        <template x-if="currentProduct.isSalable">
+            <div>
+                <i class="relative top-0.25" :class="{
+                    'icon-checkmark': currentProduct.stockLoad > <?= /* @noEscape */ Stock::LOW_STOCK_PERCENT ?>,
+                    'icon-warning': currentProduct.stockLoad <= <?= /* @noEscape */ Stock::LOW_STOCK_PERCENT ?>
+                }"></i>
+                <span><?= $escaper->escapeHtml('Available: ') ?></span>
+                <span x-html="currentProduct.qty"></span>
+            </div>
+        </template>
+        <template x-if="!currentProduct.isSalable">
+            <div>
+                <i class="icon-out-of-stock relative top-0.25"></i>
+                <span><?= $escaper->escapeHtml(__('Out of stock')) ?></span>
+            </div>
+        </template>
+        <template x-if="currentReservedQty > 0">
+            <div class="text-error ml-2">
+                <i class="icon-checkmark relative top-0.25"></i>
+                <span>Reserved: </span>
+                <span x-html="currentReservedQty"></span>
+            </div>
+        </template>
+    </div>
+    <?php if ($dispatchMessage = $stock->getDispatchMessage($product)): ?>
+        <p class="col-span-3 text-sm">
+            <?= $escaper->escapeHtml($dispatchMessage) ?>
+        </p>
+    <?php endif; ?>
+</div>

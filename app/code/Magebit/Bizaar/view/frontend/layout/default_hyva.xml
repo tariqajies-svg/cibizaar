@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="after.body.start">
+            <block name="head.bizaar-scripts" template="Magebit_Bizaar::bizaar-init.phtml"/>
+        </referenceContainer>
+        <referenceContainer name="before.body.end">
+            <block name="init.external.scripts" template="Magebit_Bizaar::page/js/init-external-scripts.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

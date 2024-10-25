@@ -1,0 +1,17 @@
+{
+  "aw_ca_company_extend": {
+    "column": {
+      "id": true,
+      "company_id": true,
+      "description": true,
+      "website": true,
+      "tln": true
+    },
+    "index": {
+      "AW_CA_COMPANY_EXTEND_ID": true
+    },
+    "constraint": {
+      "PRIMARY": true
+    }
+  }
+}

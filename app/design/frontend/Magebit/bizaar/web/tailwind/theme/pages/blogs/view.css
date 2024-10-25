@@ -1,0 +1,37 @@
+.blog-post-view {
+    #maincontent {
+        @apply mt-0 lg:mb-9;
+
+        .columns {
+            @apply grid-cols-1 gap-x-0 lg:grid-cols-4 lg:gap-x-6;
+        }
+    }
+
+    .post-view {
+        .post-header .post-info {
+            @apply pt-5;
+
+            .post-data {
+                .item {
+                    @apply after:content-['•'] after:inline-block after:px-2 last:after:content-none;
+                }
+
+                .post-tags {
+                    & a {
+                        @apply lg:hover:no-underline;
+                    }
+                }
+            }
+        }
+
+        .post-content {
+            [data-content-type='row'][data-appearance='contained'] {
+                @apply px-0;
+            }
+        }
+
+        .c-comments .p-replies .c-comment.content::after {
+            @apply content-[''] absolute -left-4 top-1/2 w-2 h-2 block rounded-full bg-gray-e6 lg:-left-7;
+        }
+    }
+}

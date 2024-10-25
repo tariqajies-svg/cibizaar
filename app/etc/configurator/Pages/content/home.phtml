@@ -1,0 +1,876 @@
+<?php
+/**
+ * This file is part of the site configuration.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use CtiDigital\Configurator\ViewModel\Cms;
+use Magebit\Bizaar\ViewModel\Cms as BizaarCms;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+const BRAND_NAMES = ['hp', 'canon', 'epson', 'rf-elements', 'ubiquiti', 'mikrotik', 'grandstream', 'dell', 'ruijie', 'lightwave', 'aruba', 'sony', 'samsung', 'bose'];
+const CATEGORY_NAMES = ['cables-racks', 'components-storage', 'displays', 'electronics', 'networking-hardware', 'outdoor-equipment', 'cameras-security', 'office-equipment', 'phones-conferencing', 'power-solutions', 'print-supplies'];
+
+$cms = $viewModels->require(Cms::class);
+$bizaarCms = $viewModels->require(BizaarCms::class);
+
+$products = [
+    $bizaarCms->getProduct('MikroTik CCR1036-8G-2S+EM')->getId(),
+    $bizaarCms->getProduct('Canon CCR1036-12G-4S-EM')->getId()
+];
+
+$brands = [];
+foreach (BRAND_NAMES as $brandName) {
+    $brand = $cms->getCategory($brandName);
+    $brands[] = $brand ? $brand->getId() : '';
+}
+
+$categories = [];
+foreach (CATEGORY_NAMES as $categoryName) {
+    $category = $cms->getCategory($categoryName);
+    $categories[] = $category ? $category->getId() : '';
+}
+
+$defaultSaleCategory = $cms->getCategory('sale');
+$saleCategory = $defaultSaleCategory ? $defaultSaleCategory->getId() : 0;
+?>
+<style>
+    #html-body [data-pb-style=TDNXWV6] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll
+    }
+
+    #html-body [data-pb-style=HF9S00K] {
+        border-color: #0000fe
+    }
+
+    #html-body [data-pb-style=W8HUF2Y] {
+        background-color: #0000fe;
+        background-position: center center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        min-height: 300px
+    }
+
+    #html-body [data-pb-style=HC37R6P] {
+        min-height: 300px;
+        background-color: transparent
+    }
+
+    #html-body [data-pb-style=NCU1J7I] {
+        background-color: #0000fe;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        min-height: 300px
+    }
+
+    #html-body [data-pb-style=Q2BD5XO] {
+        min-height: 300px;
+        background-color: transparent
+    }
+
+    #html-body [data-pb-style=CTV1HJT], #html-body [data-pb-style=MYSTMF7] {
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat
+    }
+
+    #html-body [data-pb-style=MYSTMF7] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-attachment: scroll
+    }
+
+    #html-body [data-pb-style=CTV1HJT] {
+        min-height: 300px
+    }
+
+    #html-body [data-pb-style=XU69KPX] {
+        min-height: 300px;
+        background-color: transparent
+    }
+
+    #html-body [data-pb-style=E1V4F5N] {
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        min-height: 300px
+    }
+
+    #html-body [data-pb-style=TLB8XP3] {
+        min-height: 300px;
+        background-color: transparent
+    }
+
+    #html-body [data-pb-style=WWK13K6] {
+        background-color: #0000fe;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        min-height: 300px
+    }
+
+    #html-body [data-pb-style=XO6PL27] {
+        min-height: 300px;
+        background-color: transparent
+    }
+
+    #html-body [data-pb-style=DX1RCWO], #html-body [data-pb-style=LUUVQ6X] {
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll
+    }
+
+    #html-body [data-pb-style=LUUVQ6X] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column
+    }
+
+    #html-body [data-pb-style=DX1RCWO] {
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=UW929X0] {
+        display: flex;
+        width: 100%
+    }
+
+    #html-body [data-pb-style=C3W4XDF], #html-body [data-pb-style=EK5N9SI], #html-body [data-pb-style=JTKRPJX], #html-body [data-pb-style=OPLFLSL] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        width: 25%;
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=DCO0TPS], #html-body [data-pb-style=KVFEC7B], #html-body [data-pb-style=TXVI89H] {
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll
+    }
+
+    #html-body [data-pb-style=KVFEC7B], #html-body [data-pb-style=TXVI89H] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column
+    }
+
+    #html-body [data-pb-style=DCO0TPS] {
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=QTAQKBB] {
+        display: flex;
+        width: 100%
+    }
+
+    #html-body [data-pb-style=TAU0IN3] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=TAU0IN3], #html-body [data-pb-style=UAYAQR5], #html-body [data-pb-style=W66MTT2] {
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll
+    }
+
+    #html-body [data-pb-style=UAYAQR5] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column
+    }
+
+    #html-body [data-pb-style=W66MTT2] {
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=KPWXMQN] {
+        display: flex;
+        width: 100%
+    }
+
+    #html-body [data-pb-style=QUS20XC] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        width: 33.3333%;
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=WRXYSPN] {
+        border-style: none
+    }
+
+    #html-body [data-pb-style=JEFXQX3], #html-body [data-pb-style=WFC2VQE] {
+        max-width: 100%;
+        height: auto
+    }
+
+    #html-body [data-pb-style=J44FSPS] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        width: 33.3333%;
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=IHIXU9N] {
+        border-style: none
+    }
+
+    #html-body [data-pb-style=KNAAX4O], #html-body [data-pb-style=SW86FDK] {
+        max-width: 100%;
+        height: auto
+    }
+
+    #html-body [data-pb-style=R104VTF] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        width: 33.3333%;
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=P1Y4NR9] {
+        border-style: none
+    }
+
+    #html-body [data-pb-style=ESGL0D6], #html-body [data-pb-style=XIP5MFP] {
+        max-width: 100%;
+        height: auto
+    }
+
+    #html-body [data-pb-style=GK33BGU], #html-body [data-pb-style=T1YVJH5] {
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll
+    }
+
+    #html-body [data-pb-style=T1YVJH5] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column
+    }
+
+    #html-body [data-pb-style=GK33BGU] {
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=UMVPD6E] {
+        display: flex;
+        width: 100%
+    }
+
+    #html-body [data-pb-style=D939DM2] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=D939DM2], #html-body [data-pb-style=J2206OS], #html-body [data-pb-style=JSWKRRT] {
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll
+    }
+
+    #html-body [data-pb-style=J2206OS] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column
+    }
+
+    #html-body [data-pb-style=JSWKRRT] {
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=WXCRQ8L] {
+        display: flex;
+        width: 100%
+    }
+
+    #html-body [data-pb-style=PSRG5YI] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        width: 50%;
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=EPP3M8H] {
+        border-style: none
+    }
+
+    #html-body [data-pb-style=FRQ8QPM], #html-body [data-pb-style=YQHTCOA] {
+        max-width: 100%;
+        height: auto
+    }
+
+    #html-body [data-pb-style=YLI0VQ0] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        width: 50%;
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=GYV3DSK] {
+        border-style: none
+    }
+
+    #html-body [data-pb-style=R0DV4BX], #html-body [data-pb-style=U2T8Y0U] {
+        max-width: 100%;
+        height: auto
+    }
+
+    #html-body [data-pb-style=K7LRAAV] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-color: #f2f5f7
+    }
+
+    #html-body [data-pb-style=K7LRAAV], #html-body [data-pb-style=M07MKBG], #html-body [data-pb-style=V61LNXT] {
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll
+    }
+
+    #html-body [data-pb-style=V61LNXT] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column
+    }
+
+    #html-body [data-pb-style=M07MKBG] {
+        align-self: stretch
+    }
+
+    #html-body [data-pb-style=WK22KGE] {
+        display: flex;
+        width: 100%
+    }
+
+    #html-body [data-pb-style=GXIV84R], #html-body [data-pb-style=R42RGH2] {
+        justify-content: flex-start;
+        display: flex;
+        flex-direction: column;
+        background-position: left top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        width: 50%;
+        align-self: stretch
+    }
+
+    @media only screen and (max-width: 768px) {
+        #html-body [data-pb-style=EPP3M8H], #html-body [data-pb-style=GYV3DSK], #html-body [data-pb-style=IHIXU9N], #html-body [data-pb-style=P1Y4NR9], #html-body [data-pb-style=WRXYSPN] {
+            border-style: none
+        }
+    }
+</style>
+<div class="hero-banner-desktop" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="TDNXWV6">
+    <div class="pagebuilder-slider" data-content-type="slider" data-appearance="default" data-autoplay="true"
+         data-autoplay-speed="2000" data-fade="false" data-infinite-loop="false" data-show-arrows="false"
+         data-show-dots="false" data-element="main" data-pb-style="HF9S00K">
+        <div data-content-type="slide" data-slide-name="" data-appearance="poster" data-show-button="never"
+             data-show-overlay="never" data-element="main">
+            <div data-element="empty_link">
+                <div class="pagebuilder-slide-wrapper"
+                     data-background-images="{\&quot;desktop_image\&quot;:\&quot;{{media url=wysiwyg/Aduba_7.jpg}}\&quot;,\&quot;mobile_image\&quot;:\&quot;{{media url=wysiwyg/Aduba_8.jpg}}\&quot;}"
+                     data-background-type="image" data-video-loop="true" data-video-play-only-visible="true"
+                     data-video-lazy-load="true" data-video-fallback-src="" data-element="wrapper"
+                     data-pb-style="W8HUF2Y">
+                    <div class="pagebuilder-overlay pagebuilder-poster-overlay" data-overlay-color="" aria-label=""
+                         title="" data-element="overlay" data-pb-style="HC37R6P">
+                        <div class="pagebuilder-poster-content">
+                            <div data-element="content"><p><span style="color: #ecf0f1; font-size: 14px;"><strong><span
+                                                    style="color: #ffffff;">Aruba Networking Products at Unbelievable Prices!!</span></strong></span>
+                                </p>
+                                <p><span style="color: #ecf0f1; font-size: 14px;"><strong><span style="color: #ffffff;"><img
+                                                        style="width: 107px; height: 28px;"
+                                                        src="media/catalog/category/brand_logo/logo_aruba.png" alt=""
+                                                        width="107" height="28"></span></strong></span></p>
+                                <h2 style="line-height: 10px;"><span style="color: #ffffff;">Wide Range of</span><span
+                                            style="color: #ffffff;"> Aruba</span></h2>
+                                <h2 style="line-height: 10px;"><span style="color: #ffffff;"> Networking </span><span
+                                            style="color: #ffffff;">Products.</span></h2>
+                                <p><span style="color: #ffffff;">{{widget type="Magento\Catalog\Block\Category\Widget\Link" anchor_text="Shop Aruba Products" template="category/widget/link/link_block.phtml" id_path="category/741"}}</span>
+                                </p>
+                                <h2 style="line-height: 10px;"></h2></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-content-type="slide" data-slide-name="" data-appearance="poster" data-show-button="never"
+             data-show-overlay="never" data-element="main">
+            <div data-element="empty_link">
+                <div class="pagebuilder-slide-wrapper"
+                     data-background-images="{\&quot;desktop_image\&quot;:\&quot;{{media url=wysiwyg/Epson_2.jpg}}\&quot;,\&quot;mobile_image\&quot;:\&quot;{{media url=wysiwyg/Epson_3.jpg}}\&quot;}"
+                     data-background-type="image" data-video-loop="true" data-video-play-only-visible="true"
+                     data-video-lazy-load="true" data-video-fallback-src="" data-element="wrapper"
+                     data-pb-style="NCU1J7I">
+                    <div class="pagebuilder-overlay pagebuilder-poster-overlay" data-overlay-color="" aria-label=""
+                         title="" data-element="overlay" data-pb-style="Q2BD5XO">
+                        <div class="pagebuilder-poster-content">
+                            <div data-element="content"><p><span style="color: #ffffff; font-size: 14px;"><strong>Limited Time Offer on Epson Products!!</strong></span>
+                                </p>
+                                <p><span style="color: #ffffff;"><strong><img style="width: 87px; height: 20px;"
+                                                                              src="media/catalog/category/brand_logo/logo_epson.png"
+                                                                              alt="" width="87"
+                                                                              height="20"></strong></span></p>
+                                <h2 style="line-height: 10px;"><span style="color: #ffffff;">Best Prices on </span></h2>
+                                <h2 style="line-height: 10px;"><span style="color: #ffffff;"> Epson </span><span
+                                            style="color: #ffffff;">Products</span></h2>
+                                <p>{{widget type="Magento\Catalog\Block\Category\Widget\Link" anchor_text="Shop Epson
+                                    Products" template="category/widget/link/link_block.phtml"
+                                    id_path="category/745"}}</p>
+                                <h2 style="line-height: 10px;"></h2>
+                                <p></p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="hero-banner-mobile" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="MYSTMF7">
+    <div class="pagebuilder-slider" data-content-type="slider" data-appearance="default" data-autoplay="true"
+         data-autoplay-speed="2000" data-fade="false" data-infinite-loop="false" data-show-arrows="true"
+         data-show-dots="true" data-element="main">
+        <div data-content-type="slide" data-slide-name="" data-appearance="poster" data-show-button="never"
+             data-show-overlay="never" data-element="main">
+            <div data-element="empty_link">
+                <div class="pagebuilder-slide-wrapper"
+                     data-background-images="{\&quot;desktop_image\&quot;:\&quot;{{media url=wysiwyg/bg_slider-mikrotik-mobile.jpg}}\&quot;,\&quot;mobile_image\&quot;:\&quot;{{media url=wysiwyg/bg_slider-mikrotik-mobile2.jpeg}}\&quot;}"
+                     data-background-type="image" data-video-loop="true" data-video-play-only-visible="true"
+                     data-video-lazy-load="true" data-video-fallback-src="" data-element="wrapper"
+                     data-pb-style="CTV1HJT">
+                    <div class="pagebuilder-overlay pagebuilder-poster-overlay" data-overlay-color="" aria-label=""
+                         title="" data-element="overlay" data-pb-style="XU69KPX">
+                        <div class="pagebuilder-poster-content">
+                            <div data-element="content"><p><span style="color: #ecf0f1; font-size: 10px;"><strong><span
+                                                    id="WSS2Q1L"
+                                                    style="color: #ffffff;">Mikrotik Products at Unbelievable Prices!!</span></strong></span>
+                                </p>
+                                <p><img style="width: 114px; height: 20px;"
+                                        src="media/wysiwyg/logo_mikrotik-mobile.png" alt=""
+                                        width="162" height="28"></p>
+                                <h2 style="line-height: 10px;"><span style="font-size: 20px;"><span
+                                                style="color: #ffffff;">Wide Range of</span></span></h2>
+                                <h2 style="line-height: 10px;"><span style="font-size: 20px;"><span
+                                                style="color: #ffffff;">Mikrotik </span><span
+                                                style="color: #ffffff;">Products</span></span></h2>
+                                <p>{{widget type="Magento\Catalog\Block\Category\Widget\Link" anchor_text="Shop Mikrotik
+                                    Products" template="category/widget/link/link_block.phtml"
+                                    id_path="category/742"}}</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-content-type="slide" data-slide-name="" data-appearance="poster" data-show-button="never"
+             data-show-overlay="never" data-element="main">
+            <div data-element="empty_link">
+                <div class="pagebuilder-slide-wrapper"
+                     data-background-images="{\&quot;desktop_image\&quot;:\&quot;{{media url=wysiwyg/Aduba_9.jpg}}\&quot;}"
+                     data-background-type="image" data-video-loop="true" data-video-play-only-visible="true"
+                     data-video-lazy-load="true" data-video-fallback-src="" data-element="wrapper"
+                     data-pb-style="E1V4F5N">
+                    <div class="pagebuilder-overlay pagebuilder-poster-overlay" data-overlay-color="" aria-label=""
+                         title="" data-element="overlay" data-pb-style="TLB8XP3">
+                        <div class="pagebuilder-poster-content">
+                            <div data-element="content"><p><span style="color: #ecf0f1; font-size: 10px;"><strong><span
+                                                    id="SGTNMHG" style="color: #ffffff;">Aruba Networking Products at Unbelievable Prices!!</span></strong></span>
+                                </p>
+                                <p><span style="color: #ecf0f1; font-size: 14px;"><strong><span style="color: #ffffff;"><img
+                                                        style="width: 107px; height: 28px;"
+                                                        src="media/catalog/category/brand_logo/logo_aruba_1.png"
+                                                        alt="" width="107" height="28"></span></strong></span></p>
+                                <h2 style="line-height: 10px;"><span style="font-size: 20px;"><span
+                                                style="color: #ffffff;">Wide Range of </span><span id="MJ243RT"
+                                                                                                   style="color: #ffffff;">Products.</span></span>
+                                </h2>
+                                <p><span style="color: #ffffff;">{{widget type="Magento\Catalog\Block\Category\Widget\Link" anchor_text="Shop Aruba Products" template="category/widget/link/link_block.phtml" id_path="category/741"}}</span>
+                                </p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="company-values" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="LUUVQ6X">
+    <div class="pagebuilder-column-group" data-background-images="{}" data-content-type="column-group"
+         data-appearance="default" data-grid-size="12" data-element="main" data-pb-style="DX1RCWO">
+        <div class="pagebuilder-column-line" data-content-type="column-line" data-element="main"
+             data-pb-style="UW929X0">
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="OPLFLSL">
+                <div data-content-type="html" data-appearance="default" data-element="main">&lt;i class="icon-delivery"&gt;&lt;/i&gt;</div>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p><strong>Free
+                            Shipping</strong></p>
+                    <p>Free shipping for orders over $ 50.00</p>
+                </div>
+            </div>
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="C3W4XDF">
+                <div data-content-type="html" data-appearance="default" data-element="main">&lt;i class="icon-support"&gt;&lt;/i&gt;</div>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p><strong>24/7
+                            Support</strong></p>
+                    <p>We will answer to your questions 24/7</p>
+                </div>
+            </div>
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="JTKRPJX">
+                <div data-content-type="html" data-appearance="default" data-element="main">&lt;i
+                    class="icon-money-back"&gt;&lt;/i&gt;
+                </div>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p><strong>Money back
+                            guarantee</strong></p>
+                    <p>We will return your money in 2 weeks</p>
+                </div>
+            </div>
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="EK5N9SI">
+                <div data-content-type="html" data-appearance="default" data-element="main">&lt;i
+                    class="icon-shopping-bag"&gt;&lt;/i&gt;
+                </div>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p><strong>Certified
+                            Reseller</strong></p>
+                    <p>Certified reseller for over 50 brands</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div data-content-type="html" data-appearance="default" data-element="main">&lt;div class="bizaar-cat"&gt;&lt;/div&gt;</div>
+<div class="product-slider" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="TXVI89H"><h2 data-content-type="heading" data-appearance="default" data-element="main">Popular
+        Products</h2>
+    <div data-content-type="text" data-appearance="default" data-element="main">
+        <p>Explore our most popular products</p>
+    </div>
+    <div class="product-slider" data-content-type="products" data-appearance="carousel" data-autoplay="false"
+         data-autoplay-speed="4000" data-infinite-loop="false" data-show-arrows="false" data-show-dots="true"
+         data-carousel-mode="default" data-center-padding="90px" data-element="main">
+        {{widget type="Magento\CatalogWidget\Block\Product\ProductsList" template="Magento_PageBuilder::catalog/product/widget/content/carousel.phtml" anchor_text="" id_path="" show_pager="0" products_count="20" condition_option="sku" condition_option_value="MikroTik CCR1036-8G-2S+EM, MikroTik CCR1036-12G-4S-EM, MikroTik 18POW, R2W96A" type_name="Catalog Products Carousel" conditions_encoded="^[`1`:^[`aggregator`:`all`,`new_child`:``,`type`:`Smile||ElasticsuiteVirtualCategory||Model||Rule||WidgetCondition||Combine`,`value`:`1`^],`1--1`:^[`operator`:`()`,`type`:`Smile||ElasticsuiteVirtualCategory||Model||Rule||WidgetCondition||Product`,`attribute`:`sku`,`value`:`MikroTik CCR1036-8G-2S+EM, MikroTik CCR1036-12G-4S-EM, MikroTik 18POW, R2W96A`^]^]" sort_order="position_by_sku"}}
+    </div>
+</div>
+<div class="category-menu-block" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="KVFEC7B">
+    <div class="pagebuilder-column-group" data-background-images="{}" data-content-type="column-group"
+         data-appearance="default" data-grid-size="12" data-element="main" data-pb-style="DCO0TPS">
+        <div class="pagebuilder-column-line" data-content-type="column-line" data-element="main"
+             data-pb-style="QTAQKBB">
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="TAU0IN3">
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    {{widget type="Magebit\Catalog\Block\Category\Widget\Menu" heading="Categories" description="Consumer tech, wireless &amp; networking, IoT solutions" template_type="widget/category-list.phtml" category_ids="<?= /* @noEscape */ implode(',', array_filter($categories)) ?>"}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="promo-banners-1" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="UAYAQR5">
+    <div class="pagebuilder-column-group" data-background-images="{}" data-content-type="column-group"
+         data-appearance="default" data-grid-size="12" data-element="main" data-pb-style="W66MTT2">
+        <div class="pagebuilder-column-line" data-content-type="column-line" data-element="main"
+             data-pb-style="KPWXMQN">
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="QUS20XC">
+                <figure data-content-type="image" data-appearance="full-width" data-element="main"
+                        data-pb-style="WRXYSPN">
+                    <a href="{{widget type='Magento\Catalog\Block\Category\Widget\Link' id_path='category/<?= /* @noEscape */ $brands[4] ?>' template='Magento_PageBuilder::widget/link_href.phtml' type_name='Catalog Category Link' }}"
+                       target="" data-link-type="category" title="" data-element="link">
+                            <img class="pagebuilder-mobile-hidden"
+                                 src="{{media url=wysiwyg/banner-1_1x.jpg}}"
+                                 alt="Shop Ubiquiti Solutions Banner" title=""
+                                 srcset="{{media url=wysiwyg/banner-1.jpg}} 2x"
+                                 width="496" height="212" loading="lazy"
+                                 data-element="desktop_image"
+                                 data-pb-style="WFC2VQE">
+                            <img class="pagebuilder-mobile-only"
+                                 src="{{media url=wysiwyg/banner-1-mobile_1x.jpg}}"
+                                 alt="Shop Ubiquiti Solutions Banner" title=""
+                                 srcset="{{media url=wysiwyg/banner-1-mobile.jpg}} 2x"
+                                 width="335" height="164" loading="lazy"
+                                 data-element="mobile_image"
+                                 data-pb-style="JEFXQX3">
+                    </a>
+                </figure>
+            </div>
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="J44FSPS">
+                <figure data-content-type="image" data-appearance="full-width" data-element="main"
+                        data-pb-style="IHIXU9N">
+                    <a href="{{widget type='Magento\Catalog\Block\Category\Widget\Link' id_path='category/<?= /* @noEscape */ $brands[0] ?>' template='Magento_PageBuilder::widget/link_href.phtml' type_name='Catalog Category Link' }}"
+                       target="" data-link-type="category" title="" data-element="link">
+                        <img class="pagebuilder-mobile-hidden"
+                             src="{{media url=wysiwyg/banner-2_1x.jpg}}"
+                             alt="Shop HP Monitors & Computers Banner" title=""
+                             srcset="{{media url=wysiwyg/banner-2.jpg}} 2x"
+                             width="496" height="212" loading="lazy"
+                             data-element="desktop_image"
+                             data-pb-style="SW86FDK">
+                        <img class="pagebuilder-mobile-only"
+                             src="{{media url=wysiwyg/banner-2-mobile_1x.jpg}}"
+                             alt="Shop Ubiquiti Solutions Banner" title=""
+                             srcset="{{media url=wysiwyg/banner-2-mobile.jpg}} 2x"
+                             width="335" height="164" loading="lazy"
+                             data-element="mobile_image"
+                             data-pb-style="KNAAX4O">
+                    </a>
+                </figure>
+            </div>
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="R104VTF">
+                <figure data-content-type="image" data-appearance="full-width" data-element="main"
+                        data-pb-style="P1Y4NR9">
+                    <a href="{{widget type='Magento\Catalog\Block\Category\Widget\Link' id_path='category/<?= /* @noEscape */ $categories[4] ?>' template='Magento_PageBuilder::widget/link_href.phtml' type_name='Catalog Category Link' }}"
+                        target="" data-link-type="category" title="" data-element="link">
+                        <img class="pagebuilder-mobile-hidden"
+                             src="{{media url=wysiwyg/banner-3_1x.jpg}}"
+                             alt="Shop IoT Solutions Banner" title=""
+                             srcset="{{media url=wysiwyg/banner-3.jpg}} 2x"
+                             width="496" height="212" loading="lazy"
+                             data-element="desktop_image"
+                             data-pb-style="XIP5MFP">
+                        <img class="pagebuilder-mobile-only"
+                             src="{{media url=wysiwyg/banner-3-mobile_1x.jpg}}"
+                             alt="Shop IoT Solutions Banner" title=""
+                             srcset="{{media url=wysiwyg/banner-3-mobile.jpg}} 2x"
+                             width="335" height="164" loading="lazy"
+                             data-element="mobile_image"
+                             data-pb-style="ESGL0D6">
+                    </a>
+                </figure>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="brand-menu-block" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="T1YVJH5">
+    <div class="pagebuilder-column-group" data-background-images="{}" data-content-type="column-group"
+         data-appearance="default" data-grid-size="12" data-element="main" data-pb-style="GK33BGU">
+        <div class="pagebuilder-column-line" data-content-type="column-line" data-element="main"
+             data-pb-style="UMVPD6E">
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="D939DM2">
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    {{widget type="Magebit\Catalog\Block\Category\Widget\Menu" heading="Brands" description="We are master distributors to biggest networking brands in Middle-East region." template_type="widget/brand-list.phtml" category_ids="<?= /* @noEscape */ implode(',', array_filter($brands)) ?>"}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="promo-banners-2" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="J2206OS">
+    <div class="pagebuilder-column-group" data-background-images="{}" data-content-type="column-group"
+         data-appearance="default" data-grid-size="12" data-element="main" data-pb-style="JSWKRRT">
+        <div class="pagebuilder-column-line" data-content-type="column-line" data-element="main"
+             data-pb-style="WXCRQ8L">
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="PSRG5YI">
+                <figure data-content-type="image" data-appearance="full-width" data-element="main"
+                        data-pb-style="EPP3M8H">
+                    <a href="{{widget type='Magento\Catalog\Block\Product\Widget\Link' id_path='product/<?= /* @noEscape */ $products[0] ?>' template='Magento_PageBuilder::widget/link_href.phtml' type_name='Catalog Product Link' }}"
+                        target="" data-link-type="product" title="" data-element="link">
+                        <img class="pagebuilder-mobile-hidden"
+                             src="{{media url=wysiwyg/banner-4_1x.jpg}}"
+                             alt="Buy MikroTik Chateau 5G ax Banner" title=""
+                             srcset="{{media url=wysiwyg/banner-4.jpg}} 2x"
+                             width="756" height="212" loading="lazy"
+                             data-element="desktop_image"
+                             data-pb-style="YQHTCOA">
+                        <img class="pagebuilder-mobile-only"
+                             src="{{media url=wysiwyg/banner-4-mobile_1x.jpg}}"
+                             alt="Buy MikroTik Chateau 5G ax Banner" title=""
+                             srcset="{{media url=wysiwyg/banner-4-mobile.jpg}} 2x"
+                             width="335" height="164" loading="lazy"
+                             data-element="mobile_image"
+                             data-pb-style="FRQ8QPM">
+                    </a>
+                </figure>
+            </div>
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="YLI0VQ0">
+                <figure data-content-type="image" data-appearance="full-width" data-element="main"
+                        data-pb-style="GYV3DSK">
+                    <a href="{{widget type='Magento\Catalog\Block\Product\Widget\Link' id_path='product/<?= /* @noEscape */ $products[1] ?>' template='Magento_PageBuilder::widget/link_href.phtml' type_name='Catalog Product Link' }}"
+                        target="" data-link-type="product" title="" data-element="link">
+                        <img class="pagebuilder-mobile-hidden"
+                             src="{{media url=wysiwyg/banner-5_1x.jpg}}"
+                             alt="Buy Cannon Imagerunner 2206 Banner" title=""
+                             srcset="{{media url=wysiwyg/banner-5.jpg}} 2x"
+                             width="756" height="212" loading="lazy"
+                             data-element="desktop_image"
+                             data-pb-style="R0DV4BX">
+                        <img class="pagebuilder-mobile-only"
+                             src="{{media url=wysiwyg/banner-5-mobile_1x.jpg}}"
+                             alt="Buy Cannon Imagerunner 2206 Banner" title=""
+                             srcset="{{media url=wysiwyg/banner-5-mobile.jpg}} 2x"
+                             width="335" height="164" loading="lazy"
+                             data-element="mobile_image"
+                             data-pb-style="U2T8Y0U">
+                    </a>
+                </figure>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="product-slider" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="K7LRAAV"><h2 data-content-type="heading" data-appearance="default" data-element="main">Products On
+        Sale</h2>
+    <div data-content-type="text" data-appearance="default" data-element="main">
+        <p>Explore products and sale</p>
+    </div>
+    <div data-content-type="products" data-appearance="carousel" data-autoplay="false" data-autoplay-speed="4000"
+         data-infinite-loop="false" data-show-arrows="false" data-show-dots="true" data-carousel-mode="default"
+         data-center-padding="90px" data-element="main">{{widget type="Magento\CatalogWidget\Block\Product\ProductsList" template="Magento_PageBuilder::catalog/product/widget/content/carousel.phtml" anchor_text="" id_path="" show_pager="0" products_count="10" condition_option="category_ids" condition_option_value="37" type_name="Catalog Products Carousel" conditions_encoded="^[`1`:^[`aggregator`:`all`,`new_child`:``,`type`:`Smile||ElasticsuiteVirtualCategory||Model||Rule||WidgetCondition||Combine`,`value`:`1`^],`1--1`:^[`operator`:`==`,`type`:`Smile||ElasticsuiteVirtualCategory||Model||Rule||WidgetCondition||Product`,`attribute`:`category_ids`,`value`:`<?= /* @noEscape */ $saleCategory ?>`^]^]" sort_order="position"}}
+    </div>
+</div>
+<div class="seo-description" data-content-type="row" data-appearance="full-bleed" data-enable-parallax="0"
+     data-parallax-speed="0.5" data-background-images="{}" data-background-type="image" data-video-loop="true"
+     data-video-play-only-visible="true" data-video-lazy-load="true" data-video-fallback-src="" data-element="main"
+     data-pb-style="V61LNXT"><h2 data-content-type="heading" data-appearance="default" data-element="main">About us</h2>
+    <div data-content-type="text" data-appearance="default" data-element="main">
+        <p>With our strong vendor relationships , we are able to offer you the best pricing and offers not seen anywhere
+            else</p>
+    </div>
+    <div class="pagebuilder-column-group" data-background-images="{}" data-content-type="column-group"
+         data-appearance="default" data-grid-size="12" data-element="main" data-pb-style="M07MKBG">
+        <div class="pagebuilder-column-line" data-content-type="column-line" data-element="main"
+             data-pb-style="WK22KGE">
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="R42RGH2"><h4 data-content-type="heading"
+                                                                                             data-appearance="default"
+                                                                                             data-element="main">About
+                    TLM</h4>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p>TLM represents some of the world's biggest brands including HP, Epson, Ubiquiti, MikroTik, RF
+                        Elements, Canon, Dell, Grandstream, TP-Link and Aruba. Powered by over 400,000sqft of logistics
+                        facilities in the Jebel Ali Free Zone, TLM has the capability to consolidate shipments and
+                        service its partners across the region swiftly.</p>
+                </div>
+                <h4 data-content-type="heading" data-appearance="default" data-element="main">Lightwave Global</h4>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p>As the exclusive Global Master Distributor for Lightwave, TLM has a vast reseller network across
+                        the MENA Region. Lightwave's products range from power products such as batteries, inverters,
+                        UPCs and AVRs, to print consumables &amp; accessories.</p>
+                </div>
+                <h4 data-content-type="heading" data-appearance="default" data-element="main">Consumer Tech
+                    Hardware</h4>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p>TLM is partners with globally recognized technology vendors including HP, Epson, Canon, and Dell
+                        for their consumer and corporate product ranges.</p>
+                </div>
+            </div>
+            <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                 data-background-images="{}" data-element="main" data-pb-style="GXIV84R"><h4 data-content-type="heading"
+                                                                                             data-appearance="default"
+                                                                                             data-element="main">Partner
+                    First</h4>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p id="VYEDTU0">Success comes from close partnerships in a global environment. At TLM, our business
+                        is built on strong relationships with our partners. We are proud to deliver exceptional service,
+                        and go the extra mile so that we can celebrate in your success.</p>
+                </div>
+                <h4 data-content-type="heading" data-appearance="default" data-element="main">Affordability</h4>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p>Our top tier partnerships include some of the biggest names in &nbsp;Tech: Ubiquiti, HP, Epson,
+                        MikroTik, Dell, Canon, Aruba. With our strong vendor relationships , we are able to offer you
+                        the best pricing and offers not seen anywhere else.</p>
+                </div>
+                <h4 data-content-type="heading" data-appearance="default" data-element="main">Consumer Tech
+                    Hardware</h4>
+                <div data-content-type="text" data-appearance="default" data-element="main">
+                    <p>TLM is partners with globally recognized technology vendors including HP, Epson, Canon, and Dell
+                        for their consumer and corporate product ranges.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

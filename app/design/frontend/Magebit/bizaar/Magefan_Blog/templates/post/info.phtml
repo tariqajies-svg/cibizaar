@@ -1,0 +1,91 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magefan\Blog\Block\Post\Info;
+use Magento\Framework\Escaper;
+
+/**
+ * Blog post info template
+ *
+ * @var Info $block
+ * @var Escaper $escaper
+ */
+
+ $_post = $block->getPost() ?>
+
+<div class="post-info flex justify-between pb-1">
+    <div class="post-data leading-none">
+        <?php if ($_post->isPublishDateEnabled()): ?>
+            <div class="item post-posted-date inline-block text-xs lg:text-sm">
+                <span class="value">
+                    <?= $escaper->escapeHtml($_post->getPublishDate()) ?>
+                </span>
+            </div>
+        <?php endif; ?>
+        <?php if ($_tagsCount = $_post->getTagsCount()): ?>
+            <div class="item post-tags inline-block text-xs lg:text-sm">
+                <?php $n = 0;
+                foreach ($_post->getRelatedTags() as $tag):
+                    $n++; ?>
+                    <a title="<?= $escaper->escapeHtml($tag->getTitle()) ?>"
+                       href="<?= $escaper->escapeUrl($tag->getTagUrl()) ?>"
+                    ><?= $escaper->escapeHtml($tag->getTitle()) ?></a><?= ($n != $_tagsCount) ? ',' : '' ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($block->authorEnabled()): ?>
+            <?php if ($_author = $_post->getAuthor()): ?>
+                <div class="item post-author inline-block text-xs lg:text-sm"">
+                    <span class="value">
+                        <?php if ($authorPageEnabled = $block->authorPageEnabled()): ?>
+                        <a title="<?= $escaper->escapeHtml($_author->getTitle()) ?>"
+                            href="<?= $escaper->escapeUrl($_author->getAuthorUrl()) ?>">
+                        <?php endif; ?>
+
+                        <?= $escaper->escapeHtml($_author->getTitle()) ?>
+
+                        <?php if ($authorPageEnabled): ?>
+                        </a>
+                        <?php endif; ?>
+                    </span>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+    <div class="post-statistics">
+        <?php if ($block->viewsCountEnabled()): ?>
+            <?php if ($viewsCount = $_post->getViewsCount()): ?>
+                <div class="item post-views">
+                    <span class="value">
+                    <?= $escaper->escapeHtml($viewsCount)?>
+                </span>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+        <?php if ($block->magefanCommentsEnabled()): ?>
+            <div class="item post-comments leading-4">
+                <a class="blog-listing post-comments-link"
+                    title="<?= $escaper->escapeHtml($_post->getTitle()) ?>"
+                    href="<?= $escaper->escapeUrl($_post->getPostUrl()) ?>#post-comments">
+                    <span class="count relative inline-block align-middle text-xs text-gray font-extrabold leading-4 bg-gray-e6 rounded px-2 ml-2 lg:!leading-5">
+                        <span class="leading-3 align-bottom lg:!leading-4"><?= $escaper->escapeHtml($_post->getCommentsCount() ?: '0') ?></span>
+                        <div class="triangle absolute right-0 -bottom-1 w-0 h-0 border-l-8 border-t-8 border-l-transparent border-t-gray-e6"></div>
+                    </span>
+                </a>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>

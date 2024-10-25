@@ -1,0 +1,26 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Shipping\Block\Tracking\Link;
+
+/** @var Escaper $escaper */
+/** @var Link $block */
+
+$order = $block->getOrder();
+?>
+<a href="<?= $escaper->escapeUrl($block->getWindowUrl($order)) ?>" class="text-primary"
+   target="_blank" rel="noopener" title="<?= $escaper->escapeHtmlAttr($block->getLabel()) ?>">
+    <?= $escaper->escapeHtml($block->getLabel()) ?>
+</a>

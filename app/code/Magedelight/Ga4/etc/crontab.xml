@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2023 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_Ga4
+ * @copyright Copyright (c) 2023 MageDelight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="md_ga4_clean_logs" instance="Magedelight\Ga4\Cron\ClearLog" method="execute">
+            <config_path>crontab/default/jobs/md_ga4_clean_logs/schedule/cron_expr</config_path>
+        </job>
+    </group>
+</config>

@@ -1,0 +1,80 @@
+.aw_ctq-quote-edit {
+    .aw_ctq__quote-links {
+        @apply mb-5 lg:mb-8;
+    }
+
+    .actions-toolbar {
+        @apply border-t-0 mt-0;
+    }
+
+    .order-details-items {
+        table {
+            .col {
+                &.subtotal {
+                    @apply text-right;
+                }
+
+                &.qty::before {
+                    @apply self-center;
+                }
+            }
+
+            td {
+                @apply py-1 lg:py-5 align-top;
+            }
+
+            tr:last-child {
+                @apply lg:border-b-0;
+            }
+
+            .price {
+                @apply font-bold text-navy;
+            }
+
+            .item-option {
+                @apply text-2xs lg:text-sm;
+
+                .option-value {
+                    @apply font-bold;
+                }
+
+                &.sku {
+                    .option-value {
+                        @apply text-navy;
+                    }
+                }
+            }
+        }
+    }
+
+    .aw-ctq__quote-totals-block {
+        @apply bg-gray-f2 p-5 mt-2 rounded
+            lg:p-8 lg:mt-0 lg:rounded-none;
+
+        .quote-totals {
+            @apply w-full
+                lg:w-auto;
+        }
+
+        .totals-row {
+            @apply flex justify-between pt-1
+                lg:gap-15;
+
+            &:nth-child(2) {
+                @apply pt-0;
+            }
+
+            &.grand {
+                @apply font-bold text-base lg:text-md;
+
+                .totals-value {
+                    @apply text-blue;
+                }
+            }
+
+            .totals-value {
+                @apply font-bold text-navy;
+            }
+        }
+    }
+}

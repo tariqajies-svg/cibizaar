@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_modal"/>
+    <body>
+        <referenceBlock name="product_list_item">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="product.item.price"
+                   template="Magento_Catalog::product/list/price/price.phtml"/>
+            <block class="Magebit\HyvaTheme\Block\Product\Listing\ProductQuantity"
+                   name="product.item.quantity"
+                   template="Magento_Catalog::product/list/quantity.phtml"/>
+            <block class="Magento\Framework\View\Element\Template"
+                   name="product.item.tier_prices"
+                   template="Magento_Catalog::product/list/price/tier-prices.phtml"/>
+            <block name="product.item.discount"
+                   template="Magento_Catalog::product/list/price/discount-label.phtml"/>
+            <block name="product.item.attributes"
+                   template="Magento_Catalog::product/list/attributes.phtml"/>
+            <referenceBlock name="category.product.type.details.renderers" remove="true"/>
+            <block name="product.list.item.tolist" template="Magento_Catalog::product/list/to-list.phtml">
+                <block class="Magebit\HyvaRequisitionLists\ViewModel\RequisitionList"
+                       name="product.item.addtorlist"
+                       template="Magebit_HyvaRequisitionLists::catalog/product/addto/requisitionList.phtml">
+                    <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+                    <action method="setFormAction">
+                        <argument name="form_action" xsi:type="string">aw_rl/rlist/save</argument>
+                    </action>
+                    <arguments>
+                        <argument name="list_view_model" xsi:type="object">Magebit\Aheadworks\ViewModel\RequisitionLists\Catalog\Product\View\RequisitionListProvider</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block name="product.addto.requisition.list.modal"
+                   template="Magebit_HyvaRequisitionLists::requisition-list/modal-container.phtml"/>
+        </referenceContainer>
+        <referenceContainer name="before.body.end">
+            <block name="category.products.list.js.compare" template="Magento_Catalog::product/list/js/compare.phtml"/>
+            <block name="category.products.list.js.wishlist" template="Magento_Catalog::product/list/js/wishlist.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

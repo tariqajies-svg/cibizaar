@@ -1,0 +1,397 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\Block\Form;
+use Magento\Framework\Escaper;
+
+/** @var Form $block */
+/** @var Escaper $escaper */
+?>
+<script>
+    function initEditForm() {
+        return {
+            roleName: '',
+            compareItems: [],
+            sentData: {},
+            actionTitle: '',
+            fieldsetTitle: '',
+            saveUrl: '',
+            showTooltip: false,
+            isEdit: true,
+            editTitle: String('<?= $escaper->escapeHtml(__('Edit user role')); ?>'),
+            createTitle: String('<?= $escaper->escapeHtml(__('Create new role')); ?>'),
+            isLoading: false,
+            fieldsets: {},
+            temp: '',
+            formData: [],
+            getSectionData: function () {
+                const JsLayout = JSON.parse('<?= $block->getJsLayout() ?>');
+                if (!JsLayout.components.awCaRoleProvider.data) {
+                    this.isEdit = false;
+                }
+            },
+            getComponentData: function() {
+                const JsLayout = JSON.parse('<?= $block->getJsLayout() ?>');
+                const general = JsLayout.components.awCaForm.children.fieldset.children;
+                const credit = JsLayout.components.awCaForm.children.aw_stc_fieldset;
+
+                this.saveUrl = JsLayout.components.awCaRoleProvider.clientConfig.urls.save;
+
+                this.actionTitle = JsLayout.components.awCaForm.children.save.title;
+                this.fieldsetTitle = JsLayout.components.awCaForm.children.fieldset.label;
+
+                if (JsLayout.components.awCaRoleProvider.data) {
+                    this.sentData = JsLayout.components.awCaRoleProvider.data;
+                    this.roleName = JsLayout.components.awCaRoleProvider.data?.name;
+                } else {
+                    this.isEdit = false;
+                }
+
+                this.compareItems = this.getFieldsData(general);
+                this.fieldsets = {
+                    credit: {
+                        fields: this.getFieldsData(credit.children),
+                        title: credit.label,
+                        visible: credit.visible,
+                        showTooltip: false
+                    }
+                }
+            },
+            getFieldsData: function(components) {
+                for (let i in components) {
+                    let dataScope = components[i].dataScope.split('.'),
+                        val = '';
+
+                    if (this.isEdit) {
+                        val = this.sentData;
+
+                        if (components[i].component === 'Magento_Ui/js/form/element/single-checkbox') {
+                            components[i].disabled = this.sentData.is_default_disabled;
+                        }
+                    }
+
+                    components[i].name = '';
+
+                    dataScope.forEach((slug, k) => {
+                        components[i].name += k === 0 ? slug : '[' + slug + ']';
+                        if (this.isEdit) {
+                            val = val[slug];
+                        }
+                    });
+
+                    if (components[i].name === 'id') { components[i].hidden = true; }
+
+                    components[i].val = val;
+
+                    if (components[i].component === 'Aheadworks_Ca/js/ui/form/element/tree') {
+                        this.temp = '';
+                        let html = this.getCheckboxTree(components[i].treeConfig.core.data, components[i].val, 0);
+
+                        components[i].html = html;
+                    }
+                }
+
+                return Object.values(components);
+            },
+            getCheckboxTree: function(arr, val, i) {
+                arr.map(el => {
+                    if (val.includes(el.id)) {
+                        this.formData.push(el.id)
+                    }
+
+                    this.temp += '<div class="field field-reserved !mb-1 field-'
+                        + i
+                        +'"><label class="inline-label !mb-0 w-full"><input type="checkbox" id="'
+                        + el.id
+                        +'" name="'+ el.id
+                        +'" ' + 'x-model="formData"'
+                        +' value="' + el.id + '"'
+                        +  (el.children.length > 0 ? ' x-on:change="checkboxChange"' : '')
+                        +'/><span for="'+el.id+'">'+el.text+'</span></label></div>';
+
+
+                    if (el.children.length) {
+                        this.temp += '<div class="child-wrapper field-' + i + '">';
+                        this.getCheckboxTree(el.children, val, ++i);
+                        this.temp += '</div>';
+                    }
+                });
+
+                return this.temp;
+            },
+            checkboxChange: function (e) {
+                let target = e.target;
+                let tmpFormData = this.formData;
+
+                target.parentElement.parentElement.nextElementSibling
+                .querySelectorAll('[type="checkbox"]').forEach(checkbox => {
+                    if (target.checked) {
+                        if (!tmpFormData.includes(checkbox.value)) {
+                            tmpFormData.push(checkbox.value)
+                        }
+                    } else {
+                        tmpFormData.splice(tmpFormData.indexOf(checkbox.value), 1);
+                    }
+                });
+
+                this.formData = tmpFormData
+            },
+            submitForm: function () {
+                this.isLoading = true;
+
+                const sendData = function () {
+                    const formKey = hyva.getFormKey();
+                    const $form = this.$refs.editform;
+                    const dataForm = new FormData($form);
+                    let request_data = '',
+                        k = 0;
+
+                    if (this.isEdit) {
+                        for (let i in this.sentData) {
+                            if (typeof this.sentData[i] === 'string' || typeof this.sentData[i] === 'number' || typeof this.sentData[i] === 'boolean') {
+                                if (request_data) {
+                                    request_data += '&'
+                                }
+                                request_data += i + '=' + encodeURIComponent(this.sentData[i]);
+                            }
+                        }
+                    }
+
+                    for (let [name, value] of dataForm) {
+                        if (value === name && this.formData.includes(value)) {
+                            request_data += '&permissions[' + k + ']=' + encodeURIComponent(name);
+                            k++;
+                        } else {
+                            request_data += '&' + name + '=' + encodeURIComponent(value);
+                        }
+                    }
+
+                    request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                    fetch(this.saveUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: request_data
+                        }
+                    ).then(response => {
+                            return response
+                        }
+                    ).then(data => {
+                        if (data.errors) {
+                            this.isLoading = false;
+                            dispatchMessages([{
+                                type: 'error',
+                                text: data.message
+                            }], 5000);
+                        } else {
+                            window.location.href = data.url
+                        }
+                    });
+                }.bind(this)
+
+                this.validate()
+                .then(() => {
+                    sendData()
+                })
+                .catch((invalid) => {
+                    this.isLoading = false;
+                    if (invalid.length > 0) {
+                        invalid[0].focus();
+                    }
+                });
+            },
+            getValidation(field) {
+                const validation = {};
+
+                for (const [key, value] of Object.entries(field.validation)) {
+                    switch (key) {
+                        case 'requiredEntry':
+                        case 'required-entry':
+                            if (value !== false) {
+                                validation.required = value;
+                            }
+                            break;
+                        default:
+                            validation[key] = value;
+                    }
+                }
+
+                return JSON.stringify(validation);
+            }
+        }
+    }
+
+</script>
+
+<section x-data="initEditForm()"
+         x-init="getSectionData()">
+    <div class="mt-4 mb-4.5 lg:mt-0 lg:mb-7.75">
+        <h2 x-html="isEdit ? editTitle : createTitle"></h2>
+    </div>
+    <form id="editform"
+          method="post"
+          x-ref="editform"
+          x-data="{...initEditForm(), ...hyva.formValidation($el, {fieldWrapperClassName: 'field-reserved'})}"
+          x-init="getComponentData()"
+          @submit.prevent="submitForm()"
+    >
+        <fieldset class="fieldset login border border-0 border-t pt-8.25">
+            <template x-if="fieldsetTitle">
+                <h3 class="mb-6.75 lg:mb-7.75" x-html="fieldsetTitle"></h3>
+            </template>
+
+            <div class="fields-wrapper lg:w-[48.8%]">
+                <template x-for="[key, field] of Object.entries(compareItems)">
+                    <div class="field field-reserved" :hidden="field.hidden">
+                        <template x-if="!field.hidden">
+                            <div>
+                                <template x-if="field.label && field.component !== 'Aheadworks_Ca/js/ui/form/element/tree'">
+                                    <label class="label" :class="field?.validation['required-entry'] && 'required'"
+                                           x-html="field.label"></label>
+                                </template>
+
+                                <template x-if="field.component === 'Magento_Ui/js/form/element/single-checkbox'">
+                                    <label class="inline-label" :for="field.name">
+                                        <input value="1"
+                                               :id="field.name"
+                                               :name="field.name"
+                                               type="checkbox"
+                                               class="input-text"
+                                               :checked="field.val === '1'"
+                                               :required="field?.validation?.requiredEntry"
+                                               :disabled="field.disabled" />
+                                        <span x-text="field.description"></span>
+                                    </label>
+                                </template>
+
+                                <template x-if="field.component === 'Magento_Ui/js/form/element/abstract'">
+                                    <div class="relative">
+                                        <input class="form-input"
+                                               :name="field.name"
+                                               :placeholder="field.label"
+                                               type="text"
+                                               x-model="sentData[field.name]"
+                                               :data-validate='getValidation(field)'
+                                               min="0"
+                                        />
+                                        <template x-if="field.tooltip && !!field.tooltip.description.length">
+                                            <div class="lg-max:hidden cursor-pointer absolute top-0 items-center bottom-0 inline-flex right-0 top-0 px-4">
+                                                <i @mouseover.prevent.stop="showTooltip = true"
+                                                   @mouseleave.prevent.stop="showTooltip = false"
+                                                   class="icon icon-info px-2.25">
+                                                </i>
+                                                <div     x-transition:enter="transition ease-out duration-200"
+                                                         x-transition:enter-start="opacity-0 scale-90"
+                                                         x-transition:enter-end="opacity-100 scale-100"
+                                                         x-transition:leave="transition ease-in duration-200"
+                                                         x-transition:leave-start="opacity-100 scale-100"
+                                                         x-transition:leave-end="opacity-0 scale-90"
+                                                         class="relative" x-cloak x-show="showTooltip">
+                                                    <div class="shadow-lg">
+                                                        <div class="absolute top-0 left-0 z-10 w-64 py-3 px-6 -mt-6 text-sm
+                                                            transform-translate-x-full md:-translate-x-1/3 -translate-y-full bg-white rounded shadow-lg"
+                                                        >
+                                                            <span class="subtitle text-base"
+                                                                  x-html="field.tooltip.description"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+
+                                <template x-if="field.component === 'Aheadworks_Ca/js/ui/form/element/tree'">
+                                    <div class="field-permissions mt-5.25">
+                                        <h5 class="mb-7 lg:mb-8" x-text="field.label"></h5>
+                                        <div x-html="field.html"></div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </fieldset>
+
+        <template x-for="[k, fieldset] of Object.entries(fieldsets)">
+            <fieldset class="fieldset" :class="{ 'hidden' : !fieldset.visible }">
+                <template x-if="fieldset.title">
+                    <div class="fieldset-wrapper-title">
+                        <strong><span x-html="fieldset.title"></span></strong>
+                    </div>
+                </template>
+                <template x-for="[key, field] of Object.entries(fieldset.fields)">
+                    <div class="field">
+                        <template x-if="field.label">
+                            <label x-html="field.label"></label>
+                        </template>
+
+                        <div class="control flex">
+                            <input class="input-text w-full"
+                                   :value="field.val"
+                                   :name="field.name"
+                                   type="text"
+                                   :required="field?.validation?.requiredEntry && fieldset.visible"
+                            >
+                            <template x-if="field.tooltip">
+                                <div class="inline-flex px-4">
+                                    <span @mouseover.prevent.stop="fieldset.showTooltip = true"
+                                          @mouseleave.prevent.stop="fieldset.showTooltip = false"
+                                          class="px-1 py-1 border rounded border-container flex items-center justify-center w-8 h-8"
+                                    >?</span>
+                                    <div class="relative" x-cloak x-show="fieldset.showTooltip">
+                                        <div class="shadow-lg">
+                                            <div class="absolute top-0 left-0 z-10 w-64 p-2 -mt-6 text-sm leading-tight text-black transform
+                                                -translate-x-full md:-translate-x-1/3 -translate-y-full bg-white rounded-lg shadow-lg p-4">
+                                                <span class="subtitle text-base" x-html="field.tooltip.description"></span>
+                                            </div>
+                                            <svg class="absolute z-10 w-8 h-8 text-white transform -translate-x-full
+                                                -translate-y-8 fill-current stroke-current" width="12" height="12">
+                                                <rect x="12" y="-12" width="12" height="12" transform="rotate(45)" class="shadow-xl" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <template x-if="field.notice">
+                            <p x-html="field.notice"></p>
+                        </template>
+                    </div>
+                </template>
+            </fieldset>
+        </template>
+
+        <div class="actions-toolbar sm:flex-row">
+            <template x-if="actionTitle">
+                <button class="btn btn-primary w-full sm:w-auto" type="submit">
+                    <span x-html="actionTitle"></span>
+                </button>
+            </template>
+            <a class="before-icon-arrow-left flex items-center text-base gap-x-2.25 no-underline justify-end"
+               href="<?= $escaper->escapeUrl($block->getUrl('*/*')) ?>">
+                <span class="hover:underline"><?= $escaper->escapeHtml(__('Back')) ?></span>
+            </a>
+        </div>
+
+        <?= $block->getChildHtml() ?>
+    </form>
+</section>

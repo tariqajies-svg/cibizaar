@@ -1,0 +1,118 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+?>
+<script>
+    function initCompanies() {
+        return {
+            companies: [],
+            open: false,
+            isLoading: false,
+            selectedCompany: '',
+            registerCompanyUrl: '<?= /* @noEscape */ $block->getUrl('aw_ca/company/register') ?>',
+            registerCompanyTitle: '<?= /* @noEscape */ __('Register new company')->render() ?>',
+            getCompaniesData: function () {
+                this.isLoading = true;
+                fetch('<?= /* @noEscape */ $block->getUrl('customer/companies/getList') ?>', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json, text/javascript, */*; q=0.01'
+                        }
+                    }
+                ).then(response => {
+                        return response.json()
+                    }
+                ).then(data => {
+                    this.isLoading = false;
+                    this.companies = data;
+                    for (let i = 0; i < data.length; i++) {
+                        if (data[i].is_selected === true) {
+                            this.selectedCompany = data[i].name;
+                        }
+                    }
+                })
+            },
+        }
+    }
+</script>
+<div x-data="initCompanies()" x-init="getCompaniesData()" x-show="companies.length > 0"
+     class="flex items-center justify-center w-full order-3 relative">
+    <div class="inline-block">
+        <div
+            class="flex items-center cursor-pointer py-2 lg:py-2 lg:px-6 xl:px-10"
+            @click.prevent="open = true"
+            :aria-expanded="open ? 'true' : 'false'"
+            :class="{'lg:bg-[#194467]': open, 'lg:border-[#194467] lg:border-r lg:border-l':!open}"
+        >
+            <i class="icon icon-briefcase text-white mr-3"></i>
+            <a
+                href="<?= /* @noEscape */
+                $block->getUrl('customer/companies/getList') ?>"
+                id="customer-companies"
+                class="block whitespace-nowrap lg:max-w-[200px] max-w-[300px] overflow-ellipsis overflow-hidden text-white w-auto text-sm active:text-white hover:no-underline"
+                aria-expanded="false" x-html="selectedCompany"
+            >
+            </a>
+            <i
+                class="icon icon-dropdown text-white ml-2 text-[4px] transition-all duration-150"
+                :class="{ 'rotate-180' : open }"
+            >
+            </i>
+        </div>
+        <nav
+            class="absolute text-left z-20 left-0 right-0 mx-auto w-[280px] lg:w-full xl:w-full 2xl:w-[280px] mt-2.5 rounded-sm lg:mt-3 bg-container-lighter hidden shadow-header"
+            :class="{ 'hidden' : !open }" @click.away="open = false"
+        >
+            <span class="arrow-top left-0 w-min right-0 m-auto"></span>
+            <div>
+                <template x-for="company in companies">
+                    <a :href="company.url"
+                       :title="company.name"
+                       class="flex justify-between items-center px-5 py-3 w-auto lg:px-5 lg:py-3 hover:bg-gray-100 shadow-sm bg-container-lighter border-container-lighter border-b last:border-b-0"
+                    >
+                    <span class="flex items-center text-medium text-sm"
+                          :class="{'text-blue': selectedCompany === company.name, 'text-grey-darker': selectedCompany !== company.name}">
+                        <template x-if="company.flag">
+                            <img :src="company.flag" alt="" class="mr-3">
+                        </template>
+                        <span :class="{'font-bold': selectedCompany === company.name, 'font-medium': selectedCompany !== company.name}"
+                              x-html="company.name"></span>
+                    </span>
+
+                        <template x-if="selectedCompany == company.name">
+                            <i class="icon icon-check text-blue text-[9px]"></i>
+                        </template>
+                    </a>
+                </template>
+            </div>
+            <a :href="registerCompanyUrl"
+               :title="registerCompanyTitle"
+               class="block text-medium text-sm text-grey-darker px-5 py-3 w-auto lg:px-5 lg:py-3 hover:bg-gray-100 shadow-sm bg-container-lighter border-container-lighter border-t"
+            >
+                <span class="font-medium" x-html="registerCompanyTitle"></span>
+            </a>
+        </nav>
+    </div>
+</div>
+
+

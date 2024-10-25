@@ -1,0 +1,67 @@
+<?php
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+?>
+<script>
+    "use strict";
+
+    (function () {
+        window.bizaar.telephone = function (options) {
+            const config = Object.assign({
+                fullNumber: null,
+                phoneCode : '+971'
+            }, options)
+
+            return {
+                ...config,
+                countryList: [],
+                searchResults: [],
+                phoneCode : '+971',
+                phoneNumber: '',
+                dropdownOpened: false,
+                init() {
+                    this.countryList = window.CountryList.getAll();
+
+                    if (this.fullNumber) {
+                        const splittedNumber = this.fullNumber.split(' ');
+
+                        if (splittedNumber.length > 1) {
+                            this.phoneCode = splittedNumber[0];
+                            this.phoneNumber = splittedNumber[1];
+                        } else {
+                            this.phoneNumber = this.fullNumber;
+                        }
+                    }
+                },
+                generateFullNumber() {
+                    this.fullNumber = this.phoneCode + ' ' + this.phoneNumber.replace(/\s+/g, '');
+                },
+                filteredOptions() {
+                    return this.countryList.filter(option => {
+                        return (option.data.dial_code.indexOf(this.phoneCode) > -1)
+                    })
+                },
+                matchCode() {
+                    return this.countryList.filter(option => {
+                        return (option.data.dial_code === this.phoneCode)
+                    })
+                },
+                validateCode() {
+                    if (this.phoneCode.charAt(0) !== '+') {
+                        this.phoneCode = '+' + this.phoneCode;
+                    }
+
+                    if (this.phoneCode.charAt(0) !== '+' || !this.matchCode().length) {
+                        this.phoneCode = '';
+                    }
+
+                    this.generateFullNumber();
+                }
+            }
+        }
+    })();
+</script>

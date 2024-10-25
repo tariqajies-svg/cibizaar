@@ -1,0 +1,41 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Aheadworks\Ca\Block\Customer\CreateCompanyButton;
+
+/** @var CreateCompanyButton $block */
+/** @var Escaper $escaper */
+
+
+?>
+<div class="block-new-company card w-full md:w-1/2 my-8 md:my-0">
+    <div class="block-title">
+        <h2 class="text-xl font-medium title-font mb-3 text-primary" role="heading"
+            aria-level="2"><?= $escaper->escapeHtml(__('New Company Account')) ?></h2>
+    </div>
+    <div class="block-content" aria-labelledby="block-new-customer-heading">
+        <p>
+            <?= $escaper->escapeHtml( // phpcs:disable Generic.Files.LineLength.TooLong
+                __('If you are a company representative, use this feature to be able to manage subaccounts and other B2B features.')
+            ) // phpcs:enable  ?>
+        </p>
+    </div>
+    <div class="actions-toolbar pt-6 pb-2 flex self-end">
+        <a href="<?= $escaper->escapeUrl($block->getCreatePageUrl()) ?>"
+           class="btn btn-primary"><span><?= $escaper->escapeHtml(__('Create a Company Account')) ?></span></a>
+    </div>
+</div>

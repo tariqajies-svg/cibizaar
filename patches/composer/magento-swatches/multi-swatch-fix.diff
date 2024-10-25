@@ -1,0 +1,17 @@
+diff --git a/vendor/magento/module-swatches/Helper/Data.php b/vendor/magento/module-swatches/Helper/Data.php
+index dd257de..97c2db2 100644
+--- a/vendor/magento/module-swatches/Helper/Data.php
++++ b/vendor/magento/module-swatches/Helper/Data.php
+@@ -283,7 +283,11 @@ class Data
+     private function addFilterByAttributes(ProductCollection $productCollection, array $attributes)
+     {
+         foreach ($attributes as $code => $option) {
+-            $productCollection->addAttributeToFilter($code, ['eq' => $option]);
++            if (is_array($option)) {
++                $productCollection->addAttributeToFilter($code, ['in' => $option]);
++            } else {
++                $productCollection->addAttributeToFilter($code, ['eq' => $option]);
++            }
+         }
+     }
+

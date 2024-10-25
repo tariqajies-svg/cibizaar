@@ -1,0 +1,74 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Sidebar;
+use Amasty\RequestQuoteHyva\ViewModel\QuoteIcons;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+
+/** @var Sidebar $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+$isLoggedIn = $block->isLoggedIn();
+if (!$isLoggedIn) {
+    return;
+}
+
+$quoteIcons = $viewModels->require(QuoteIcons::class);
+?>
+
+<a x-data="initAmQuoteIcon()"
+   @click.prevent.stop="$dispatch('toggle-amquote',{})"
+   @private-content-loaded.window="getData($event.detail.data)"
+   id="amquote-icon"
+   href="<?= $escaper->escapeUrl($block->getQuoteCartUrl()) ?>"
+   class="hidden header-icon relative quote-icon clear flex pointer-event-none">
+   <i class="icon-quote text-lg lg:text-xl relative">
+    <span x-text="quotecart.summary_count"
+            class="poppins-font counter absolute top-0 right-0 min-w-5 h-5 text-nine font-semibold px-1 text-center text-white uppercase transform rounded-full bg-red-600 border-2 flex border-white items-center justify-center"
+            :class="{
+                            'hidden': !quotecart.summary_count,
+                            'block': quotecart.summary_count }"
+        ></span>    
+   </i>
+    <span class="text">
+        <?= $escaper->escapeHtml(__('My Quote')) ?>
+    </span>
+</a>
+
+<script>
+    'use strict';
+
+    (function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            const quoteIcon = document.getElementById("amquote-icon");
+            const insertBeforeNode = document.querySelector('<?= $escaper->escapeJs($block->getData('insertBeforeSelector')) ?>');
+            if (!insertBeforeNode) {
+                return;
+            }
+
+            const destination = insertBeforeNode.parentNode;
+            destination.insertBefore(quoteIcon, insertBeforeNode);
+            quoteIcon.classList.remove('hidden');
+        });
+    })()
+</script>
+<script>
+    'use strict';
+
+    function initAmQuoteIcon() {
+        return {
+            quotecart: {},
+            getData(data) {
+                if (data.quotecart) { this.quotecart = data.quotecart }
+            }
+        }
+    }
+</script>
+
+<?= $block->getChildHtml('quotecart-drawer') ?>

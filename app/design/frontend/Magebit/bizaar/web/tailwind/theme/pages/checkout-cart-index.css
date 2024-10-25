@@ -1,0 +1,5 @@
+.checkout-cart-index {
+    .product-slider {
+        @apply bg-gray-f2;
+    }
+}

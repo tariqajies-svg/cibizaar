@@ -1,0 +1,64 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\Block\Role\RoleList;
+use Magento\Framework\Escaper;
+
+/** @var RoleList $block */
+/** @var Escaper $escaper */
+
+$roleList = $block->getRoleListViewModel()->getSearchResults()->getItems();
+$roleViewModel = $block->getRoleViewModel();
+?>
+<?php if ($roleList && count($roleList)): ?>
+    <div class="table-wrapper aw-ca__customer-roles mb-8">
+        <table class="data table w-full">
+            <thead>
+                <tr>
+                    <th scope="col"><?= $escaper->escapeHtml(__('Name')) ?></th>
+                    <th scope="col"><?= $escaper->escapeHtml(__('Users')) ?></th>
+                    <th scope="col" class="text-right"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php /** @var $role \Magento\Customer\Api\Data\CustomerInterface */  ?>
+            <?php foreach ($roleList as $role): ?>
+                <tr>
+                    <td class="md:w-[47.3%]" data-th="<?= $escaper->escapeHtml(__('Name') . ':') ?>">
+                        <?= $escaper->escapeHtml($role->getName()) ?>
+                        <?php if ($role->isDefault()): ?><?= $escaper->escapeHtml('(default)') ?> <?php endif; ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Users') . ':') ?>">
+                        <?= $escaper->escapeHtml($role->getCountUsers()) ?>
+                    </td>
+                    <td class="clean actions">
+                        <div class="inline-flex space-x-4">
+                            <a href="<?= $escaper->escapeUrl($roleViewModel->getEditUrl($role->getId())) ?>">
+                                <span class="text-sm md:hidden"><?= $escaper->escapeHtml(__('Edit')) ?></span>
+                                <i class="icon icon-edit text-black-40 text-base hover:text-black focus:text-black hidden md:block"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php else: ?>
+    <div class="message info empty">
+        <span><?= $escaper->escapeHtml(__('You have created no roles.')) ?></span>
+    </div>
+<?php endif ?>

@@ -1,0 +1,555 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\RequisitionLists\ViewModel\Customer\RequisitionList\DataProvider;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Hyva\Theme\ViewModel\ProductStockItem;
+use Magebit\HyvaRequisitionLists\ViewModel\ProductList\RequisitionListProducts;
+use Magento\Framework\Escaper;
+
+/** @var RequisitionListProducts $block */
+/** @var Escaper $escaper */
+/** @var DataProvider $viewModel */
+/** @var ViewModelRegistry $viewModels */
+/** @var Modal $modalViewModel */
+
+/** @var ProductStockItem $stockItemViewModel */
+$stockItemViewModel = $viewModels->require(ProductStockItem::class);
+
+$listViewModel = $block->getData('requisition_list_view_model');
+$modalViewModel = $viewModels->require(Modal::class);
+$listName = $listViewModel->getCurrentRequisitionListName();
+$listId = $listViewModel->getCurrentRequisitionListId();
+$allRequisitionLists = $block->getRequisitionLists();
+?>
+
+<script>
+    function initProductTable () {
+        return {
+            ...hyva.modal(),
+            namespace: 'aw_requisition_list_item_listing',
+            isLoading: false,
+            items: {},
+            checkedProducts: [],
+            selectAllProducts: false,
+            productIds: [],
+            updateQtyData: {},
+            configureData: {},
+            configFormId: 'requisition-list-configuration-form',
+            allProductsSelected: false,
+            calculateSubtotal(price, qty) {
+                if (price && qty) {
+                    return hyva.formatPrice(parseFloat(price) * parseFloat(qty));
+                }
+
+                return '';
+            },
+            checkProducts () {
+                if (this.checkedProducts.length !== this.productIds.length) {
+                    this.checkedProducts = this.productIds;
+                } else {
+                    this.checkedProducts = [];
+                }
+            },
+            allListProductsChecked () {
+                return this.checkedProducts.length === this.productIds.length
+            },
+            deleteItem(itemId) {
+                const url = '<?= $escaper->escapeUrl($block->getUrl($block->getDeleteItem(), ['list_id' => $listId])) ?>'
+                const data = {'item_id': itemId}
+                this.sendRequest(url, data).then(response => {
+                    this.getItems()
+                })
+            },
+            deleteSelectedItems() {
+                if (this.checkedProducts.length) {
+                    const deleteLink = '<?= $escaper->escapeJs($block->getUrl($block->getDeleteItem(), ['list_id' => $listId])) ?>';
+
+                    this.executeRequest(deleteLink, this.prepareSelectedDataForRequest());
+                } else {
+                    this.displayErrorMessage()
+                }
+            },
+            copySelectedItems(event) {
+                if (this.checkedProducts.length) {
+                    const selectedList = event.target.value;
+                    const copyLink = '<?= $escaper->escapeJs($block->getUrl($block->getCopyItem(), ['list_id' => $listId])) ?>' + 'copy_to_list/' + selectedList;
+
+                    this.executeRequest(copyLink, this.prepareSelectedDataForRequest());
+                } else {
+                    this.displayErrorMessage()
+                }
+            },
+            moveSelectedItems(event) {
+                if (this.checkedProducts.length) {
+                    const selectedList = event.target.value;
+                    const moveLink = '<?= $escaper->escapeJs($block->getUrl($block->getMoveItem(), ['list_id' => $listId])) ?>' + 'move_to_list/' + selectedList;
+
+                    this.executeRequest(moveLink, this.prepareSelectedDataForRequest());
+                } else {
+                    this.displayErrorMessage()
+                }
+            },
+            prepareSelectedDataForRequest(isAddToCart = false) {
+                let preparedArray = {};
+
+                this.checkedProducts.map((id, index) => {
+                    preparedArray['selected[' + index + ']'] = id;
+
+                    if (isAddToCart) {
+                        preparedArray['qty[' + id +']'] = this.$refs['product-qty-' + id].value
+                    }
+                })
+
+                preparedArray['namespace'] = this.namespace;
+                preparedArray['form_key'] = '<?= $escaper->escapeHtmlAttr($listViewModel->getFormKey())?>';
+
+                if (this.allListProductsChecked()) {
+                    preparedArray['excluded'] = 'false';
+                }
+
+                return preparedArray
+            },
+            collectUpdatedQty(event) {
+                this.updateQtyData[event.target.name] = event.target.value;
+            },
+            prepareDataForUpdQty() {
+                const preparedArray = this.updateQtyData;
+                preparedArray['namespace'] = 'aw_requisition_list_item_listing';
+                preparedArray['form_key'] = '<?= $escaper->escapeHtmlAttr($listViewModel->getFormKey())?>';
+
+                if (this.allListProductsChecked()) {
+                    preparedArray['excluded'] = 'false';
+                }
+
+                return preparedArray
+            },
+            updateSelectedItemQty() {
+                if (Object.keys(this.updateQtyData).length) {
+                    const updateLink = '<?= $escaper->escapeJs($block->getUrl($block->getUpdateQty(), ['list_id' => $listId])) ?>'
+
+                    this.executeRequest(updateLink, this.prepareDataForUpdQty())
+                } else {
+                    this.displayErrorMessage()
+                }
+            },
+            addToCart () {
+                if (this.checkedProducts.length) {
+                    const link = '<?= $escaper->escapeJs($block->getUrl(
+                        $block->getAddToCart(),
+                        ['list_id' => $listId]
+                    )) ?>';
+
+                    this.executeRequest(link, this.prepareSelectedDataForRequest(true))
+                } else {
+                    this.displayErrorMessage()
+                }
+            },
+            executeRequest(link, preparedData) {
+                this.isLoading = true;
+                hyva.postForm({
+                    action: link,
+                    data: preparedData
+                })
+            },
+            displayErrorMessage () {
+                window.dispatchMessages([{
+                    type: 'error',
+                    text: 'You haven\'t selected any items.'
+                }], 4000);
+            },
+            getRequestData(data) {
+                const formKey = hyva.getFormKey();
+                let request_data = '';
+                for (const key in data) {
+                    if (request_data) {
+                        request_data += '&';
+                    }
+
+                    request_data += key + '=' + encodeURIComponent(data[key]);
+                }
+
+                request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                return request_data;
+            },
+            sendRequest(url, data) {
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: this.getRequestData(data)
+                });
+            },
+            configureItem(itemId, productId, itemData) {
+                this.isLoading = true;
+                this.sendRequest('<?= $escaper->escapeUrl($block->getUrl('aw_rl/rlist/configure')) ?>', {
+                    product_id: productId,
+                    item_id: itemId
+                }).then(response => response.json())
+                    .then(json => {
+                        this.configureData = {
+                            ...json,
+                            itemData,
+                            ...initConfigurableOptions(
+                                json.productId,
+                                JSON.parse(json.jsonConfig)
+                            ),
+                            ...initSwatchOptions(
+                                JSON.parse(json.jsonSwatchConfig)
+                            )
+                        }
+
+                        this.configureData.findAllowedAttributeOptions();
+                        this.configureData.showSwatches = true
+                        // Just get some image to show initially
+                        const image = this.configureData.optionConfig.images[Object.keys(this.configureData.optionConfig.images)[0]]
+
+                        window.dispatchEvent(new CustomEvent(
+                            "update-gallery",
+                            { detail: image }
+                        ));
+                        this.isLoading = false;
+                        this.show('popup-configure');
+                    });
+            },
+            updateConfiguration() {
+                hyva.formValidation(this.$refs.requisitionListConfigurationForm).validate().then(() => {
+                    const $form = document.getElementById(this.configFormId);
+                    const dataForm = new FormData($form);
+
+                    let data = {
+                        ['item_id']: this.configureData.itemData.item_id,
+                        product: this.configureData.productId
+                    };
+
+                    for (let [name, value] of dataForm) {
+                        data[name] = value;
+                    }
+
+                    this.sendRequest('<?= $escaper->escapeUrl($block->getUrl('aw_rl/rlist/updateOption')) ?>', data).then((response) => {
+                        this.hide();
+                        return response.json();
+                    }).then(json => {
+                        if (json) {
+                            this.getItems()
+                        } else if (json.error) {
+                            dispatchMessages([{
+                                type: 'error',
+                                text: json.error
+                            }], 5000);
+                        }
+                    })
+                }).catch((invalid) => {
+                    if (invalid.length > 0) {
+                        invalid[0].focus();
+                    }
+                });
+            },
+            getItems() {
+                this.isLoading = true;
+                const data = {
+                    namespace: {
+                        key: 'namespace',
+                        value: this.namespace
+                    },
+                    pageSize: {
+                        key: 'paging[pageSize]',
+                        value: 9999
+                    },
+                    current: {
+                        key: 'paging[current]',
+                        value: 1
+                    }
+                }
+
+                let request_data = {};
+                for (let i in data) {
+                    request_data[data[i].key] = data[i].value;
+                }
+
+                fetch('<?= $escaper->escapeUrl($block->getUrl(
+                    'mui/index/render',
+                    ['list_id' => $listId]
+                )) ?>?' + new URLSearchParams(request_data).toString(), {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json, text/javascript, */*; q=0.01'
+                        }
+                    }
+                ).then(response => {
+                        return response.json()
+                    }
+                ).then(data => {
+                    if (data.errors) {
+                        dispatchMessages([{
+                            type: 'error',
+                            text: data.message
+                        }], 5000);
+                    } else {
+                        this.items = data.items;
+                        this.collectItemIds()
+                        this.parseQty()
+                        this.$watch('checkedProducts', value => {
+                            this.allProductsSelected = value.length === this.productIds.length
+                        })
+                    }
+
+                    this.isLoading = false;
+                });
+            },
+            parseQty() {
+                this.items = this.items.map(item => {
+                    item.product_qty = parseFloat(item.product_qty)
+
+                    return item;
+                })
+            },
+            collectItemIds() {
+                this.productIds = this.items.map(item => item.item_id)
+            }
+        }
+    }
+</script>
+
+<div class="lg:mt-7.5 mb-3.75 lg:mb-8">
+    <div x-data="initProductTable()" x-init="getItems()">
+        <div class="flex justify-between lg-max:mt-7.5 flex-col space-y-4.75 bg-white lg:flex-row mb-2.75 lg:mb-4.75">
+            <div class="flex justify-between items-center lg:w-full lg:mr-5.75 ">
+                <p>
+                    <span x-text="Object.entries(items).length"></span>
+                    <span><?= $escaper->escapeHtml(__('Items')) ?></span>
+                    <span
+                        x-show="checkedProducts.length"
+                        x-text="'(' + checkedProducts.length + ' ' + '<?= $escaper->escapeHtml(__('selected')) ?>' + ')'"
+                    />
+                </p>
+
+                <div class="no-print flex lg:hidden">
+                    <label class="inline-label w-full">
+                        <input
+                            @click="checkProducts()"
+                            type="checkbox"
+                            x-model="allProductsSelected"
+                        >
+                        <span>
+                    <?= $escaper->escapeHtml(__('Select all')) ?>
+                </span>
+                    </label>
+                </div>
+            </div>
+            <div class="no-print flex gap-x-1 lg:!my-0 lg:gap-x-2">
+                <button
+                    @click="deleteSelectedItems()"
+                    class="link min-w-[82px]"
+                >
+                    <?= $escaper->escapeHtml(__('Remove')) ?>
+                </button>
+                <select class="form-select form-select-sm !pl-5.75 lg:min-w-[192px]" x-on:change="moveSelectedItems($event)" id="moveItems">
+                    <option value="" disabled selected><?= $escaper->escapeHtml(__('Move')) ?></option>
+                    <?php foreach ($allRequisitionLists as $requisitionList): ?>
+                        <option value="<?= $escaper->escapeHtmlAttr($requisitionList->getListId()) ?>">
+                            <?= $escaper->escapeHtml($requisitionList->getName()) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <select class="form-select form-select-sm !pl-5.75 lg:min-w-[192px]" x-on:change="copySelectedItems($event)" name="copyItems" id="copyItems">
+                    <option value="" disabled selected><?= $escaper->escapeHtml(__('Copy')) ?></option>
+                    <?php foreach ($allRequisitionLists as $requisitionList): ?>
+                        <option value="<?= $escaper->escapeHtmlAttr($requisitionList->getListId()) ?>">
+                            <?= $escaper->escapeHtml($requisitionList->getName()) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <table id="requisitionListTable" class="table">
+            <thead>
+            <tr>
+                <th class="lg-max:!hidden lg:!py-3.5">
+                    <label class="checkbox !mb-0">
+                        <input
+                            class="bg-white bg-opacity-30"
+                            @click="checkProducts()"
+                            type="checkbox"
+                            x-model="allProductsSelected"
+                        >
+                    </label>
+                </th>
+                <th>#</th>
+                <th><?= $escaper->escapeHtml(__('Item')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Price')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Qty')) ?></th>
+                <th><?= $escaper->escapeHtml(__('Subtotal')) ?></th>
+                <th class="w-0 text-right">
+                    <?= $escaper->escapeHtml(__('Action')) ?>
+                </th>
+            </tr>
+            </thead>
+            <tbody class="grid md:table-row-group ss:grid-cols-2 gap-x-2">
+            <template x-for="[key, item] of Object.entries(items)">
+                <tr>
+                    <td data-th="#">
+                        <div class="w-full flex justify-between">
+                            <span class="lg:hidden" x-text="(parseInt(key) + 1)"></span>
+                            <label class="checkbox !mb-0">
+                                <input
+                                    class="productItem"
+                                    type="checkbox"
+                                    :id="item.item_id"
+                                    x-model="checkedProducts"
+                                    :x-ref="'qty[' + item.item_id + ']'"
+                                    :name="item.item_id"
+                                    :value="item.item_id"
+                                >
+                            </label>
+                        </div>
+                    </td>
+                    <td class="lg-max:!hidden justify-between">
+                        <span x-text="(parseInt(key) + 1)"></span>
+                    </td>
+                    <td class="no-before-item">
+                        <div>
+                            <div class="flex gap-x-4 lg:items-center lg:gap-x-6.25">
+                                <img
+                                    class="w-[80px] h-[80px] object-contain border rounded"
+                                    loading="lazy"
+                                    :src="item.image_url"
+                                    :alt="item.product_name"
+                                >
+                                <div>
+                                    <a
+                                        class="!text-gray font-semibold active:!text-navy lg:hover:!text-blue-darker lg:active:!text-navy lg:text-base"
+                                        :href="item.product_name_url">
+                                        <span x-text="item.product_name"></span>
+                                    </a>
+                                    <div class="mt-1 text-2xs lg:text-sm">
+                                        <span><?= $escaper->escapeHtml(__('SKU')) ?>:</span>
+                                        <span class="text-navy font-bold" x-text="item.product_sku"></span>
+                                    </div>
+                                    <template x-for="productOption of item.product_attributes.product_options">
+                                        <div class="flex gap-x-1 text-2xs lg:text-sm">
+                                            <span x-text="productOption.label + ':'"></span>
+                                            <span class="font-bold" x-text="productOption.value"></span>
+                                        </div>
+                                    </template>
+                                    <template x-for="customOption of item.product_attributes.custom_options">
+                                        <div class="flex gap-x-1 text-2xs lg:text-sm">
+                                            <span x-text="customOption.label + ':'"></span>
+                                            <span class="font-bold" x-text="customOption.value"></span>
+                                        </div>
+                                    </template>
+                                    <span class="text-navy block mt-2.25 font-bold lg:hidden" x-html="item.price"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="lg-max:!hidden no-before-item text-blue !font-bold">
+                        <span class="text-navy" x-html="item.price"></span>
+                    </td>
+                    <td class="no-before-item gap-x-1">
+                        <div class="control flex border border-gray-e6 rounded lg-max:h-10 lg:w-[min-content]">
+                            <button class="btn btn-secondary px-5.25 w-9.75 lg:w-11 lg:h-10.5
+                                   before:block before:absolute before:w-3 before:h-0.5
+                                   before:bg-gray border-none rounded-r-none"
+                                    :disabled="item.product_qty <= 1"
+                                    type="button"
+                                    @click="item.product_qty--">
+                            </button>
+                            <input type="number"
+                                   :x-ref="'product-qty-' + item.item_id"
+                                   data-role="qty"
+                                   :id="'qty[' + item.item_id + ']'"
+                                   class="form-input form-input-qty px-2 py-2 w-full
+                                   lg:h-10.5 lg:w-11.5 text-center border-none"
+                                   :name="'qty[' + item.item_id + ']'"
+                                   x-model.number="item.product_qty"
+                                   @change.debounce="collectUpdatedQty($event)"
+                                   min="0"
+                            >
+                            <button class="btn btn-secondary px-5.25 w-9.75 lg:w-11 lg:h-10.5 before:block before:absolute
+                                   before:w-3 before:h-0.5 before:bg-gray after:block after:absolute
+                                   after:w-3 after:h-0.5 after:bg-gray after:rotate-90 border-none rounded-l-none"
+                                    type="button"
+                                    @click="item.product_qty++; updateQtyData['qty[' + item.item_id + ']'] = item.product_qty">
+                            </button>
+                        </div>
+                        <div class="no-print flex lg:hidden gap-x-1">
+                            <button
+                                x-show="item.product_type === 'configurable'"
+                                @click="configureItem(item.item_id)"
+                                class="btn btn-sq"
+                            ><i class="icon icon-edit"></i></button>
+                            <button
+                                class="btn btn-sq"
+                                @click="deleteItem(item.item_id)"
+                            ><i class="icon icon-delete"></i></button>
+                        </div>
+                    </td>
+                    <td class="lg-max:!pb-4.5 justify-between" data-th="<?= $escaper->escapeHtml(__('Subtotal')) ?>">
+                        <span class="text-blue font-bold" x-text="calculateSubtotal(item.product_qty, item.price_value)"></span>
+                    </td>
+                    <td class="no-print lg-max:!hidden table-actions text-right"
+                        data-th="<?= $escaper->escapeHtml(__('Action')) ?>">
+                        <button
+                            x-show="item.product_type === 'configurable'"
+                            @click="configureItem(item.item_id, item.product_id, item)"
+                            class="btn btn-secondary btn-sq">
+                            <i class="icon icon-edit"></i>
+                        </button><button
+                            class="btn btn-secondary btn-sq"
+                            @click="deleteItem(item.item_id)"
+                        >
+                            <i class="icon icon-delete"></i>
+                        </button>
+                    </td>
+                </tr>
+            </template>
+            <tr class="lg-max:!border-r-0 lg-max:!border-l-0 lg-max:!rounded-none"
+                x-show="Object.entries(items).length === 0">
+                <td colspan="4" class="no-colons lg-max:!px-0 !text-base">
+                    <span><?= $escaper->escapeHtml(__("We couldn't find any records.")) ?></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="no-print flex md:justify-between flex-col mt-5 md:flex-row lg:items-center lg:mt-9.75">
+            <div class="flex flex-col lg:flex-row gap-y-2 lg:gap-y-0 lg:gap-x-2">
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="addToCart()"
+                >
+                    <?= $escaper->escapeHtml(__('Add To Cart')) ?>
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    @click="updateSelectedItemQty()"
+                >
+                    <?= $escaper->escapeHtml(__('Update List')) ?>
+                </button>
+            </div>
+            <?= $block->getBlockHtml('aw_rl.delete-requisition-list') ?>
+        </div>
+        <?= $block->getBlockHtml('aw_requisition_list_item_listing.listing.loading') ?>
+        <?= $block->getBlockHtml('aw_rl.popup-wrapper') ?>
+    </div>
+</div>
+

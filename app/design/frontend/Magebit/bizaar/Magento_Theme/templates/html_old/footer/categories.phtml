@@ -1,0 +1,42 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaTheme\ViewModel\Navigation;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$menuItems = $viewModels->require(Navigation::class)->getFooterNavigation();
+?>
+<?php if ($menuItems): ?>
+<div class="col-span-2 order-3 md:order-2 ">
+    <h5 class="section-heading"><?= $escaper->escapeHtml(__('Categories')) ?></h5>
+    <ul class="grid grid-cols-2 gap-x-2.5 md:gap-x-6">
+    <?php foreach ($menuItems as $index => $menuItem): ?>
+        <li>
+            <a href="<?= $escaper->escapeUrl($menuItem['url']) ?>"
+               title="<?= $escaper->escapeHtmlAttr($menuItem['name']) ?>">
+                <?= $escaper->escapeHtml($menuItem['name']) ?>
+            </a>
+        </li>
+    <?php endforeach; ?>
+    </ul>
+</div>
+<?php endif; ?>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCreditLimit package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:framework:Ui/etc/ui_configuration.xsd">
+    <columns name="aw_credit_limit_transaction_columns">
+        <column name="credit_due_date" sortOrder="90">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Credit due date</label>
+                <dataType>text</dataType>
+                <bodyTmpl>Aheadworks_UiComponents/grid/cells/text</bodyTmpl>
+            </settings>
+        </column>
+    </columns>
+</listing>

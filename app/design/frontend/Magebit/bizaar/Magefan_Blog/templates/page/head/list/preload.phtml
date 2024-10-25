@@ -1,0 +1,60 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+/**
+ * Blog post view preload template
+ *
+ * @var Index $block
+ * @var Escaper $escaper
+ * @var ViewModelRegistry $viewModels
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\ImageResizer\ViewModel\ImageResizer;
+use Magebit\MagefanBlog\ViewModel\PlaceholderImage;
+use Magebit\MagefanBlog\Block\Index;
+use Magento\Framework\Escaper;
+
+$_post = $block->getHighlightPost();
+
+if (!$_post || !$_post->getId()) {
+    $_post = $block->getPostCollection()->getFirstItem();
+}
+
+if (!$_post || !$_post->getId()) {
+    return;
+}
+
+$imageResizer = $viewModels->require(ImageResizer::class);
+$mediaDir = $imageResizer->getMediaDirectoryAbsolutePath();
+$placeholderViewModel = $viewModels->require(PlaceholderImage::class);
+
+$featuredImage = $_post->getData('featured_img');
+
+if (!$imageResizer->fileExists($mediaDir . $featuredImage)) {
+    $featuredImage = $placeholderViewModel->getImageSrc();
+}
+?>
+<link rel="preload" as="image" fetchpriority="high"
+      imagesrcset="<?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 370, 312, true)) ?> 370w,
+                   <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 702, 312, true)) ?> 702w,
+                   <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 969, 573, true)) ?> 969w,
+                   <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 1144, 573, true)) ?> 1144w"
+      imagesizes="(max-width: 428px) 370px,
+                  (max-width: 1023px) 702px,
+                  (max-width: 1366px) 969px,
+                  (min-width: 1367px) 1144px"
+>

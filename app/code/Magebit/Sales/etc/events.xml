@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Sales package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Sales
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_order_save_after">
+        <observer name="Magbeit_Sales::after_order_save" instance="Magebit\Sales\Observer\AfterOrderSave"/>
+    </event>
+    <event name="catalog_product_is_salable_after">
+        <observer name="magebit_sales_observer_catalog_productissalableafter_catalog_product_is_salable_after"
+                  instance="Magebit\Sales\Observer\Catalog\ProductIsSalableAfter"/>
+    </event>
+    <event name="payment_method_assign_data">
+        <observer name="magebit_sales_observer_payment_assign_po_number"
+                  instance="Magebit\Sales\Observer\Payment\AssignPoNumber"/>
+    </event>
+</config>

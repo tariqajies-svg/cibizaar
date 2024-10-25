@@ -1,0 +1,38 @@
+<?php
+/**
+ * This file is part of the Magebit_Brands package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Brands
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magebit\Brands\Block\BrandSwatch;
+use Magento\Framework\Escaper;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\ImageResizer\ViewModel\ImageResizer;
+
+/** @var Escaper $escaper */
+/** @var BrandSwatch $block */
+/** @var ViewModelRegistry $viewModels */
+
+$brandLogo = $block->getBrandLogo();
+$isLazy = $block->getIsLazy();
+$imageResizer = $viewModels->require(ImageResizer::class);
+?>
+<?php if ($brandLogo): ?>
+    <img class="w-auto max-h-6 inline-block align-middle"
+         alt="<?= $escaper->escapeUrl($brandLogo['brand']) ?>"
+         src="<?= $escaper->escapeUrl($imageResizer->resize(str_replace('/media', '', $brandLogo['image']), $brandLogo['width'])) ?>"
+         width="<?= $escaper->escapeHtmlAttr($brandLogo['width'] . 'px') ?>"
+         height="<?= $escaper->escapeHtmlAttr($brandLogo['height'] . 'px') ?>"
+         <?php if ($isLazy): ?>loading="lazy"<?php endif; ?>
+    />
+<?php endif; ?>

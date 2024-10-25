@@ -1,0 +1,8 @@
+{
+    "amasty_hideprice_request": {
+        "column": {
+            "company": true,
+            "quantity": true
+        }
+    }
+}

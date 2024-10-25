@@ -1,0 +1,438 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\Customer\ViewModel\OrderStatus;
+use Magebit\OrderStatusColor\ViewModel\StatusColorViewModel;
+use Magebit\Sales\ViewModel\Reorder;
+use Magento\Framework\Escaper;
+use Magento\Sales\Block\Order\History;
+
+/** @var History $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var StatusColorViewModel $statusColor */
+$statusColor = $viewModels->require(StatusColorViewModel::class);
+
+/** @var Reorder $reorderViewModel */
+$reorderViewModel = $viewModels->require(Reorder::class);
+
+/** @var OrderStatus $orderStatus */
+$orderStatus = $viewModels->require(OrderStatus::class)
+?>
+<div x-data="getOrders()" x-init="getData();">
+    <h2 class="mb-4.75 lg:mb-8 text-2xl font-semibold"><?= $escaper->escapeHtml(__('My Orders')) ?></h2>
+    <div>
+        <?= $block->getChildHtml('loading') ?>
+
+        <?php /* Filters Sections */ ?>
+        <form class="mb-5 lg:mb-8" @submit.prevent="getData();">
+            <div class="order-filters grid grid-cols-1 gap-3 lg:gap-6 lg:items-end">
+                <div>
+                    <label for="orderStatusField">
+                        <span><?= $escaper->escapeHtml(__('Order status')) ?></span>
+                    </label>
+                    <select id="orderStatusField" class="form-select" x-model="data.order_status.value"">
+                        <option value="" hidden><?= $escaper->escapeHtml(__('Select order status')) ?></option>
+                        <?php foreach ($orderStatus->getStatusListForFilter() as $status): ?>
+                            <option value="<?= $escaper->escapeHtmlAttr($status->getStatus()) ?>">
+                                <?= $escaper->escapeHtml(
+                                    key_exists($orderStatus->getStoreId(), $status->getStoreLabels()) ?
+                                         $status->getStoreLabels()[$orderStatus->getStoreId()] :
+                                         $status->getLabel()
+                                ) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div>
+                    <label class="label w-full mb-2">
+                        <span><?= $escaper->escapeHtml(__('Order date')) ?></span>
+                    </label>
+                    <div class="flex gap-x-1.75 items-center lg:gap-x-3.75">
+                        <div class="control flex-1 relative set-bdr">
+                            <input
+                                type="date"
+                                class="hide-date-icon form-input lg:!pr-11.25"
+                                id="date_from"
+                                :value="data.date_from.value"
+                                @input="setDate($event.target.value, 'date_from')">
+                            <i class="icon icon-calendar text-[16px] cursor-pointer absolute top-1/2
+                                      -translate-y-1/2 right-5.25 lg:right-6"
+                               @click="dateTrigger('date_from')"></i>
+                        </div>
+                        <span class="lg-max:hidden h-0.5 w-2.5 bg-gray"></span>
+                        <div class="control flex-1 relative  set-bdr">
+                            <input
+                                type="date"
+                                class="hide-date-icon form-input lg:!pr-11.25"
+                                id="date_to"
+                                :value="data.date_to.label"
+                                @input="setDate($event.target.value, 'date_to')"
+                            >
+                            <i class="icon icon-calendar text-[16px] cursor-pointer absolute top-1/2
+                                      -translate-y-1/2 right-5.25 lg:right-6"
+                               @click="dateTrigger('date_to')"></i>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary w-full lg:h-[52px]">
+                    <?= $escaper->escapeHtml(__('Search')) ?>
+                </button>
+            </div>
+            <button
+                class="btn btn-secondary w-full mt-1 lg:mt-6 lg:px-0 lg:py-1.75 lg:max-w-[152px]"
+                :class="{'hidden': clearFilters}"
+                @click="clearData()"
+            >
+                <?= $escaper->escapeHtml(__('Clear All Filters')) ?>
+            </button>
+        </form>
+
+        <?php /* Filtered Orders Section */ ?>
+        <template x-if="orders.length > 0">
+                <table class="table block-orders">
+                    <thead>
+                    <tr>
+                        <th><?= $escaper->escapeHtml(__('Order #')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Date')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Ship To')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Order Total')) ?></th>
+                        <th><?= $escaper->escapeHtml(__('Status')) ?></th>
+                        <th class="w-0"><?= $escaper->escapeHtml(__('Action')) ?></th>
+                    </tr>
+                    </thead>
+                    <tbody class="grid lg:table-row-group ss:grid-cols-2 gap-2">
+                    <template x-for="(order, index) in orders">
+                        <tr class="border-x-0 !m-0">
+                            <td data-th="<?= $escaper->escapeHtml(__('Order No.')) ?>">
+                                <span x-text="order.increment_id"></span>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtml(__('Date')) ?>">
+                                <span x-text="order.display_created_at"></span>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtml(__('Ship To')) ?>">
+                                <span x-text="order.customer_firstname + ' ' + order.customer_lastname"></span>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtml(__('Total')) ?>">
+                                <span class="font-bold text-navy" x-html="order.grand_total"></span>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtml(__('Status')) ?>">
+                                <div class="flex gap-1 lg:gap-2 items-center">
+                                    <template x-if="statusColors[order.status]">
+                                        <div
+                                            class="w-2 h-2 rounded-full"
+                                            :style="`background-color: ${statusColors[order.status]}`"
+                                        ></div>
+                                    </template>
+                                   <span x-text="order.status_label"></span>
+                                </div>
+                            </td>
+                            <td class="table-actions lg:text-right">
+                                <a :href="'<?= $escaper->escapeHtml($block->getUrl('sales/order/view')); ?>order_id/'+order.entity_id"
+                                   class="btn btn-secondary btn-sq">
+                                    <i class="icon icon-eye"></i>
+                                </a>
+                                <template x-if="order.reorder_data">
+                                    <form class="w-full lg:inline-flex lg:w-min lg:!ml-1"
+                                          :action="order.reorder_data.action" method="post">
+                                        <input type="hidden" name="form_key" :value="hyva.getFormKey()">
+                                        <input type="hidden" name="data"
+                                               :value="JSON.stringify(order.reorder_data.data)"/>
+                                        <button class="btn btn-secondary btn-sq">
+                                            <i class="icon-reload"></i>
+                                        </button>
+                                    </form>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+        </template>
+
+        <?php /* No Orders Message */ ?>
+        <template x-if="orders.length === 0">
+            <div class="my-4 lg:my-8 p-4 lg:px-8">
+                <template x-if="getFiltersCount() > 0">
+                    <span><?= $escaper->escapeHtml(__('You don\'t have any orders matching the search criteria.')) ?></span>
+                </template>
+                <template x-if="getFiltersCount() === 0">
+                    <span><?= $escaper->escapeHtml(__('You don\'t have any orders yet.')) ?></span>
+                </template>
+            </div>
+        </template>
+
+        <?php /* Order Navigation Section */ ?>
+        <template x-if="!isLoading && data.page.totalRecords">
+            <div class="mt-5">
+                <div>
+                    <div class="pager grid-cols-4 sm:grid-cols-8 md:grid-cols-4 lg:grid-cols-8
+                    grid-flow-row grid gap-3.25 items-center">
+                        <span class="toolbar-amount text-gray font-semibold order-3 sm:order-2 md:order-3
+    lg:order-2 col-span-2 gap-x-1 lg:text-base" x-html="counterText"></span>
+                        <div class="pages-wrapper">
+                            <template x-if="pages.length > 1 && data.page.countPages > 1 && orders.length > 0">
+                                <nav class="pages">
+                                    <ol class="pages-items clear">
+                                        <template x-for="page in pages">
+                                            <li
+                                                class="item"
+                                                :class="{'pages-item-next' : page.btnType === 'arrow'}">
+                                                <button class="page btn btn-sq"
+                                                        :class="{
+                                                            'btn-primary' : page.currentPage,
+                                                            'pointer-events-none': page.currentPage || page.disabled,
+                                                            'btn-secondary': !page.currentPage,
+                                                            'next' : page.btnType === 'arrow' && page.disabled
+                                                        }"
+                                                        x-html="page.pageLabel"
+                                                        @click="{if(!page.currentPage){setPageNumber(page.pageNumber)}}"></button>
+                                            </li>
+                                        </template>
+                                    </ol>
+                                </nav>
+                            </template>
+                        </div>
+                        <div class="field limiter">
+                            <label class="inline-label">
+                                <span><?= $escaper->escapeHtml(__('Show:')) ?></span>
+                            </label>
+                            <select x-ref="limiter" class="form-select form-select-sm limiter-options
+                                w-fit lg:w-[5.71rem] lg:pl-5.75"
+                                    @change="changePageSize()">
+                                <option value="10" :selected="data.page.pageSize == 10">10</option>
+                                <option value="20" :selected="data.page.pageSize == 20">20</option>
+                                <option value="50" :selected="data.page.pageSize == 50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
+<script defer>
+    function getOrders() {
+        let data = null;
+        let defaultData = {
+            date_from: {
+                value: null,
+                frontName: '<?= $escaper->escapeHtml(__('Date from')) ?>',
+                label: null
+            },
+            date_to: {
+                value: null,
+                frontName: '<?= $escaper->escapeHtml(__('Date to')) ?>',
+                label: null
+            },
+            order_status: {
+                value: '',
+                frontName: '<?= $escaper->escapeHtml(__('Status')) ?>'
+            },
+            page: {
+                type: 'page',
+                value: 1,
+                totalRecords: null,
+                pageSize: 10,
+                countPages: null
+            }
+        };
+        if(sessionStorage.orderListData) {
+            data = JSON.parse(sessionStorage.getItem('orderListData'));
+        }
+        return {
+            ...hyva.modal(),
+            orders: {},
+            data: data ?? defaultData,
+            clearFilters: false,
+            searchQuery: sessionStorage.getItem('searchQuery') ?? '',
+            statusColors: JSON.parse('<?= $escaper->escapeJs($statusColor->getAllColors()) ?: "{}" ?>'),
+            pages: [],
+            countPagesBeforeAndAfterCurrent: 2,
+            counterText: '',
+            selectedOrders: {
+                items: {},
+                initialLength: 0,
+                total: 0
+            },
+            pagerFrameSize: 5,
+            pageAmountWithoutDots: 5,
+            clearData() {
+                this.data = defaultData;
+                this.searchQuery = "";
+                this.getData();
+            },
+            changePageSize() {
+                this.data.page.pageSize = this.$refs.limiter.value;
+                this.getData();
+            },
+            saveData() {
+                sessionStorage.setItem('orderListData', JSON.stringify(this.data))
+                sessionStorage.setItem('searchQuery', this.searchQuery)
+            },
+            getFiltersCount() {
+                let counter = 0;
+                for (let key in this.data) {
+                    if (key === 'page') {
+                        continue;
+                    }
+                    if (this.data[key].value !== null &&
+                        this.data[key].value !== "" &&
+                        this.data[key].value !== undefined
+                    ) {
+                        counter++;
+                    }
+                }
+                return counter;
+            },
+            getPagination() {
+                let currentPage = this.data.page.value;
+                let countPages = this.data.page.countPages;
+                let pages = [];
+
+                for (let i = 1; i <= countPages; i++) {
+                    if (i === 1) {
+                        let pageData = {
+                            pageNumber: this.data.page.value - 1,
+                            currentPage: false,
+                            pageLabel: '<i class="icon icon-arrow-left text-[14px] lg:text-[16px]"></i>',
+                            btnType: 'arrow',
+                            disabled: false
+                        }
+
+                        if (currentPage === 1) {
+                            pageData.disabled = true;
+                        }
+                        pages.push(pageData)
+                    }
+
+                    if (
+                        (currentPage < this.countPagesBeforeAndAfterCurrent + 1 && i < this.pagerFrameSize + 1) ||
+                        (currentPage > countPages - this.countPagesBeforeAndAfterCurrent && i > countPages - this.pagerFrameSize) ||
+                        (i >= currentPage && i <= currentPage + this.countPagesBeforeAndAfterCurrent) ||
+                        (i <= currentPage && i >= currentPage - this.countPagesBeforeAndAfterCurrent)
+                    ) {
+                        let pageData = {
+                            pageNumber: i,
+                            currentPage: false,
+                            pageLabel: i,
+                            btnType: 'simpleButton',
+                            disabled: false
+                        };
+                        if (i === currentPage) {
+                            pageData.currentPage = true;
+                            pageData.disabled = true;
+                        }
+                        pages.push(pageData)
+                    }
+
+                    if (i === countPages) {
+                        let pageData = {
+                            pageNumber: this.data.page.value + 1,
+                            currentPage: false,
+                            pageLabel: '<i class="icon icon-arrow-right text-[14px] lg:text-[16px]"></i>',
+                            btnType: 'arrow',
+                            disabled: false
+                        }
+
+                        if (currentPage === countPages) {
+                            pageData.disabled = true;
+                        }
+                        pages.push(pageData)
+                    }
+                }
+
+                this.pages = pages;
+            },
+            getData() {
+                this.isLoading = true;
+                this.orders = {};
+                this.saveData();
+                let query = this.data;
+                let searchQuery = this.searchQuery;
+
+                this.clearFilters = !this.getFiltersCount() > 0;
+
+                fetch('/customer/orders/getList/',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({form_key:hyva.getFormKey(), data: query, searchQuery}),
+                        headers: {contentType: 'application/json', "X-Requested-With": "XMLHttpRequest"}
+                    })
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((data) => {
+                        this.orders = data.orders;
+                        this.data = data.params;
+                        this.saveData();
+                        this.getPagination();
+                        this.setCounterText();
+                        this.isLoading = false;
+                    });
+            },
+            deleteFromQuery(key) {
+                let value = this.data[key].value;
+                this.data[key].value = null;
+                if (this.data[key].label) {
+                    this.data[key].label = null;
+                }
+                let regex = new RegExp(value+',?\\s?|,?\\s?'+value,'g');
+                this.searchQuery = this.searchQuery.replace(regex, '');
+                this.saveData();
+                this.getData();
+            },
+            setPageNumber(pageNumber) {
+                this.data.page.value = pageNumber;
+                this.getData();
+
+                window.scrollTo({
+                    top: 0,
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            },
+            dateTrigger(dateId) {
+                document.getElementById(dateId).showPicker();
+            },
+            setDate(date, key) {
+                if (key === 'date_to') {
+                    this.data[key].value = date+' 23:59:59'
+                    this.data[key].label = date;
+                } else {
+                    this.data[key].value = date
+                }
+            },
+            setCounterText() {
+                let pageSize = this.data.page.pageSize;
+                let totalRecords = this.data.page.totalRecords
+                let currentPage = this.data.page.value
+                let pageCount = this.data.page.countPages
+
+                this.counterText = '<?= $escaper->escapeHtml(__('Orders')) ?>'
+                    + ' '
+                    + (totalRecords ? (1 + (pageCount > 1 ? (pageSize * (currentPage - 1)) : 0)) : 0)
+                    + ' - '
+                    + (pageSize * currentPage > totalRecords ? totalRecords : (pageSize * currentPage))
+                    + ' '
+                    + '<?= $escaper->escapeHtml(__('of')) ?>'
+                    + ' '
+                    + totalRecords;
+            },
+        }
+    }
+</script>

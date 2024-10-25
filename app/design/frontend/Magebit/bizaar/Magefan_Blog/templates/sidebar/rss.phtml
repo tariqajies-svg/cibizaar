@@ -1,0 +1,36 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magefan\Blog\Block\Sidebar\Rss;
+use Magento\Framework\Escaper;
+
+/**
+ * Blog sidebar archive template
+ *
+ * @var Rss $block
+ * @var Escaper $escaper
+ */
+?>
+<div class="widget block block-rss relative p-5 bg-gray-f2 lg:px-8">
+    <div class="block-title">
+        <a class="link flex no-underline"
+           target="_blank"
+           href="<?= $escaper->escapeUrl($block->getUrl('blog/rss/feed')) ?>">
+            <i class="icon-rss leading-6 text-blue mr-2"></i>
+            <span><?= $escaper->escapeHtml(__('RSS Feed')) ?></span>
+        </a>
+    </div>
+</div>

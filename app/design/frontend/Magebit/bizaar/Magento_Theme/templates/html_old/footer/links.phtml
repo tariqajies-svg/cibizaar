@@ -1,0 +1,70 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Customer;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Customer $customer */
+$customer = $viewModels->require(Customer::class);
+/** @var StoreConfig $storeConfig */
+$storeConfig = $viewModels->require(StoreConfig::class);
+?>
+<div class="order-5">
+    <h5 class="section-heading">Account</h5>
+    <ul>
+        <?php if (!$customer->customerLoggedIn()): ?>
+            <li>
+                <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login')) ?>">
+                    <?= $escaper->escapeHtml(__('Log in')) ?>
+                </a>
+            </li>
+            <li>
+                <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>">
+                    <?= $escaper->escapeHtml(__('Register')) ?>
+                </a>
+            </li>
+        <?php else: ?>
+            <li>
+                <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>">
+                    <?= $escaper->escapeHtml(__('Dashboard')) ?>
+                </a>
+            </li>
+            <li>
+                <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/edit')) ?>">
+                    <?= $escaper->escapeHtml(__('Account Information')) ?>
+                </a>
+            </li>
+            <li>
+                <a href="<?= $escaper->escapeUrl($block->getUrl('customer/address')) ?>">
+                    <?= $escaper->escapeHtml(__('Address Book')) ?>
+                </a>
+            </li>
+            <li>
+                <a href="<?= $escaper->escapeUrl($block->getUrl('sales/order/history')) ?>">
+                    <?= $escaper->escapeHtml(__('My Orders')) ?>
+                </a>
+            </li>
+        <?php endif; ?>
+    </ul>
+</div>
+

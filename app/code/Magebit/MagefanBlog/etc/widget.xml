@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_MagefanBlog package.
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+ -->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget class="Magebit\MagefanBlog\Block\Widget\RecentPostsSlider" id="magebit_recent_blog_posts_slider">
+        <label>Recent Blog Posts Slider</label>
+        <description>Recent Blog Posts Slider</description>
+        <parameters>
+            <parameter name="posts" sort_order="10" visible="true" xsi:type="text">
+                <label>Custom Posts Label</label>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

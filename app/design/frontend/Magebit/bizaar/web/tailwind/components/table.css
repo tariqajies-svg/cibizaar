@@ -1,0 +1,121 @@
+table {
+    @apply w-full text-left;
+}
+
+@layer components {
+    .table {
+        thead {
+            th {
+                @apply text-navy font-bold text-sm;
+            }
+        }
+
+        td {
+            @apply font-semibold text-sm;
+        }
+
+        .table-actions {
+            a,
+            button {
+                @apply inline-flex text-gray lg:hover:text-blue-darker active:text-navy lg:active:text-navy;
+            }
+        }
+
+        @screen lg-max {
+            @apply w-full;
+
+            thead {
+                @apply hidden;
+            }
+
+            tbody {
+                @apply space-y-2;
+            }
+
+            tr {
+                @apply flex flex-col border border-b rounded overflow-hidden;
+            }
+
+            td:not(.clear, .table-actions) {
+                @apply flex pt-0 px-4.75 pb-2;
+
+                &:first-child {
+                    @apply pt-4.75;
+                }
+
+                &:last-child {
+                    @apply pb-4.75;
+                }
+
+                &::before {
+                    @apply flex items-center pr-1 text-navy font-bold self-start;
+
+                    content: attr(data-th) ':';
+                }
+
+                &.no-before-item {
+                    &::before {
+                        @apply hidden;
+                    }
+                }
+            }
+
+            td.table-actions {
+                @apply flex p-0 pt-2.75 mt-auto;
+
+                a,
+                button {
+                    @apply border-0 border-t w-full rounded-none;
+
+                    &:first-child {
+                        @apply rounded-bl;
+                    }
+
+                    &:last-child {
+                        @apply rounded-br;
+                    }
+
+                    &:not(:last-child) {
+                        @apply border-r;
+                    }
+                }
+            }
+        }
+
+        @screen lg {
+            thead {
+                @apply border-t;
+
+                th {
+                    @apply py-5;
+                }
+            }
+
+            tbody {
+                @apply border-t;
+
+                tr {
+                    @apply border-b;
+                }
+            }
+
+            th,
+            td {
+                @apply px-0;
+
+                &:not(:last-child) {
+                    @apply pr-5;
+                }
+            }
+
+            th[scope='row'],
+            td:not(.table-actions) {
+                @apply py-7.25;
+            }
+
+            td.table-actions {
+                @apply align-middle space-x-2 whitespace-nowrap;
+            }
+        }
+    }
+}

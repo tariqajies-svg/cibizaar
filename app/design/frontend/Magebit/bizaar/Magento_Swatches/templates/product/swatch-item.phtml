@@ -1,0 +1,103 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Swatches\ViewModel\Product\Renderer\Configurable as ConfigurableViewModel;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ConfigurableViewModel $configurableViewModel */
+$configurableViewModel = $viewModels->require(ConfigurableViewModel::class);
+
+$productId = $block->getProductId();
+$attributeId = $block->getAttributeId();
+
+if (!$productId || !$attributeId) {
+    return '';
+}
+?>
+<div>
+    <template x-if="optionIsEnabled(<?= (int) $attributeId ?>, item.id) && optionIsActive(<?= (int) $attributeId ?>, item.id)">
+        <label
+            :for="'attribute-option-<?= (int) $productId ?>-'+item.id"
+            class="swatch-option !mb-0 relative border cursor-pointer select-none product-option-value-label"
+            :class="{
+                'border-[#80b2ff]' : (selectedValues[<?= (int)$attributeId ?>] === item.id),
+                'border-gray-e1' : (selectedValues[<?= (int)$attributeId ?>] !== item.id),
+                'w-8 h-8' : !isTextSwatch(<?= (int) $attributeId ?>, item.id),
+                'border-container-lighter ring ring-primary ring-opacity-75' : focusedLabel === item.id
+            }"
+            <?php if ($configurableViewModel->getShowSwatchTooltip()): ?>
+                @mouseenter.self="activeTooltipItem = {
+                    attribute: '<?= (int) $attributeId ?>',
+                    item: item.id
+                }; tooltipPositionElement = $event.target;"
+                @mouseleave.self="activeTooltipItem = false"
+            <?php endif; ?>
+        >
+            <template x-if="!isTextSwatch(<?= (int) $attributeId ?>, item.id)">
+                <span
+                    class="rounded-full w-full h-full border"
+                    :style="getSwatchBackgroundStyle('<?= (int) $attributeId ?>',item.id)"
+                ></span>
+            </template>
+
+            <input
+                :id="'attribute-option-<?= (int) $productId ?>-'+item.id"
+                :value="item.id"
+                name="super_attribute[<?= (int) $attributeId ?>]"
+                type="radio"
+                class="inline-block invisible absolute p-0 border-0 focus:border-0 focus:ring-0 product-option-value-input"
+                style="z-index:-1"
+                x-on:focus="focusLabel(item.id)"
+                x-on:blur="blurLabel()"
+                x-on:change="changeOption(<?= (int) $attributeId ?>, $event.target.value)"
+                x-model="selectedValues[<?= (int) $attributeId ?>]"
+                :required="getAllowedAttributeOptions(<?= (int) $attributeId ?>).filter(
+                    attributeOption => selectedValues[attributeOption]
+                ).length === 0"
+            >
+            <div x-html="getSwatchText(<?= (int) $attributeId ?>, item.id)"
+                 class="whitespace-nowrap"
+                 :class="{ 'sr-only' : !isTextSwatch(<?= (int) $attributeId ?>, item.id) }"
+            ></div>
+        </label>
+    </template>
+
+    <template x-if="optionIsEnabled(<?= (int) $attributeId ?>, item.id) && !optionIsActive(<?= (int) $attributeId ?>, item.id)">
+        <div
+            class="relative border opacity-50 cursor-pointer select-none swatch-option"
+            :class="{
+                'w-8 h-8' : !isTextSwatch(<?= (int) $attributeId ?>, item.id)
+            }"
+            :style="getSwatchBackgroundStyle('<?= (int) $attributeId ?>',item.id)"
+        >
+            <div x-html="getSwatchText(<?= (int) $attributeId ?>, item.id)"
+                 class="whitespace-nowrap"
+                 :class="{ 'sr-only' : !isTextSwatch(<?= (int) $attributeId ?>, item.id) }"
+            ></div>
+            <svg class="absolute inset-0 w-full h-full text-gray-500 bg-white bg-opacity-25">
+                <line x1="0" y1="100%" x2="100%" y2="0" class="stroke-current stroke-1"></line>
+            </svg>
+        </div>
+    </template>
+</div>

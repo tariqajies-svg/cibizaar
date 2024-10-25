@@ -1,0 +1,42 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Customer;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$customer = $viewModels->require(Customer::class);
+?>
+<?php if (!$customer->customerLoggedIn()): ?>
+    <div class="items clear py-3 lg:pt-5 flex flex-wrap">
+        <span class="text-xs lg:text-sm font-bold text-navy mr-4"><?= $escaper->escapeHtml(__('Purchasing options')) ?></span>
+        <span class="text-xs lg:text-sm">
+            <?= $escaper->escapeHtml(__('To make a purchase')) ?>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>">
+                <?= $escaper->escapeHtml(__('create account')) ?>
+            </a>
+            <?= $escaper->escapeHtml(__('or')) ?>
+            <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login')) ?>">
+                <?= $escaper->escapeHtml(__('log in')) ?>
+            </a>
+        </span>
+    </div>
+<?php endif; ?>

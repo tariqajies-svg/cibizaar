@@ -1,0 +1,173 @@
+/**
+ * This file is part of the Magebit/bizaar_fallback design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit/bizaar_fallback
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+//
+//  Variables
+//  _____________________________________________
+
+@checkout-sidebar-shipping-information__padding: @indent__l;
+@checkout-sidebar-shipping-information__line-height: 24px;
+
+@checkout-sidebar-shipping-information-edit-icon__color: @minicart-icons-color;
+@checkout-sidebar-shipping-information-edit-icon__content: @icon-settings;
+@checkout-sidebar-shipping-information-edit-icon__font-size: 28px;
+@checkout-sidebar-shipping-information-edit-icon__line-height: 28px;
+@checkout-sidebar-shipping-information-edit-icon__top: 2px;
+@checkout-sidebar-shipping-information-edit-icon__hover__color: @primary__color;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    //
+    //  Shipping Information
+    //  ---------------------------------------------
+
+    .opc-block-shipping-information {
+        .shipping-information-title {
+            &:extend(.abs-checkout-title all);
+            .lib-css(border-bottom, @checkout-step-title__border);
+            margin: 0 0 @indent__base;
+            position: relative;
+
+            .action-edit {
+                &:extend(.abs-action-button-as-link all);
+                margin: 0;
+                position: absolute;
+                right: 0;
+
+                span {
+                    visibility: hidden;
+                }
+
+                &::after {
+                    content: '';
+                    font-family: icomoon;
+                    color: @color-gray;
+                    position: absolute;
+                    font-size: 15px;
+                    right: 1px;
+                    background-repeat: no-repeat;
+                    background-image: url(../images/ic_edit.svg);
+                    background-position: 0 0;
+                    background-size: 16px;
+                    width: 16px;
+                    height: 16px;
+                    top: 3px;
+                }
+
+                &:hover,
+                &:active {
+                    text-decoration: none;
+
+                    &::after {
+                        color: @color-blue-darker;
+                    }
+                }
+            }
+        }
+
+        .shipping-information-content {
+            .lib-css(line-height, @checkout-sidebar-shipping-information__line-height);
+            .actions-toolbar {
+                margin-left: 0;
+            }
+
+            a {
+                pointer-events: none;
+                color: inherit;
+            }
+        }
+
+        .ship-to {
+            margin: 0 0 21px;
+        }
+
+        .shipping-information-title {
+            font-weight: 400;
+            font-size: 20px;
+            line-height: 28px;
+            color: @color-navy;
+        }
+    }
+    .opc-block-shipping-information {
+        .shipping-information {
+            .ship-to,
+            .ship-via {
+                margin: 0 0 10px;
+                border: 1px solid #F7F7F7;
+                border-radius: 5px;
+                padding: 20px;
+            }
+
+            .shipping-information-title {
+                font-size: 20px;
+                line-height: 24px;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                color: #062B48;
+                font-weight: 400;
+            }
+
+            .shipping-information-content {
+                font-size: 14px;
+                line-height: 24px;
+                color: #000000;
+                font-weight: 400;
+            }
+        }
+    }
+}
+
+
+//
+//  Desktop
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .opc-block-shipping-information--mobile {
+        display: none;
+    }
+
+    .opc-block-shipping-information {
+        .shipping-information {
+            .ship-to,
+            .ship-via {
+                margin: 0 0 10px;
+                border: 1px solid #F7F7F7;
+                border-radius: 5px;
+                padding: 20px;
+            }
+
+            .shipping-information-title {
+                font-size: 20px;
+                line-height: 24px;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+                color: #062B48;
+                font-weight: 400;
+            }
+
+            .shipping-information-content {
+                font-size: 14px;
+                line-height: 24px;
+                color: #000000;
+                font-weight: 400;
+            }
+        }
+    }
+}

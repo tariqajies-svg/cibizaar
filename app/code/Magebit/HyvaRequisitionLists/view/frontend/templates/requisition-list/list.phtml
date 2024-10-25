@@ -1,0 +1,94 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCa\ViewModel\CustomerData;
+use Magebit\HyvaRequisitionLists\ViewModel\RequisitionList;
+use Magento\Framework\Escaper;
+
+/** @var RequisitionList $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$requisitionListItems = $block->getRequisitionListCollection();
+
+/** @var CustomerData $customerData */
+$customerData = $viewModels->require(CustomerData::class);
+$columnMaxLength = 20;
+?>
+
+<div class="aw-rl__list-table">
+    <?php if ($requisitionListItems !== null && $requisitionListItems->getSize()): ?>
+    <table class="table requisition-list-main-table">
+        <thead>
+        <tr>
+            <th><?= $escaper->escapeHtml(__('Name')) ?></th>
+            <th><?= $escaper->escapeHtml(__('Description')) ?></th>
+            <th class="lg:text-center"><?= $escaper->escapeHtml(__('Qty Of Items')) ?></th>
+            <th><?= $escaper->escapeHtml(__('Owner')) ?></th>
+            <th><?= $escaper->escapeHtml(__('Updated By')) ?></th>
+            <th><?= $escaper->escapeHtml(__('Last Update')) ?></th>
+            <th class="float-right text-right">
+                <?= $escaper->escapeHtml(__('Action')) ?>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($requisitionListItems as $item): ?>
+            <tr>
+                <td data-th="<?= $escaper->escapeHtml(__('Name')) ?>">
+                    <span>
+                        <?= /** @noEscape */ mb_strimwidth($escaper->escapeHtml($item->getName()), 0, $columnMaxLength, '...') ?>
+                    </span>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Description')) ?>">
+                    <span>
+                        <?= /** @noEscape */ mb_strimwidth($escaper->escapeHtml($item->getDescription()), 0, $columnMaxLength, '...') ?>
+                    </span>
+                </td>
+                <td class="lg:text-center" data-th="<?= $escaper->escapeHtml(__('Qty of items')) ?>">
+                    <span><?= $escaper->escapeHtml($item->getListItemsCount()) ?></span>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Owner')) ?>">
+                    <span><?= $escaper->escapeHtml($item->getData('o_fullname')) ?></span>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Updated by')) ?>">
+                    <span><?= $escaper->escapeHtml($item->getData('u_fullname')) ?></span>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Last update')) ?>">
+                    <span><?= $escaper->escapeHtml($block->getFormatDate($item->getUpdatedAt())) ?></span>
+                </td>
+                <td class="table-actions" data-th="<?= $escaper->escapeHtml(__('Action')) ?>">
+                    <a
+                        class="btn btn-secondary btn-sq"
+                        href="<?= $escaper->escapeUrl($block->getUrl($block->getEditAction(), ['list_id' => $item->getListId()])) ?>"
+                    >
+                        <i class="icon icon-edit"></i>
+                        <span class="edit-text lg:hidden">
+                             <?= $escaper->escapeHtml(__('Edit')) ?>
+                        </span>
+                    </a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php else: ?>
+        <div class="card flex flex-col gap-y-4 lg-max:mt-4 py-4 font-medium">
+            <span><?= $escaper->escapeHtml(__('You don\'t have any lists.')) ?></span>
+        </div>
+    <?php endif;?>
+</div>

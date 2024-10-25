@@ -1,0 +1,41 @@
+<?php
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+?>
+<script>
+    "use strict";
+
+    (function () {
+        window.bizaar.initProductListQtyField = function (options) {
+            return {
+                qty: options.qty,
+                productId: options.productId,
+                isQtyDecimal: options.isQtyDecimal,
+                maxSalesQtyLength: options.maxSalesQtyLength,
+                updateQty(newVal, $dispatch) {
+                    if (options.isQtyDecimal) {
+                        newVal = parseFloat(newVal.toFixed(1));
+                    }
+                    const input = this.$refs['qty-' + this.productId];
+                    const min = parseFloat(input.min);
+                    const max = parseFloat(input.max);
+                    const maxLength = parseInt(this.maxSalesQtyLength)
+
+                    if (((!!min && newVal >= min) || !min)
+                        && ((!!max && newVal <= max) || !max)
+                        && (!this.isQtyDecimal &&
+                            ((!!maxLength && newVal.toString().length <= maxLength) || !maxLength)
+                        )
+                    ) {
+                        this.qty = newVal;
+                        $dispatch('update-qty-' + this.productId, this.qty)
+                    }
+                }
+            }
+        }
+    })();
+</script>

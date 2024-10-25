@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="skyex_label" translate="label" sortOrder="10">
+            <label>SkyEx Label</label>
+        </tab>
+        <section id="skyex_label_config" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>SkyEx Label</label>
+            <tab>skyex_label</tab>
+            
+            <resource>SkyExLabel_Slabel::skyex_config</resource>
+            <group id="skyex_label_general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>General Configuration</label>
+
+                
+
+                <field id="skyex_key" translate="label" type="textarea" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enter your SkyEx User Token: </label>
+                    <validate>required-entry validate-token</validate>
+                </field>
+
+                <field id="stype" translate="label" type="radios" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Select the Shipment Type:</label>
+                    <validate>required-entry</validate>
+                    <source_model>SkyExLabel\Slabel\Model\System\Stype</source_model>
+                </field>
+
+
+                <field id="dpw" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Default product weight in kg:</label>
+                    <validate>required-entry validate-zero-or-greater</validate>
+                </field>
+
+            </group>
+        </section>
+    </system>
+</config>

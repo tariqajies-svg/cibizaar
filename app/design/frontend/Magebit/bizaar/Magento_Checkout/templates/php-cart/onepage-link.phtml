@@ -1,0 +1,31 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Magento\Checkout\Block\Onepage\Link;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Link $block */
+?>
+<?php if ($block->isPossibleOnepageCheckout()): ?>
+    <a @click.prevent.stop="$dispatch('toggle-authentication',
+        {url: '<?= $escaper->escapeHtmlAttr($escaper->escapeUrl($block->getCheckoutUrl())) ?>'});"
+        href="<?= $escaper->escapeHtmlAttr($escaper->escapeUrl($block->getCheckoutUrl())) ?>"
+        title="<?= $escaper->escapeHtmlAttr(__('Proceed to Checkout')) ?>"
+        class="btn btn-primary"
+        id="checkout-link-button"
+    >
+        <?= $escaper->escapeHtml(__('Proceed to Checkout')) ?>
+    </a>
+<?php endif ?>

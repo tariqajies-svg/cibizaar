@@ -1,0 +1,67 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductCompare;
+use Magento\Framework\Escaper;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+/** @var ProductCompare $compareViewModel */
+$compareViewModel = $viewModels->require(ProductCompare::class);
+?>
+<?php if ($compareViewModel->showInProductList()): ?>
+<script>
+    function initCompareOnProductList() {
+        return {
+            isLoading: false,
+            addToCompare(productId, productName) {
+                const formKey = hyva.getFormKey();
+                const postUrl = BASE_URL + 'catalog/product_compare/add/?isAjax=1';
+                this.isLoading = true;
+                fetch(postUrl, {
+                    "headers": {
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    "body": "form_key=" + formKey + "&product=" + productId + "&uenc=" + hyva.getUenc(),
+                    "method": "POST",
+                    "mode": "cors",
+                    "credentials": "include"
+                }).then(function (response) {
+                    if (response.ok) {
+                        window.dispatchEvent(new CustomEvent("reload-customer-section-data"));
+                        typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                            [{
+                                type: "success",
+                                text: `<?= $escaper->escapeJs(__('You added product %1 to the <a href="%2">comparison list</a>.')) ?>`
+                                    .replace('%1', productName).replace('%2', '<?= $escaper->escapeUrl($block->getUrl('catalog/product_compare')) ?>')
+                            }], 5000
+                        );
+                    }
+                }).catch(function (error) {
+                    typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                        [{
+                            type: "error",
+                            text: error
+                        }], 5000
+                    );
+                }).finally(() => {
+                    this.isLoading = false;
+                })
+            }
+        };
+    }
+</script>
+<?php endif; ?>

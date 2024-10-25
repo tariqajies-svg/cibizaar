@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaTheme package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+-->
+<page layout="3columns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="header-content">
+            <!-- Removing topmenu, because it will be loaded via AJAX request dynamically -->
+            <referenceBlock name="topmenu_generic" remove="true"/>
+            <block name="topmenu_generic_loading" template="Hyva_Theme::ui/loading.phtml"/>
+        </referenceBlock>
+    </body>
+</page>

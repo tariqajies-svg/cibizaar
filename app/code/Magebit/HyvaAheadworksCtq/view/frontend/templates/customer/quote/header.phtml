@@ -1,0 +1,105 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\Customer\Quote\Header;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCtq\ViewModel\Customer\Quote;
+use Magento\Framework\Escaper;
+
+/** @var Header $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$block->getDataProviderViewModel()->setMethodToLocateQuote($block->getMethodToLocateQuote());
+$quote = $block->getDataProviderViewModel()->getQuote();
+$cart = $block->getDataProviderViewModel()->getCart();
+$quoteViewModel = $viewModels->require(Quote::class);
+$actions = ['link_actions' => [], 'button_actions' => []];
+
+foreach ($block->getQuoteViewModel()->prepareBuyerQuoteActions($quote, $cart) as $quoteAction) {
+    if ($quoteAction->getIsDisabled()) {
+        continue;
+    }
+
+    if (in_array($quoteAction->getType(), ['edit', 'buy', 'requote'])) {
+        $actions['button_actions'][] = $quoteAction;
+    } else {
+        $actions['link_actions'][] = $quoteAction;
+    }
+}
+?>
+<div class="mt-4 mb-5.25 lg:mt-0 lg:mb-5 lg:flex lg:justify-between lg:items-center lg:flex-wrap lg:gap-2">
+    <div class="mb-5.25 lg:mb-0 lg:flex lg:justify-between lg:items-center lg:gap-3 lg:flex-wrap">
+        <h2 class="mb-1.75 lg:mb-0"><?= $escaper->escapeHtml($quote->getName()) ?></h2>
+        <div class="rounded bg-gray-f2 border-gray-e6 text-gray border inline-block pt-1 px-3.75 pb-0.5
+                    lg:px-3.75 lg:py-1.75">
+            <i class="w-2 h-2 rounded-full inline-block mb-px mr-1.25 lg:mb-0.5
+                      bg-<?= $escaper->escapeHtmlAttr($quoteViewModel->getStatusColor($quote->getStatus())) ?>"></i>
+            <span><?= $escaper->escapeHtml($quoteViewModel->getStatusLabel($quote->getStatus())) ?></span>
+        </div>
+    </div>
+    <div class="flex gap-y-4.75 gap-x-6.5 items-center flex-wrap lg:gap-x-6">
+        <?php foreach ($actions['link_actions'] as $action): ?>
+            <a href="<?= $escaper->escapeUrl($quoteViewModel
+                ->getQuoteUrlByAction($quote, $action, $block->getMethodToLocateQuote())) ?>"
+                <?php if ($class = $action->getClass()): ?>
+                    class="<?= $escaper->escapeHtmlAttr($class) ?>"
+                <?php endif; ?>>
+                <span><?= $escaper->escapeHtml(__($action->getName())) ?></span>
+            </a>
+        <?php endforeach; ?>
+        <div class="flex flex-grow gap-2 items-center flex-wrap">
+            <?php foreach ($actions['button_actions'] as $action): ?>
+                <button
+                    x-data="{}"
+                    @click="$dispatch('trigger-quote-submit', {detail: '<?= $escaper->escapeUrl($quoteViewModel->getQuoteUrlByAction($quote, $action, $block->getMethodToLocateQuote())) ?>'})"
+                    <?php if ($class = $action->getClass()): ?>
+                        class="<?= $escaper->escapeHtmlAttr($class) ?> flex-grow"
+                    <?php endif; ?>>
+                    <?= $escaper->escapeHtml(__($action->getName())) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+<div class="mb-4 lg:mb-5">
+    <div class="text-sm lg:text-base">
+        <?php if ($quote->getOrderId()): ?>
+            <div class="mb-2 lg:mb-1">
+                <span class="font-bold text-navy"><?= $escaper->escapeHtml(__('Order:')) ?></span>
+                <?php if ($quote->getCustomerId()): ?>
+                    <a href="<?= $escaper->escapeUrl($quoteViewModel->getOrderUrl($quote->getOrderId())) ?>">
+                        <span><?= $escaper->escapeHtml($quoteViewModel->getOrderIdFormatted($quote->getOrderId())) ?></span>
+                    </a>
+                <?php else: ?>
+                    <span><?= $escaper->escapeHtml($quoteViewModel->getOrderIdFormatted($quote->getOrderId())) ?></span>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+        <div class="mb-2 lg:mb-1">
+            <span class="font-bold text-navy"><?= $escaper->escapeHtml(__('Quote #:')) ?></span>
+            <span><?= $escaper->escapeHtml($quote->getId()) ?></span>
+        </div>
+        <div class="mb-2 lg:mb-1">
+            <span class="font-bold text-navy"><?= $escaper->escapeHtml(__('Created:')) ?></span>
+            <span class="uppercase"><?= $escaper->escapeHtml($quoteViewModel->getCreatedAtFormatted($quote->getCreatedAt(), false)) ?></span>
+        </div>
+        <?php if ($quote->getExpirationDate()): ?>
+            <div class="mb-2 lg:mb-1">
+                <span class="font-bold text-navy"><?= $escaper->escapeHtml(__('Expired:')) ?></span>
+                <span class="uppercase"><?= $escaper->escapeHtml($quoteViewModel->getExpiredDateFormatted($quote->getExpirationDate(), false)) ?></span>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>

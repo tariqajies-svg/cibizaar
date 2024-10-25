@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Ccavenue package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+ -->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="ccavenue_script" type="host">*.ccavenue.ae</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="ccavenue_connect" type="host">*.ccavenue.ae</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="ccavenue_frame" type="host">*.ccavenue.ae</value>
+            </values>
+        </policy>
+        <policy id="form-action">
+            <values>
+                <value id="ccavenue_form" type="host">*.ccavenue.ae</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

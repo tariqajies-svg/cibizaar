@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <referenceBlock name="aw_ctq.customer.quote.comment"
+                            template="Magebit_HyvaAheadworksCtq::customer/quote/comment.phtml">
+                <block class="Aheadworks\Ctq\Block\Customer\FileUploader"
+                       name="aw_ctq.customer.quote.comment.file_uploader"
+                       template="Magebit_HyvaAheadworksCtq::checkout/request_quote_modal_file_uploader.phtml">
+                    <block name="aw_ctq.customer.quote.comment.file_uploader.loading" template="Hyva_Theme::ui/loading.phtml"/>
+                    <arguments>
+                        <argument name="view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\FileUploader</argument>
+                        <argument name="jsLayout" xsi:type="array">
+                            <item name="components" xsi:type="array">
+                                <item name="awCtqFileUploader" xsi:type="array">
+                                    <item name="isMultipleFiles" xsi:type="boolean">true</item>
+                                </item>
+                            </item>
+                        </argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Customer\Block\Account\Dashboard"
+                       template="Magebit_HyvaAheadworksCtq::customer/quote/back.phtml"
+                       name="aw_ctq.customer.quote.comment.back"/>
+            </referenceBlock>
+        </referenceContainer>
+        <referenceBlock name="customer.account.link.back" remove="true"/>
+    </body>
+</page>

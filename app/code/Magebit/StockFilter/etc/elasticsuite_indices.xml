@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_StockFilter package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_StockFilter
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<indices xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Smile_ElasticsuiteCore:etc/elasticsuite_indices.xsd">
+    <index identifier="catalog_product" defaultSearchType="product">
+        <type name="product" idFieldName="entity_id">
+            <mapping>
+                <!-- Static fields handled by the "stock" datasource -->
+                <field name="stock.is_in_stock" type="boolean" >
+                    <isSearchable>1</isSearchable>
+                    <isFilterable>1</isFilterable>
+                </field>
+            </mapping>
+        </type>
+    </index>
+</indices>

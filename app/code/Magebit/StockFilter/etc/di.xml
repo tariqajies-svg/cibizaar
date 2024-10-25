@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_StockFilter package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_StockFilter
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="Magebit\StockFilter\Model\Layer\Filter\Item\StockFactory" type="Magento\Catalog\Model\Layer\Filter\ItemFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">Magebit\StockFilter\Model\Layer\Filter\Item\Stock</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magebit\StockFilter\Model\Layer\Filter\Stock">
+        <arguments>
+            <argument name="filterItemFactory" xsi:type="object">Magebit\StockFilter\Model\Layer\Filter\Item\StockFactory</argument>
+        </arguments>
+    </type>
+</config>

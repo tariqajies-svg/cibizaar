@@ -1,0 +1,60 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Product\Action;
+use Amasty\RequestQuoteHyva\ViewModel\QuoteIcons;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+
+/** @var Action $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+$quoteIcons = $viewModels->require(QuoteIcons::class);
+$buttonClasses = 'justify-center btn btn-secondary text-sm w-auto mr-auto';
+$buttonClasses .= $block->isProductListing()
+    ? ' mt-3'
+    : ' ml-3 mt-0 lg:mt-2 xl:mt-0';
+$buttonClasses .= $block->getLoggedIn()
+    ? ''
+    : ' amasty-quote-login';
+$textClasses = $block->isProductListing()
+    ? 'ml-2 inline md:ml-0 lg:ml-2 lg:inline'
+    : 'sm:block lg:block';
+?>
+<?php if ($block->isProductListing()): ?>
+    <div class="w-full h-0"></div>
+<?php endif; ?>
+<?php
+$isProductListing = (bool)$block->isProductListing();
+if ($this->getRequest()->getFullActionName() == 'cms_index_index') {
+ $isProductListing = true;
+}
+?>
+<?php 
+$hidePriceHelper = $this->helper('\Amasty\HidePrice\Helper\Data');
+if (!$hidePriceHelper->isNeedHideProduct($block->getProduct()))
+{
+?>
+<button x-data="initAmQuoteButton(
+            '<?= $escaper->escapeUrl($block->getAddUrl()); ?>',
+            <?= /** @noEscape */ var_export($isProductListing, true) ?>,
+            <?= /** @noEscape */ var_export((bool)$block->getLoggedIn(), true) ?>
+        )"
+        x-init="initButton($el)"
+        @click.prevent="submitQuote($el)"
+        <?php if (!$isProductListing): ?>
+            form="product_addtocart_form"
+        <?php endif; ?>
+        type="button"
+        title="<?= $escaper->escapeHtmlAttr($block->getButtonText()) ?>"
+        aria-label="<?= $escaper->escapeHtmlAttr($block->getButtonText()) ?>"
+        class="amquote-addto-button add-to-quote btn-light btn-primary <?= /** @noEscape */$buttonClasses ?>">
+    <?= $quoteIcons->quoteHtml('h-6 w-6 border-current inline', 25, 25) ?>
+    <span class="amquote-addto-button-text <?= /** @noEscape */ $textClasses ?>"><?= $escaper->escapeHtml($block->getButtonText()) ?></span>
+</button>
+<?php } ?>

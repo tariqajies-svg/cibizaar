@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="after.body.start">
+            <block name="head.bizaar-scripts" template="Magebit_Bizaar::bizaar-init.phtml"/>
+            <block name="head.bizaar-scripts.init-product-tile" template="Magento_Catalog::product/list/js/init-product-tile.phtml"/>
+            <block name="head.bizaar-scripts.init-to-list-button" template="Magento_Catalog::product/list/js/init-to-list-button.phtml"/>
+            <block name="head.bizaar-scripts.init-add-to-requisition-list" template="Magento_Catalog::product/list/js/init-add-to-requisition-list.phtml"/>
+            <block name="head.bizaar-scripts.init-price" template="Magento_Catalog::product/list/js/init-price.phtml"/>
+            <block name="head.bizaar-scripts.init-product-list-qty-field" template="Magento_Catalog::product/list/js/init-product-list-qty-field.phtml"/>
+        </referenceContainer>
+        <referenceBlock name="catalog.list.item.addto">
+            <block class="Amasty\RequestQuoteHyva\Block\Product\Action" name="amquote.catalog.list.item.addto"/>
+        </referenceBlock>
+    </body>
+</page>

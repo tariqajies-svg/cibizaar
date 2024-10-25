@@ -1,0 +1,67 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+/**
+ * @var Info $block
+ * @var Escaper $escaper
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Sales\Block\Order\Info;
+
+$order = $block->getOrder();
+$payment = $order->getPayment();
+?>
+<div class="pb-4 border-b border-container lg:pb-3">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-5.25">
+        <div class="w-full py-1 lg:py-4">
+            <p class="font-bold text-navy mb-1"><?= $escaper->escapeHtml(__('Billing Address')) ?></p>
+            <div class="box-content">
+                <address><?= /* @noEscape */ $block->getFormattedAddress($order->getBillingAddress()) ?></address>
+            </div>
+        </div>
+        <?php if (!$order->getIsVirtual()): ?>
+            <div class="w-full py-1 lg:py-4">
+                <p class="font-bold text-navy mb-1"><?= $escaper->escapeHtml(__('Shipping Address')) ?></p>
+                <div class="box-content">
+                    <address><?= /* @noEscape */ $block->getFormattedAddress($order->getShippingAddress()) ?></address>
+                </div>
+            </div>
+            <div class="w-full py-1 lg:py-4">
+                <p class="font-bold text-navy mb-1"><?= $escaper->escapeHtml(__('Shipping Method')) ?></p>
+                <div class="box-content">
+                    <?php if ($order->getShippingDescription()): ?>
+                        <?= $escaper->escapeHtml($order->getShippingDescription()) ?>
+                    <?php else: ?>
+                        <?= $escaper->escapeHtml(__('No shipping information available')) ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+        <div class="w-full py-1 lg:py-4">
+            <p class="font-bold text-navy mb-1"><?= $escaper->escapeHtml(__('Payment Method')) ?></p>
+            <div class="box-content">
+                <?= $block->getPaymentInfoHtml() ?>
+            </div>
+            <?php if ($poNumber = $payment->getPoNumber()): ?>
+                <p class="font-bold text-navy mb-1 mt-3"><?= $escaper->escapeHtml(__('PO number')) ?></p>
+                <div class="box-content">
+                    <?= $escaper->escapeHtml($poNumber) ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

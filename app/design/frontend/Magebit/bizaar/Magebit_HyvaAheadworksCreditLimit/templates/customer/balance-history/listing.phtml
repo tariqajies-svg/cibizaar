@@ -1,0 +1,412 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCreditLimit package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\ViewModel\Company\Company;
+use Aheadworks\CreditLimit\Block\Customer\BalanceHistory\Listing;
+use Magebit\HyvaAheadworksCreditLimit\ViewModel\Customer;
+use Magento\Framework\Escaper;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCa\ViewModel\AuthManagement;
+use Aheadworks\Ca\ViewModel\Company\Customer as CustomerAwVm;
+
+/** @var Listing $block */
+/** @var Customer $viewModel */
+/** @var Escaper $escaper */
+// phpcs:disable Generic.Files.LineLength.TooLong
+/** @var ViewModelRegistry $viewModels */
+
+/** @var AuthManagement $authManagement */
+$authManagement = $viewModels->require(AuthManagement::class);
+
+if (!$authManagement->isAllowedByResource('Aheadworks_CreditLimit::company_cl_transactions')) {
+    return '';
+}
+
+$viewModel = $block->getData('view_model');
+$params = $block->getComponentParams(['customer_id' => $viewModel->getCustomerId()]);
+
+$companyViewModel = $viewModels->require(Company::class);
+$customerViewModel = $viewModels->require(CustomerAwVm::class);
+$company = null;
+
+if ($companyUser = $customerViewModel->getCurrentCompanyUser()) {
+    $company = $companyViewModel->getCompanyByCustomer($companyUser);
+}
+?>
+
+<script>
+    'use strict';
+
+    function initTable() {
+        let data = null;
+        let defaultData = {
+            page: {
+                type: 'page',
+                value: 1,
+                totalRecords: null,
+                pageSize: 10,
+                countPages: null
+            }
+        };
+
+        return {
+            data: data ?? defaultData,
+            isMobile: true,
+            counterText: '',
+            pages: [],
+            countPagesBeforeAndAfterCurrent: 1,
+            pagerFrameSize: 3,
+            pageAmountWithoutDots: 5,
+            isLoading: false,
+            companyId: '<?= $escaper->escapeHtml($company ? $company->getId() : 'null') ?>',
+            namespace: 'aw_credit_limit_transaction_listing',
+            sortValue: 'created_at',
+            // 0 - desc, 1 - asc
+            sortDirection: 0,
+            initData: function () {
+                this.checkWindowSizeMobile()
+                this.getItems();
+            },
+            getItems: function () {
+                let request_data = {};
+
+                let data = {
+                    company_id: {
+                        key: 'company_id',
+                        value: this.companyId
+                    },
+                    namespace: {
+                        key: 'namespace',
+                        value: this.namespace
+                    },
+                    page_size: {
+                        key: 'paging[pageSize]',
+                        value: this.data.page.pageSize
+                    },
+                    paging: {
+                        key: 'paging[current]',
+                        value: this.data.page.value
+                    },
+                    sort_by: {
+                        key: 'sorting[field]',
+                        value: this.sortValue
+                    },
+                    sort_dir: {
+                        key: 'sorting[direction]',
+                        value: this.sortDirection ? 'asc' : 'desc'
+                    },
+                    date: {
+                        key: '_',
+                        value: Date.now()
+                    }
+                }
+
+                for (let i in data) {
+                    request_data[data[i].key] = data[i].value;
+                }
+
+                this.isLoading = true;
+
+                fetch('<?= $escaper->escapeUrl($block->getUrl('mui/index/render')) ?>?' + new URLSearchParams(request_data).toString(), {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json, text/javascript, */*; q=0.01'
+                        }
+                    }
+                ).then(response => {
+                        return response.json()
+                    }
+                ).then(data => {
+                    if (data.errors) {
+                        this.isLoadingDelete = false;
+                        dispatchMessages([{
+                            type: 'error',
+                            text: data.message
+                        }], 5000);
+                    } else {
+                        this.setTableData(data);
+                        this.getPagination();
+                        this.setCounterText();
+                    }
+                    this.isLoading = false;
+                });
+            },
+            setTableData: function (data) {
+                const table_data = this.$refs['table-data'];
+                let html = '';
+
+                this.data.page.totalRecords = data.totalRecords;
+                this.data.page.countPages = Math.ceil(this.data.page.totalRecords / this.data.page.pageSize);
+                if (data.totalRecords > 0) {
+                    data.items.map(item => {
+                        html += '<tr class="lg-max:!overflow-x-auto">';
+                        html += '<td data-th="<?= $escaper->escapeHtml(__('Invoice Date')) ?>"><span class="price-two-rows uppercase">' + (item.created_at !== null ? hyva.formatDateAndTime(item.created_at) : '') + '</span></td>';
+                        html += '<td data-th="<?= $escaper->escapeHtml(__('Purchase Order')) ?>">' + (item.po_number !== null ? item.po_number : '') + '</td>';
+                        html += '<td data-th="<?= $escaper->escapeHtml(__('Due Date')) ?>">' + (item.credit_due_date !== null ? hyva.formatDateAndTime(item.credit_due_date, true) : '') + '</td>';
+                        html += '<td data-th="<?= $escaper->escapeHtml(__('Action')) ?>">' + this.getAction(item.action) + '</td>';
+                        html += '<td class="whitespace-nowrap text-navy !font-bold" data-th="<?= $escaper->escapeHtml(__('Amount')) ?>">' + (item.amount !== null ? item.amount : '') + '</td>';
+                        html += '<td class="whitespace-nowrap text-navy !font-bold" data-th="<?= $escaper->escapeHtml(__('Credit Balance ')) ?>">' + (item.credit_balance !== null ? item.credit_balance : '') + '</td>';
+                        html += '<td class="whitespace-nowrap text-navy !font-bold" data-th="<?= $escaper->escapeHtml(__('Available Credit')) ?>">' + (item.credit_available !== null ? item.credit_available : '') + '</td>';
+                        html += '<td class="whitespace-nowrap text-navy !font-bold" data-th="<?= $escaper->escapeHtml(__('Credit limit')) ?>">' + (item.credit_limit !== null ? item.credit_limit : '') + '</td>';
+                        html += '<td data-th="<?= $escaper->escapeHtml(__('Update by')) ?>">' + (item.updated_by !== null ? item.updated_by : '') + '</td>';
+                        html += '<td data-th="<?= $escaper->escapeHtml(__('Comment')) ?>"><span>' + (item.comment_to_customer !== null ? item.comment_to_customer : '') + '</span></td>';
+                        html += '</tr>';
+                    });
+                } else {
+                    html += '<tr colspan="9" class="table-row"><td><?= $escaper->escapeHtml(__("We couldn't find any records")) ?></td></tr>';
+                }
+
+                table_data.innerHTML = html;
+                window.scrollTo({
+                    top: 0,
+                    left: 0,
+                    behavior: 'smooth'
+                });
+            },
+            getAction: function (actionItem) {
+                let label = '';
+
+                switch (actionItem) {
+                    case 'credit_limit_assigned':
+                        label = '<?= $escaper->escapeHtml(__('Assigned')) ?>'
+                        break;
+                    case 'credit_limit_changed':
+                        label = '<?= $escaper->escapeHtml(__('Changed')) ?>'
+                        break;
+                    case 'credit_balance_updated':
+                        label = '<?= $escaper->escapeHtml(__('Updated by Admin')) ?>'
+                        break;
+                    case 'credit_balance_updated_by_unit':
+                        label = '<?= $escaper->escapeHtml(__('Updated by Customer')) ?>'
+                        break;
+                    case 'credit_balance_refunded_by_unit':
+                        label = '<?= $escaper->escapeHtml(__('Refunded Credit')) ?>'
+                        break;
+                    case 'order_purchased':
+                        label = '<?= $escaper->escapeHtml(__('Purchased')) ?>'
+                        break;
+                    case 'order_canceled':
+                        label = '<?= $escaper->escapeHtml(__('Canceled')) ?>'
+                        break;
+                    case 'credit_memo_refunded':
+                        label = '<?= $escaper->escapeHtml(__('Refunded')) ?>'
+                        break;
+                }
+
+                return label;
+            },
+            getPagination() {
+                let currentPage = this.data.page.value;
+                let countPages = this.data.page.countPages;
+                let pages = [];
+
+                for (let i = 1; i <= countPages; i++) {
+                    if (i === 1) {
+                        let pageData = {
+                            pageNumber: this.data.page.value - 1,
+                            currentPage: false,
+                            pageLabel: '<i class="icon icon-arrow-left text-[14px] lg:text-[16px]"></i>',
+                            btnType: 'arrow',
+                            arrowType: 'first',
+                            disabled: false
+                        }
+
+                        if (currentPage === 1) {
+                            pageData.disabled = true;
+                        }
+                        pages.push(pageData)
+                    }
+
+                    if (
+                        (currentPage < this.countPagesBeforeAndAfterCurrent + 1 && i < this.pagerFrameSize + 1) ||
+                        (currentPage > countPages - this.countPagesBeforeAndAfterCurrent && i > countPages - this.pagerFrameSize) ||
+                        (i >= currentPage && i <= currentPage + this.countPagesBeforeAndAfterCurrent) ||
+                        (i <= currentPage && i >= currentPage - this.countPagesBeforeAndAfterCurrent)
+                    ) {
+                        let pageData = {
+                            pageNumber: i,
+                            currentPage: false,
+                            pageLabel: i,
+                            btnType: 'simpleButton',
+                            arrowType: false,
+                            disabled: false
+                        };
+                        if (i === currentPage) {
+                            pageData.currentPage = true;
+                            pageData.disabled = true;
+                        }
+                        pages.push(pageData)
+                    }
+
+                    if (i === countPages) {
+                        let pageData = {
+                            pageNumber: this.data.page.value + 1,
+                            currentPage: false,
+                            pageLabel: '<i class="icon icon-arrow-right text-[14px] lg:text-[16px]"></i>',
+                            btnType: 'arrow',
+                            arrowType: 'last',
+                            disabled: false
+                        }
+
+                        if (currentPage === countPages) {
+                            pageData.disabled = true;
+                        }
+                        pages.push(pageData)
+                    }
+                }
+
+                this.pages = pages;
+            },
+            changePageSize() {
+                this.data.page.pageSize = this.$refs.limiter.value;
+                this.data.page.value = Math.ceil(this.data.page.totalRecords / this.data.page.pageSize);
+                this.getItems();
+            },
+            sorting(sortValue) {
+                if (sortValue === this.sortValue) {
+                    this.sortDirection = !this.sortDirection
+                } else {
+                    this.sortValue = sortValue
+                    this.sortDirection = 0;
+                }
+
+                this.getItems()
+            },
+            setPageNumber(pageNumber) {
+                this.data.page.value = pageNumber;
+                this.getItems();
+            },
+            setCounterText() {
+                let pageSize = this.data.page.pageSize;
+                let totalRecords = this.data.page.totalRecords
+                let currentPage = this.data.page.value
+                let pageCount = this.data.page.countPages
+
+                this.counterText = '<?= $escaper->escapeHtml(__('Items')) ?>'
+                    + ' '
+                    + (totalRecords ? (1 + (pageCount > 1 ? (pageSize * (currentPage - 1)) : 0)) : 0)
+                    + ' - '
+                    + (pageSize * currentPage > totalRecords ? totalRecords : (pageSize * currentPage))
+                    + ' '
+                    + '<?= $escaper->escapeHtml(__('of')) ?>'
+                    + ' '
+                    + totalRecords;
+            },
+            checkWindowSizeMobile() {
+                this.isMobile = window.innerWidth < 479
+            }
+        }
+    }
+</script>
+<div x-data="initTable()" x-init="initData()">
+    <h3 class="mb-4.75 lg:mb-7.5"><?= $escaper->escapeHtml(__('Credit History')) ?></h3>
+    <div class="admin__data-grid-wrap lg:mt-8 overflow-x-auto"
+         @resize.window="checkWindowSizeMobile(); getPagination()">
+        <?= $block->getChildHtml('loading') ?>
+        <table x-show="data.page.totalRecords" class="table" id="credit_limit_table" x-ref="credit_limit_table">
+            <thead>
+            <tr class="table-row">
+                <th @click="sorting('created_at')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Invoice Date')) ?></span>
+                </th>
+                <th @click="sorting('po_number')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Purchase Order')) ?></span>
+                </th>
+                <th @click="sorting('credit_due_date')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Due Date')) ?></span>
+                </th>
+                <th @click="sorting('action')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Action')) ?></span>
+                </th>
+                <th @click="sorting('amount')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Amount')) ?></span>
+                </th>
+                <th @click="sorting('credit_balance')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Credit Balance ')) ?></span>
+                </th>
+                <th @click="sorting('credit_available')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Available Credit')) ?></span>
+                </th>
+                <th @click="sorting('credit_limit')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Credit limit')) ?></span>
+                </th>
+                <th @click="sorting('updated_by')" class="cursor-pointer">
+                    <span><?= $escaper->escapeHtml(__('Updated By')) ?></span>
+                </th>
+                <th>
+                    <span><?= $escaper->escapeHtml(__('Comment')) ?></span>
+                </th>
+            </tr>
+            </thead>
+            <tbody id="table-data" x-ref="table-data" class="ss:grid lg:table-row-group md:grid-cols-2 gap-x-4">
+            <tr>
+                <td colspan="9"><?= $escaper->escapeHtml(__('We couldn\'t find any records')) ?></td>
+            </tr>
+            </tbody>
+        </table>
+        <span
+            x-show="!isLoading && !data.page.totalRecords"><?= $escaper->escapeHtml(__('We couldn\'t find any records')) ?>
+    </div>
+    <?= $block->getChildHtml('aw-cl.customer.top_total_list') ?>
+    <template x-if="!isLoading && data.page.totalRecords">
+        <div class="pager grid-cols-4 sm:grid-cols-8 md:grid-cols-4 lg:grid-cols-8
+                    grid-flow-row grid gap-3.25 items-center mt-5">
+                <span class="toolbar-amount text-gray font-semibold order-3 sm:order-2 md:order-3
+    lg:order-2 col-span-2 gap-x-1 lg:text-base" x-text="counterText"></span>
+            <div class="pages-wrapper">
+                <template x-if="pages.length > 1 && data.page.countPages > 1">
+                    <nav class="pages">
+                        <ol class="pages-items clear">
+                            <template x-for="page in pages">
+                                <li
+                                    class="item"
+                                    :class="{
+                                            'pages-item-next' : page.btnType === 'arrow',
+                                            '!ml-0' : page.arrowType === 'first'
+                                        }"
+                                >
+                                    <button class="page btn btn-sq"
+                                            :class="{
+                                                'btn-primary' : page.currentPage,
+                                                'pointer-events-none': page.currentPage || page.disabled,
+                                                'btn-secondary': !page.currentPage,
+                                                'next' : page.btnType === 'arrow' && page.disabled,
+                                                'lg-max:!w-full': page.btnType === 'arrow'
+                                             }"
+                                            :disabled="page.disabled"
+                                            x-html="page.pageLabel"
+                                            @click="{if(!page.currentPage){setPageNumber(page.pageNumber)}}"></button>
+                                </li>
+                            </template>
+                        </ol>
+                    </nav>
+                </template>
+            </div>
+            <div class="field limiter">
+                <label class="inline-label">
+                    <span><?= $escaper->escapeHtml(__('Show:')) ?></span>
+                </label>
+                <select x-ref="limiter" class="form-select form-select-sm limiter-options
+                                w-fit lg:w-[5.71rem] lg:pl-5.75"
+                        @change="changePageSize()">
+                    <option value="10" :selected="data.page.pageSize == 10">10</option>
+                    <option value="20" :selected="data.page.pageSize == 20">20</option>
+                    <option value="50" :selected="data.page.pageSize == 50">50</option>
+                </select>
+            </div>
+        </div>
+    </template>
+</div>

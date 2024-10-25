@@ -1,0 +1,202 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\Customer\FileUploader;
+use Aheadworks\Ctq\ViewModel\Customer\FileUploader as FileUploaderViewModel;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper as Escaper;
+
+/** @var FileUploader $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$viewModels = $viewModels->require(FileUploaderViewModel::class);
+$jsLayout = json_decode($block->getJsLayout());
+$allowedFileSize = $jsLayout->components->awCtqFileUploader->maxFileSize;
+$uploadUrl = $block->getUrl($jsLayout->components->awCtqFileUploader->uploaderConfig->url);
+$loaderName = $block->getLoaderName() ?: 'aw.ctq.create.request.modal.file_uploader.loading';
+$isModal = $block->getIsModal();
+?>
+<script>
+    function fileUploader() {
+        return {
+            isLoading: false,
+            files: [],
+            fileUploadErrorMessages: [],
+            isFileUploadError: false,
+            uploadedFileName: {},
+
+            // Create an array with file objects (file object contains name, size, type and other metadata)
+            createFileList: function() {
+                const files = Array.prototype.concat.apply([], arguments);
+                let index = 0;
+                const {length} = files;
+
+                const dataTransfer = new DataTransfer();
+
+                for (; index < length; index++) {
+                    dataTransfer.items.add(files[index]);
+                }
+
+                return dataTransfer.files;
+            },
+
+            // Add file into array of files
+            async addFiles(e) {
+                let filesToUpload = [];
+                this.fileUploadErrorMessages = [];
+                this.isFileUploadError = false;
+                const files = e.target.files;
+                const allowedFileSize = parseInt('<?= $escaper->escapeJs($allowedFileSize) ?>');
+
+                this.isLoading = true;
+                for (let i = 0; i < files.length; i++) {
+                    // Check the file size
+                    if (files[i]['size'] > allowedFileSize) {
+                        this.isFileUploadError = true;
+                        this.fileUploadErrorMessages.push({
+                            fileName: files[i]['name'],
+                            errorType: '<?= $escaper->escapeJs(__('The file size is too large')) ?>',
+                        });
+
+                        continue;
+                    }
+
+                    // Creating a post request to upload the file
+                    let data = new FormData();
+                    data.append('attachments', files[i]);
+                    data.append('param_name', 'attachments');
+                    data.append('form_key', hyva.getFormKey());
+
+                    await window.fetch('<?= $escaper->escapeJs($escaper->escapeUrl($uploadUrl))?>', {
+                        method: 'POST',
+                        body: data,
+                    }).then(response => response.json()).then(result => {
+                        if (result.error) {
+                            this.isFileUploadError = true;
+                            this.fileUploadErrorMessages.push({
+                                fileName: files[i]['name'],
+                                errorType: result.error,
+                            });
+                        } else {
+                            this.uploadedFileName[files[i]['name']] = result.file_name;
+                            filesToUpload.push(files[i]);
+                        }
+                    });
+                }
+
+                this.isLoading = false;
+
+                if (filesToUpload.length) {
+                    this.files = this.createFileList([...this.files], [...filesToUpload]);
+                }
+            },
+
+            // Magento is changing file names, and we need to get the right name from the request
+            getFileName(fileName) {
+                return this.uploadedFileName[fileName];
+            },
+
+            // Remove file from files array
+            remove: function(index) {
+                let files = [...this.files];
+                files.splice(index, 1);
+
+                this.files = this.createFileList(files);
+            },
+
+            // Convert size into human-readable format
+            humanFileSize: function(size) {
+                const i = Math.floor(Math.log(size) / Math.log(1024));
+                return (
+                    (size / Math.pow(1024, i)).toFixed(2) * 1 +
+                    ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i]
+                );
+            },
+
+            // Get blob url for the file
+            loadFile: function(file) {
+                return URL.createObjectURL(file);
+            },
+
+            // Format file name
+            formatFileName: function(fileName) {
+                return encodeURIComponent(fileName);
+            },
+
+            // Get input name
+            getInputName: function(name, fileName) {
+                const isQuoteCommentPage = document.body.classList.contains('aw_ctq-quote-comment');
+                const fieldNamePrefix = isQuoteCommentPage ? 'attachments' : 'comment[attachments]';
+
+                return fieldNamePrefix + '[' + fileName + '][' + name + ']';
+            },
+        };
+    }
+</script>
+
+<div class="relative" x-data="fileUploader()">
+    <div class="form-input text-blue active:text-navy lg:hover:text-blue-darker border-dashed relative mb-2 !px-0<?php if (!$isModal): ?> lg:p-4.25 lg:mb-4.25<?php endif; ?>"
+         x-ref="fileInput">
+        <input id="fileUploader" type="file"
+            <?= $escaper->escapeHtmlAttr($jsLayout->components->awCtqFileUploader->isMultipleFiles ? 'multiple' : '') ?>
+               class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+               @change="addFiles($event)"
+               @dragover="$refs.fileInput.classList.add('border-blue', 'ring-0');"
+               @dragleave=" $refs.fileInput.classList.remove('border-blue', 'ring-0');"
+               @drop="$refs.fileInput.classList.remove('border-blue', 'ring-0');"
+        >
+        <div class="font-bold text-center">
+            <i class="icon-attachment mr-2 align-text-top"></i><?= $escaper->escapeHtml(__('Click here or drag in attachment')) ?>
+        </div>
+    </div>
+    <div class="block text-center text-xs mb-2<?php if (!$isModal): ?> lg:text-sm lg:mb-4.25<?php endif; ?>"><?= $escaper->escapeHtml($jsLayout->components->awCtqFileUploader->notice) ?></div>
+
+    <div class="messages-wrapper">
+        <template
+            x-if="isFileUploadError"
+            x-for="errorMessages in fileUploadErrorMessages"
+        >
+            <div class="message error !justify-start">
+                <span class="break-words max-w-full" x-text="'&quot;' + errorMessages.fileName + '&quot; - ' + errorMessages.errorType"></span>
+            </div>
+        </template>
+    </div>
+
+    <template x-if="files.length > 0">
+        <div>
+            <template x-for="(_, index) in Array.from({ length: files.length })">
+                <div class="w-full border border-gray-e6 rounded text-xs flex justify-between mb-2 py-2.75 pl-4.75<?php if (!$isModal): ?> lg:text-base lg:py-3.25 lg:pl-5.75<?php endif; ?>">
+                    <div>
+                        <a class="block" :href="loadFile(files[index])" target="_blank"
+                           x-text="files[index].name"><?= $escaper->escapeHtml(__('Loading')) ?></a>
+                        <span class="text-2xs block<?php if (!$isModal): ?> lg:text-xs<?php endif; ?>"
+                              x-text="humanFileSize(files[index].size)">...</span>
+                    </div>
+                    <button class="text-gray lg:hover:text-blue-darker px-4.75 w-[62px]<?php if (!$isModal): ?> lg:px-5.75<?php endif; ?>" type="button" @click="remove(index)">
+                        <i class="icon icon-delete"></i>
+                    </button>
+                    <input type='hidden'
+                           :name="getInputName('name', files[index].name)"
+                           :value="files[index].name">
+                    <input type='hidden'
+                           :name="getInputName('file_name', files[index].name)"
+                           :value="getFileName(files[index].name)">
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <?= $block->getChildHtml($loaderName) ?>
+</div>

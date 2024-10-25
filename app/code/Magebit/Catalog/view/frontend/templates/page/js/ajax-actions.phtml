@@ -1,0 +1,56 @@
+<?php
+/**
+ * This file is part of the Magebit_Catalog package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+?>
+<script>
+    'use strict';
+    (function( hyva ) {
+        hyva.ajaxActions = () => {
+            return {
+                loading: {
+                    addToCart: false
+                },
+                ajaxForm(type) {
+                    this.loading[type] = true;
+                    event.preventDefault();
+                    const form = event.target;
+                    const url = new URL(form.action);
+                    url.searchParams.append('isAjax', '1');
+                    const formData = new FormData(form);
+                    if (formData.has('form_key')) {
+                        formData.set('form_key', hyva.getFormKey());
+                    }
+
+                    fetch(url.toString(), {
+                        method: form.method,
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }).then(response => {
+                        return response.json()
+                    })
+                        .then(data => {
+                            if (data.backUrl) {
+                                window.location.assign(data.backUrl);
+                            } else {
+                                window.dispatchEvent(new CustomEvent("reload-customer-section-data"));
+                                this.loading[type] = false;
+                            }
+                        });
+                }
+            }
+        }
+    }( window.hyva = window.hyva || {} ));
+</script>

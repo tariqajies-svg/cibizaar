@@ -1,0 +1,79 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Smile\ElasticsuiteCatalog\Block\Navigation\Renderer\Slider;
+use Magento\Framework\Escaper;
+
+/** @var Slider $block */
+/** @var Escaper $escaper */
+
+$uniqueId = '_' . uniqid();
+$jsConfig = $this->getJsonConfig();
+$dataRole = $block->getDataRole();
+$childBlockName = (strpos($dataRole, 'price') !== false) ? 'renderer.price.slider' : 'renderer.slider' ;
+?>
+<?= $block->getChildBlock($childBlockName)
+    ->setUniqueId($uniqueId)
+    ->setJsConfig($jsConfig)
+    ->setDataRole($dataRole)
+    ->toHtml() ?>
+
+<div class="smile-es-range-slider" data-role="<?= /* @noEscape */ $block->getDataRole(); ?>">
+    <div x-data="rangeSlider<?= /* @noEscape */ $uniqueId ?>({})" x-init="initialize()" class="relative max-w-xl w-full">
+        <div class="flex flex-wrap justify-between items-center mb-6 -mr-1 -lg:mr-2">
+            <div class="border rounded bg-white py-1.75 px-3 lg-max:max-w-30.5 mb-1 flex flex-1 mr-1 lg:mr-2">
+                <span x-model="minprice" x-text="fromLabel"></span>
+            </div>
+            <div class="border rounded bg-white py-1.75 px-3 lg-max:max-w-30.5 mb-1 flex flex-1 mr-1 lg:mr-2">
+                <span x-model="maxprice" x-text="toLabel"></span>
+            </div>
+        </div>
+
+        <div class="es-range-slider relative rounded-md bg-gray-200">
+            <input type="range"
+                   class="absolute pointer-events-none appearance-none h-0.5 w-full opacity-0 cursor-pointer"
+                   step="1"
+                   x-bind:min="min"
+                   x-bind:max="max"
+                   x-on:input="mintrigger"
+                   x-bind:style="'z-index: ' + minZindex"
+                   x-model="minprice">
+            <input type="range"
+                   class="absolute pointer-events-none appearance-none h-0.5 w-full opacity-0 cursor-pointer"
+                   step="1"
+                   x-bind:min="min"
+                   x-bind:max="max"
+                   x-on:input="maxtrigger"
+                   x-bind:style="'z-index: ' + maxZindex"
+                   x-model="maxprice">
+
+            <div class="relative z-10 h-0.5 mr-5">
+                <div class="absolute z-10 left-0 right-0 bottom-0 top-0"></div>
+                <div class="absolute z-20 top-0 bottom-0 bg-blue" x-bind:style="'right:'+ (100 - 1 - maxthumb)+'%; left:'+ minthumb+'%'"></div>
+                <div class="absolute z-30 w-5 h-5 top-0 left-0 bg-blue rounded-full -mt-2 thumb"  x-bind:style="'left: '+minthumb+'%'"></div>
+                <div class="absolute z-30 w-5 h-5 top-0 right-0 bg-blue rounded-full -mt-2 thumb" x-bind:style="'left: '+maxthumb+'%'"></div>
+            </div>
+        </div>
+
+        <div class="mt-7">
+            <a class="btn btn-sm btn-primary btn-light block space-x-0 text-sm font-semibold" x-show="count" x-model="url" :href="url">
+                <span><?= /* @noEscape */ __('Apply'); ?></span>
+                <span x-html="'(' + count + ')'"></span>
+            </a>
+            <div class="py-2 text-center" x-show="!count" x-html="message"></div>
+        </div>
+    </div>
+</div>

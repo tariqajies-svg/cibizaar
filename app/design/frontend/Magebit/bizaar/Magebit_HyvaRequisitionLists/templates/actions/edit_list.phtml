@@ -1,0 +1,108 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+
+/** @var Wrapper $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Modal $modalViewModel */
+
+$viewModel = $block->getParentBlock()->getData('requisition_list_view_model');
+$modalViewModel = $viewModels->require(Modal::class);
+?>
+
+<script>
+    function initUpdateRequisitionList() {
+        return {
+            isLoading: false,
+            error: false,
+            submitForm (event) {
+                this.$refs.listName.required = true;
+
+                if (!this.$refs.listName.form.checkValidity()) {
+                    this.isLoading = false;
+                    this.error = true;
+                    event.preventDefault();
+                }
+            }
+        }
+    }
+</script>
+<?php $modal = $modalViewModel->createModal()->withDialogRefName('edit-list')->withContent(
+    <<<END_OF_CONTENT
+                <h3 class="requisition-list-modal-header">{$escaper->escapeHtml(__('Edit Requisition List'))}</h3>
+                <div class="requisition-list-modal-content py-7.25 lg:pt-6.5 lg:pb-8">
+                    <form
+                        x-data="initUpdateRequisitionList()"
+                        action="{$viewModel->getUpdateUrl()}"
+                        @submit="isLoading = true, submitForm(event)"
+                        method="post"
+                        id="list-validate-detail"
+                    >
+                        <div class="list-name field required">
+                            <label class="label" for="name">{$escaper->escapeHtml(__('Requisition List Name'))}</label>
+                            <input
+                                class="form-input"
+                                :class="{'error': error}"
+                                type="text"
+                                id="name"
+                                name="name"
+                                x-ref="listName"
+                                value="{$viewModel->getCurrentRequisitionListName()}"
+                            >
+                            <span x-show="error" class="block text-2xs lg:text-xs text-error font-bold">{$escaper->escapeHtml(__('Field is required'))}</span>
+                        </div>
+                        <div class="list-description mt-3.5 lg:mt-3">
+                            <label class="label" for="description">{$escaper->escapeHtml(__('Description'))}</label>
+                            <textarea class="form-input" x-ref="description" type="text" id="description" name="description" 
+                                      rows="4">{$viewModel->getCurrentRequisitionListDescription()}</textarea>
+                        </div>
+                       {$block->getBlockHtml('formkey')}
+                       {$block->getBlockHtml('loading')}
+                        <button type="submit" class="save-button btn btn-primary w-full mt-4 lg:mt-6">
+                            {$escaper->escapeHtml(__('Save'))}
+                        </button>
+                    </form>
+                    <button type="button" @click="hide" class="cancel-button link text-center w-full mt-4 lg:mt-6">
+                        {$escaper->escapeHtml(__('Cancel'))}
+                    </button>
+                </div>
+                END_OF_CONTENT
+)->positionBottom()
+    ->addContainerClass('pop-up', 'rounded-none')
+    ->addOverlayClass('backdrop')
+    ->addDialogClass('pop-up-dialog')
+    ->removeOverlayClass('bg-black')
+    ->removeContainerClass('rounded-lg')
+    ->removeDialogClass('rounded-lg', 'shadow-xl')
+?>
+<div class="lg-max:!w-full" x-data="{...hyva.modal() }">
+    <button
+        @click="<?= $escaper->escapeHtmlAttr($modal->getShowJs()) ?>"
+        type="button"
+        class="link-button-lg w-full btn lg-max:btn-secondary btn-sm !px-0 lg:h-[fit-content] lg:py-1.75 lg:border-0
+        lg:text-blue lg:hover:text-blue-darker lg:active:text-navy"
+    >
+        <i class="lg:hidden icon icon-edit"></i>
+        <span><?= $escaper->escapeHtml(__('Rename')) ?></span>
+    </button>
+    <?= /** @noEscape */ $modal->withAriaLabel('edit-list') ?>
+</div>
+

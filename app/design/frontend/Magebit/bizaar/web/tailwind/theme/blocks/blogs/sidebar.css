@@ -1,0 +1,90 @@
+/* stylelint-disable value-no-vendor-prefix */
+.blog-posts.sidebar {
+    .widget.block {
+        @apply last:after:content-none;
+
+        &::after {
+            @apply content-[''] w-[calc(100%-40px)] absolute block h-0.25 left-5 bottom-0 bg-gray-e6;
+        }
+
+        &.block-categories {
+            & ul {
+                @apply pl-2;
+            }
+
+            .accordion {
+                @apply pl-0;
+
+                > .category:first-child {
+                    @apply pt-0;
+                }
+
+                .category {
+                    @apply pb-0;
+
+                    &::before {
+                        @apply content-none;
+                    }
+
+                    & a:hover {
+                        .count {
+                            @apply lg:bg-blue lg:text-white;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.block-list-posts {
+            .block-content {
+                .item {
+                    .post-item-link {
+                        @apply overflow-hidden last:mb-0;
+
+                        display: -webkit-box;
+                        -webkit-line-clamp: 2;
+                        -webkit-box-orient: vertical;
+                    }
+                }
+            }
+        }
+
+        &.block-archive {
+            .item {
+                @apply after:content-['•'] after:inline-block after:px-2 after:font-extrabold last:after:content-none;
+
+                & a {
+                    @apply hover:lg:no-underline;
+                }
+            }
+        }
+
+        &.block-tags {
+            .tags-list {
+                @apply pl-0 list-none;
+
+                .tag-item {
+                    @apply pb-1 lg:pb-2;
+
+                    & a:hover {
+                        @screen lg {
+                            .count {
+                                @apply bg-blue text-white;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        &.block-rss {
+            .link:hover {
+                @screen lg {
+                    .icon-rss::before {
+                        @apply text-blue-darker;
+                    }
+                }
+            }
+        }
+    }
+}

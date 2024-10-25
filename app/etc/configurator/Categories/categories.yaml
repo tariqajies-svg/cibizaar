@@ -1,0 +1,712 @@
+categories:
+  -
+    store_group: Bizaar
+    categories:
+      -
+        name: Brands
+        categories:
+          - name: HP
+            image: app/etc/configurator/Categories/images/brands/logo_hp.jpg
+          - name: Canon
+            image: app/etc/configurator/Categories/images/brands/logo_canon.jpg
+          - name: Epson
+            image: app/etc/configurator/Categories/images/brands/logo_epson.jpg
+          - name: RF Elements
+            image: app/etc/configurator/Categories/images/brands/logo_rf-elements.jpg
+          - name: Ubiquiti
+            image: app/etc/configurator/Categories/images/brands/logo_ubiquiti.jpg
+          - name: Mikrotik
+            image: app/etc/configurator/Categories/images/brands/logo_mikrotik.jpg
+          - name: Grandstream
+            image: app/etc/configurator/Categories/images/brands/logo_grandstream.jpg
+          - name: Dell
+            image: app/etc/configurator/Categories/images/brands/logo_dell.jpg
+          - name: Ruijie
+            image: app/etc/configurator/Categories/images/brands/logo_ruijie.jpg
+          - name: Lightwave
+            image: app/etc/configurator/Categories/images/brands/logo_lightwave.jpg
+          - name: Aruba
+            image: app/etc/configurator/Categories/images/brands/logo_aruba.jpg
+          - name: Sony
+            image: app/etc/configurator/Categories/images/brands/logo_sony.jpg
+          - name: Samsung
+            image: app/etc/configurator/Categories/images/brands/logo_samsung.jpg
+          - name: Bose
+            image: app/etc/configurator/Categories/images/brands/logo_bose.jpg
+      -
+        name: Categories
+        categories:
+          -
+            name: Cables
+            image: app/etc/configurator/Categories/images/image_categorie-12.jpg
+            categories:
+              -
+                name: Audio/Video Cables
+              -
+                name: Cable Management
+              -
+                name: Cables & Connectors
+                categories:
+                  -
+                    name: Cable Connectors
+                  -
+                    name: Power Cables
+                  -
+                    name: Printer Cables
+                  -
+                    name: Monitor Cables
+                  -
+                    name: Other Cables
+              -
+                name: Ethernet Cables
+                categories:
+                  -
+                    name: Cat 5 Cables
+                  -
+                    name: Cat 6 Cables
+                  -
+                    name: Coaxial Cables
+                  -
+                    name: Fiber Optic Cables
+                  -
+                    name: Network Cables
+                  -
+                    name: Patch Panels
+                  -
+                    name: Phone Cables
+              -
+                name: USB Cables & Adapters
+                categories:
+                  -
+                    name: USB Adapters
+                  -
+                    name: USB Cables
+                  -
+                    name: USB Hubs
+          -
+            name: Computer Accessories
+            image: app/etc/configurator/Categories/images/image_categorie-11.jpg
+            categories:
+              -
+                name: Computer Components
+                categories:
+                  -
+                    name: Computer Cases
+                  -
+                    name: Computer Memory
+                  -
+                    name: CPUs
+                  -
+                    name: Graphic Cards
+                  -
+                    name: Motherboards
+                  -
+                    name: System Cooling Fans
+                  -
+                    name: Power Supplies
+
+              -
+                name: Computer Speakers
+              -
+                name: Docking Stations
+              -
+                name: Keyboards & Mice
+                categories:
+                  -
+                    name: Keyboards
+                  -
+                    name: Keyboards & Mouse Bundles
+                  -
+                    name: Mice
+                  -
+                    name: Mouse Pads & Wrist Rests
+              -
+                name: Laptop Accessories
+                categories:
+                  -
+                    name: Laptop Batteries
+                  -
+                    name: Laptop Chargers & Adapters
+                  -
+                    name: Laptop Memory
+                  -
+                    name: Laptop Mounts
+              -
+                name: Laptop Cases & Bags
+                categories:
+                  -
+                    name: Backpacks
+                  -
+                    name: Carrying Cases
+                  -
+                    name: Protective Sleeves
+              -
+                name: Tablet Accessories
+                categories:
+                  -
+                    name: Tablet Cases
+                  -
+                    name: Tablet Styluses
+              -
+                name: Security Locks
+              -
+                name: Webcams
+          -
+            name: Computer Monitors & Displays
+            image: app/etc/configurator/Categories/images/image_categorie-10.jpg
+            categories:
+              -
+                name: Computer Monitors
+                categories:
+              -
+                name: Large Format Displays
+                categories:
+              -
+                name: Monitor Accessories
+                categories:
+                  -
+                    name: Monitor Cables & Adapters
+                  -
+                    name: Monitor Mounts
+                  -
+                    name: Monitor Mount Accessories
+                  -
+                    name: Monitor Stands
+                  -
+                    name: Privacy Screens
+              -
+                name: Projectors
+                categories:
+                  -
+                    name: Document Cameras
+                  -
+                    name: Interactive Projectors
+                  -
+                    name: Large Venue Projectors
+                  -
+                    name: Office Projectors
+                  -
+                    name: Projector Accessories
+                  -
+                    name: Short Throw Projectors
+          -
+            name: Computers
+            image: app/etc/configurator/Categories/images/image_categorie-9.jpg
+            categories:
+              -
+                name: Desktops & All-in-Ones
+                categories:
+                  -
+                    name: All-in-One Computers
+                  -
+                    name: Mini PCs
+                  -
+                    name: Thin Clients
+                  -
+                    name: Towers
+                  -
+                    name: Workstations
+              -
+                name: Laptops
+                categories:
+                  -
+                    name: 2-in-1 Laptops
+                  -
+                    name: Laptops
+              -
+                name: Workstations
+              -
+                name: Tablets
+              -
+                name: Point of Sale
+          -
+            name: Electronics
+            image: app/etc/configurator/Categories/images/image_categorie-13.jpg
+            categories:
+              -
+                name: Cameras & Video Cameras
+                categories:
+                  -
+                    name: Cameras
+                  -
+                    name: Camera & Video Accessories
+                  -
+                    name: Drones & Accessories
+                  -
+                    name: Video Cameras
+
+              -
+                name: Headphones
+              -
+                name: Microphones & Audio Systems
+                categories:
+                  -
+                    name: Amplifiers & Voice Recorders
+                  -
+                    name: Audio Equipment
+                  -
+                    name: iPods & MP3 Players
+                  -
+                    name: Microphones
+                  -
+                    name: Speakers
+                  -
+                    name: Two-Way Radios
+              -
+                name: Smartwatches
+              -
+                name: STEM & Robotics
+              -
+                name: TV & Video
+                categories:
+                  -
+                    name: TVs
+                  -
+                    name: Streaming Devices
+                  -
+                    name: TV Accessories
+              -
+                name: Video Games
+                categories:
+                  -
+                    name: Gaming Consoles & Controllers
+                  -
+                    name: VR Headsets
+          -
+            name: Networking & Indoor Wireless
+            image: app/etc/configurator/Categories/images/image_categorie-8.jpg
+            categories:
+              -
+                name: Access Points
+                categories:
+                  -
+                    name: Wi-Fi 4 (802.11n)
+                  -
+                    name: Wi-Fi 5 (802.11ac)
+                  -
+                    name: Wi-Fi 5 (802.11ac W2)
+                  -
+                    name: Wi-Fi 6 (802.11ax)
+                  -
+                    name: Wi-Fi Outdoor AP
+                  -
+                    name: Access Points Antennas
+                  -
+                    name: Accessories for AP
+                  -
+                    name: Wi-Fi Range Extenders
+              -
+                name: Wi-Fi Routers
+                categories:
+                  -
+                    name: Wi-Fi 4 (802.11n)
+                  -
+                    name: Wi-Fi 5 (802.11ac)
+                  -
+                    name: Wi-Fi 6 (802.11ax)
+              -
+                name: Wi-Fi Accessories
+                categories:
+                  -
+                    name: USB Accessories
+                  -
+                    name: Wi-Fi Indoor Antennas
+                  -
+                    name: Bluetooth Antennas
+              -
+                name: Wi-Fi Kits
+              -
+                name: Wired Routers
+                categories:
+                  -
+                    name: 100M Routers
+                  -
+                    name: 1G Routers
+                  -
+                    name: SFP+ Routers
+                  -
+                    name: SFP28 Routers
+                  -
+                    name: Embedded Routers
+              -
+                name: Network Controllers
+              -
+                name: Switches
+                categories:
+                  -
+                    name: 100M Switches
+                  -
+                    name: 1G Switches
+                  -
+                    name: 10G Switches
+                  -
+                    name: PoE Switches
+                  -
+                    name: SFP Switches
+                  -
+                    name: Industrial Switches
+                  -
+                    name: Ethernet Repeaters
+          -
+            name: Outdoor Wireless Networking
+            image: app/etc/configurator/Categories/images/image_categorie-7.jpg
+            categories:
+              -
+                name: Integrated Antennas
+                categories:
+                  -
+                    name: CPE Antennas
+                  -
+                    name: Sector Antennas
+                  -
+                    name: Directional Antennas
+                  -
+                    name: PtP Links
+              -
+                name: Wireless Antennas
+                categories:
+                  -
+                    name: Omni Antennas
+                  -
+                    name: Sector Antennas
+                  -
+                    name: Parabolic Dish Antennas
+                  -
+                    name: Horn Antennas
+              -
+                name: Radio for External Antennas
+              -
+                name: Carrier Backhaul Radio
+                categories:
+                  -
+                    name: Radio Systems
+                  -
+                    name: Antennas
+                  -
+                    name: Modules
+                  -
+                    name: Accessories
+              -
+                name: Antenna Accessories
+                categories:
+                  -
+                    name: Anti-Noise Shields
+                  -
+                    name: Antenna Mounts
+                  -
+                    name: Coaxial Cables
+                  -
+                    name: Pigtail
+              -
+                name: LTE & 5G
+                categories:
+                  -
+                    name: 4G Products
+                  -
+                    name: 5G Products
+              -
+                name: Fiber Networks
+                categories:
+                  -
+                    name: SFP Modules
+                  -
+                    name: GPON
+                  -
+                    name: Fiber Products
+                  -
+                    name: Cables & Splitters
+              -
+                name: LoRa Products
+                categories:
+                  -
+                    name: Gateways
+                  -
+                    name: Antennas
+                  -
+                    name: Accessories
+              -
+                name: Fleet Management
+                categories:
+                  -
+                    name: GPS Trackers
+                  -
+                    name: Sensors
+                  -
+                    name: Accessories
+          -
+            name: Security Systems
+            image: app/etc/configurator/Categories/images/image_categorie-5.jpg
+            categories:
+              -
+                name: Cameras
+                categories:
+                  -
+                    name: Bullet
+                  -
+                    name: Dome
+                  -
+                    name: Turret
+                  -
+                    name: PTZ
+                  -
+                    name: Fisheye
+                  -
+                    name: Fixed
+                  -
+                    name: Webcams
+                  -
+                    name: IR Range
+              -
+                name: NVR
+                categories:
+                  -
+                    name: 4 Channel
+                  -
+                    name: 8 Channel
+                  -
+                    name: 16 Channel
+                  -
+                    name: 32 Channel
+                  -
+                    name: 64 Channel
+              -
+                name: Surveillance HDD
+              -
+                name: Intercom
+                categories:
+                  -
+                    name: Indoor Stations
+                  -
+                    name: Door Stations
+                  -
+                    name: Protective Shields
+              -
+                name: Access Control
+              -
+                name: Security Accessories
+                categories:
+                  -
+                    name: Memory Cards
+                  -
+                    name: ViewPort
+                  -
+                    name: Camera Mounts
+                  -
+                    name: Junction Boxe
+          -
+            name: Office Equipment & Supplies
+            image: app/etc/configurator/Categories/images/image_categorie-3.jpg
+            categories:
+              -
+                name: Charging Carts
+                categories:
+                  -
+                    name: Furniture
+                  -
+                    name: Office Furniture
+                  -
+                    name: Sit & Stand Desks
+                  -
+                    name: Smart Boards
+              -
+                name: Medical & Utility Carts
+              -
+                name: Office Supplies
+                categories:
+                  -
+                    name: Binders & Laminators
+                  -
+                    name: Books
+                  -
+                    name: Calculators
+                  -
+                    name: Cleaning Supplies
+                  -
+                    name: Dry Erase Whiteboards
+                  -
+                    name: Fax Machines & Copiers
+                  -
+                    name: Office Basics
+                  -
+                    name: Paper Shredders
+                  -
+                    name: Tools
+          -
+            name: Phones & Video Conferencing
+            image: app/etc/configurator/Categories/images/image_categorie-14.jpg
+            categories:
+              -
+                name: Cell Phones & Accessories
+                categories:
+                  -
+                    name: Cell Phones
+                  -
+                    name: Cell Phone Accessories
+                  -
+                    name: Cell Phone Cases
+              -
+                name: Headsets
+                categories:
+                  -
+                    name: Wireless Headsets
+                  -
+                    name: Wired Headsets
+                  -
+                    name: Headset Accessories
+
+              -
+                name: Phones
+                categories:
+                  -
+                    name: Conference & Speaker Phones
+                  -
+                    name: Landline Phones
+                  -
+                    name: VoIP Phones
+
+              -
+                name: Phone Accessories
+              -
+                name: Video Conferencing
+                categories:
+                  -
+                    name: Conference Room Cameras
+                  -
+                    name: Video Conference Systems
+          -
+            name: Power
+            image: app/etc/configurator/Categories/images/image_categorie-2.jpg
+            categories:
+              -
+                name: Battery Backups
+                categories:
+                  -
+                    name: UPS Accessories
+                  -
+                    name: UPS Battery Backups
+                  -
+                    name: UPS Battery Replacements
+              -
+                name: Power Inverters
+              -
+                name: Power Management
+              -
+                name: Power Strips & Surge Protectors
+              -
+                name: Racks & Enclosures
+                categories:
+                  -
+                    name: Air Distribution & Cooling
+                  -
+                    name: Rack Accessories
+                  -
+                    name: Racks & Cabinets
+          -
+            name: Printers & Supplies
+            image: app/etc/configurator/Categories/images/image_categorie-1.jpg
+            categories:
+              -
+                name: All-in-One Printers
+              -
+                name: Laser Printers
+              -
+                name: Large Format & Plotter Printers
+              -
+                name: Scanners & Accessories
+                categories:
+                  -
+                    name: Document Scanners
+                  -
+                    name: Scanner Accessories
+              -
+                name: Copiers
+              -
+                name: Ink & Toner
+                categories:
+                  -
+                    name: Inkjet Cartridges
+                  -
+                    name: Toner Cartridges
+                  -
+                    name: Inkjet Printers
+              -
+                name: Printer Supplies & Accessories
+                categories:
+                  -
+                    name: Drums & Fusers
+                  -
+                    name: Maintenance Kits & Waste Toner
+                  -
+                    name: Paper & Labels
+                  -
+                    name: Printer Accessories
+                  -
+                    name: Printer Ribbons
+                  -
+                    name: Printer Trays
+          -
+            name: Servers & Server Management
+            image: app/etc/configurator/Categories/images/image_categorie.jpg
+            categories:
+              -
+                name: Server Components
+                categories:
+                  -
+                    name: Server Accessories
+                  -
+                    name: Server Memory
+              -
+                name: Servers
+                categories:
+                  -
+                    name: Blade Servers
+                  -
+                    name: Rack Servers
+              -
+                name: Server Management
+          -
+            name: Storage & Hard Drives
+            image: app/etc/configurator/Categories/images/image_categorie-6.jpg
+            categories:
+              -
+                name: Drive Arrays
+                categories:
+                  -
+                    name: Duplicators
+                  -
+                    name: Flash Arrays
+                  -
+                    name: Hard Drive Arrays
+                  -
+                    name: Hybrid Arrays
+                  -
+                    name: Tape Drives
+              -
+                name: Hard Drives
+                categories:
+                  -
+                    name: Internal Hard Drives
+                  -
+                    name: External Hard Drives
+              -
+                name: Memory Cards
+              -
+                name: Network Attached Storage
+              -
+                name: Solid State Drives
+              -
+                name: Storage Media
+                categories:
+                  -
+                    name: CD-ROMs
+                  -
+                    name: DVD & Blu-Rays
+                  -
+                    name: Tape Cartridges
+              -
+                name: Storage Mounts & Enclosures
+              -
+                name: USB Flash Drives
+          -
+            name: Software
+            image: app/etc/configurator/Categories/images/image_categorie-4.jpg

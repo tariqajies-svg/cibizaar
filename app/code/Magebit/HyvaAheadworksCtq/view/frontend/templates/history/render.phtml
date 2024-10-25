@@ -1,0 +1,45 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\History\Render;
+use Magento\Framework\Escaper;
+
+/** @var Render $block */
+/** @var Escaper $escaper */
+
+$history = $block->getHistory();
+?>
+<?php if ($history->getOwnerName() && $history->getStatus()): ?>
+    <div class="font-bold mb-5 lg:flex lg:items-center lg:mb-4.5">
+        <div class="text-navy mb-1.25 lg:mr-2">
+            <span>
+                <?= $escaper->escapeHtml($block->getHistoryViewModel()->getOwnerName($history)) ?>,
+            </span>
+            <span>
+                <?= $escaper->escapeHtml($block->getHistoryViewModel()->getCreatedAtFormatted($history->getCreatedAt())) ?>
+            </span>
+        </div>
+        <div class="aw-ctq__email_status rounded bg-gray-f2 border border-gray-e6 text-gray text-xs font-semibold inline-block py-px px-1.5
+                    lg:text-sm lg:mt-[-5px] lg:pt-0.5 lg:pb-0">
+            <?= $escaper->escapeHtml($block->getHistoryViewModel()->getStatusFormatted($history->getStatus())) ?>
+        </div>
+    </div>
+<?php endif; ?>
+<?php if ($history->getActions()): ?>
+    <div class="aw-ctq__email_action">
+        <?php foreach ($history->getActions() as $action): ?>
+            <?= /* @noEscape */ $block->getActionHtml($action) ?>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>

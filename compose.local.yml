@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  php:
+    env_file:
+      - ./.docker/.env.local
+    volumes:
+      - ~/.composer:/var/www/.composer
+    networks:
+      - magebit
+
+  xdebug:
+    env_file:
+      - ./.docker/.env.local
+    volumes:
+      - ~/.composer:/var/www/.composer
+    networks:
+      - magebit
+
+  nginx:
+    env_file:
+      - ./.docker/.env.local
+    networks:
+      - magebit
+
+  varnish:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bizaar.tls=true
+      - traefik.http.routers.bizaar.entrypoints=https
+      - traefik.http.routers.bizaar.rule=Host(`bizaar.docker`)
+      - traefik.http.services.bizaar.loadbalancer.server.port=80
+    networks:
+      - magebit
+
+  db:
+    networks:
+      magebit:
+        aliases:
+          - db.bizaar.docker
+
+  redis:
+    networks:
+      magebit:
+        aliases:
+          - redis.bizaar.docker
+
+  elasticsearch:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.bizaar-es.tls=true
+      - traefik.http.routers.bizaar-es.entrypoints=https
+      - traefik.http.routers.bizaar-es.rule=Host(`es.bizaar.docker`)
+      - traefik.http.services.bizaar-es.loadbalancer.server.port=9200
+    networks:
+      magebit:
+        aliases:
+          - es.bizaar.docker
+
+  node:
+    image: node:16
+    command: [ "bash", "./.docker/node-watcher-startup.sh" ]
+    working_dir: /opt/app
+    volumes:
+      - .:/opt/app
+    user: 1000:1000
+    networks:
+      - magebit
+
+networks:
+  magebit:
+    external: true

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_AheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_AheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="sales.order.buttons">
+            <block name="aw-ca.order.buttons.approve" template="Aheadworks_Ca::order/view/button.phtml" cacheable="false">
+                <arguments>
+                    <argument name="order_button_view_model" xsi:type="object">Aheadworks\Ca\ViewModel\Order\View\Button\Approve</argument>
+                </arguments>
+            </block>
+            <block name="aw-ca.order.buttons.reject" template="Aheadworks_Ca::order/view/button.phtml" cacheable="false">
+                <arguments>
+                    <argument name="order_button_view_model" xsi:type="object">Aheadworks\Ca\ViewModel\Order\View\Button\Reject</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,80 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\LayeredNavigation\Block\Navigation;
+
+/** @var Navigation $block */
+/** @var Escaper $escaper */
+?>
+<?php if ($block->canShowBlock()): ?>
+    <div class="block bg-white"
+         id="layered-navigation-filters"
+         x-data="initLayeredNavigation()"
+         x-init="checkIsMobileResolution()"
+         @resize.window.debounce="checkIsMobileResolution()"
+         @visibilitychange.window.debounce="checkIsMobileResolution()"
+    >
+        <div class="block-title flex items-center justify-between p-3 mb-5 md:hidden"
+             :class="{ 'border-b' : blockOpen }"
+             @click="blockOpen = !blockOpen">
+            <span class="text-navy text-md font-semibold"><?= $escaper->escapeHtml(__('Filters')) ?></span>
+            <span class="hidden"
+                  x-cloak
+                  :class="{ 'block' : isMobile, 'hidden': !isMobile }">
+                <i class="icon-arrow-right block" :class="blockOpen ? '-rotate-90' : 'rotate-90'"></i>
+            </span>
+        </div>
+        <div class="block-content filter-content text-sm px-6 py-1" x-cloak x-show="isMobile && blockOpen || !isMobile">
+            <?php $filterIndex = 0; ?>
+            <?php $activeFilters = json_decode($block->getActiveFilters()) ?>
+            <?= $block->getChildHtml('state') ?>
+            <?php foreach ($block->getFilters() as $filter): ?>
+                <?php if ($filter->getItemsCount()): ?>
+                    <?php $showOpen = in_array($filterIndex, $activeFilters) ?>
+                    <div class="filter-option border-t first:border-t-0 border-[#EDEDED]" x-data="{ open: <?= $showOpen ? 'true' : 'false' ?> }">
+                        <div
+                            class="filter-options-title flex justify-between items-center cursor-pointer py-5"
+                            @click="open = !open">
+                            <strong class="title text-black text-[18px] leading-6 font-semibold">
+                                <?= $escaper->escapeHtml(__($filter->getName())) ?>
+                            </strong>
+                            <i class="text-[#959595]" :class="open ? 'icon-minus' : 'icon-plus'"></i>
+                        </div>
+                        <div class="filter-options-content py-5 pt-0 hidden"
+                             :class="{ 'hidden': !open , 'block': 'open' }"
+                        >
+                            <?= /* @noEscape */
+                            $block->getChildBlock('renderer')->render($filter) ?>
+                        </div>
+                    </div>
+                    <?php $filterIndex++ ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <script>
+        function initLayeredNavigation() {
+            return {
+                isMobile: false,
+                blockOpen: false,
+                checkIsMobileResolution: function () {
+                    this.isMobile = window.outerWidth < 768
+                }
+            }
+        }
+    </script>
+<?php endif; ?>

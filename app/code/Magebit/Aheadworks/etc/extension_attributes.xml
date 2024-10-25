@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
+    <extension_attributes for="Aheadworks\Ca\Api\Data\CompanyInterface">
+        <attribute code="tln" type="string">
+            <join reference_table="aw_ca_company_extend" join_on_field="id" reference_field="company_id">
+                <field>tln</field>
+            </join>
+        </attribute>
+        <attribute code="description" type="string">
+            <join reference_table="aw_ca_company_extend" join_on_field="id" reference_field="company_id">
+                <field>description</field>
+            </join>
+        </attribute>
+        <attribute code="website" type="string">
+            <join reference_table="aw_ca_company_extend" join_on_field="id" reference_field="company_id">
+                <field>website</field>
+            </join>
+        </attribute>
+    </extension_attributes>
+</config>

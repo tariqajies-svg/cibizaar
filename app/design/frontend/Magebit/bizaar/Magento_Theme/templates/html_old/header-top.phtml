@@ -1,0 +1,127 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\Modal\ModalBuilder;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Hyva\Theme\ViewModel\StoreSwitcher;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\Theme\ViewModel\Currency;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ModalBuilder $modal */
+$modal = $viewModels->require(Modal::class)->getModal();
+$currency = $viewModels->require(Currency::class);
+$storeSwitcher = $viewModels->require(StoreSwitcher::class);
+?>
+<script>
+    function initHeaderTop() {
+        return {
+            compareProducts: null,
+            itemCount: 0,
+            wishlistCount: 0,
+            receiveCompareData(data) {
+                if (data['compare-products']) {
+                    this.compareProducts = data['compare-products'];
+                    this.itemCount = this.compareProducts.count;
+                }
+            },
+            receiveWishlistData(data) {
+                if (data.wishlist?.counter) {
+                    this.wishlistCount = data.wishlist.counter.match(/\d+/g);
+                }
+            }
+        }
+    }
+</script>
+<div id="top-header" class="border-b bg-white">
+    <div class="container flex justify-center lg:justify-between">
+        <button x-data=""
+                class="flex space-x-2 lg:space-x-3 items-center pt-2 pb-[7px] lg:pt-3 lg:pb-[11px] text-gray
+                    lg:hover:text-blue-darker group font-bold"
+                @click="$dispatch('toggle-store-switcher')">
+            <i class="icon-pin"></i>
+            <span class="text-xs lg:text-sm underline-offset-0.75 lg:group-hover:underline">
+                <?php $currentStore = $storeSwitcher->getStore() ?>
+                <?= count($storeSwitcher->getGroups()) !== 1 ? $escaper->escapeHtml($storeSwitcher->getRawGroups()[$currentStore->getStoreGroupId()]->getName() . ',') : '' ?>
+                <?= $escaper->escapeHtml($currentStore->getName()) ?>,
+                <?= $escaper->escapeHtml($currency->getCurrentCurrencySymbol()) ?>
+                (<?= $escaper->escapeHtml($currency->getCurrentCurrencyCode()) ?>)
+            </span>
+        </button>
+
+        <div x-data="hyva.modal()" @toggle-store-switcher.window="show('store-switcher-modal')">
+            <?= /** @noEscape */ $modal->withTemplate('Magento_Theme::html/switcher.phtml')
+                ->withDialogRefName('store-switcher-modal') ?>
+        </div>
+
+        <div class="hidden lg:flex space-x-5 xl:space-x-7 items-center" x-data="initHeaderTop()">
+            <?= $block->getChildHtml('header-top-links-block') ?>
+
+            <!--Quick order-->
+            <a id="quick-order-link" href="<?= $escaper->escapeUrl($block->getUrl('aw_quick_order')) ?>"
+               class="!text-gray lg:hover:!text-blue-darker active:!text-navy text-sm font-bold">
+                <?= $escaper->escapeHtml(__('Quick Order')) ?>
+            </a>
+
+            <!--Compare button-->
+            <a id="compare-link"
+               class="clear group hidden invisible flex items-center space-x-2 text-gray hover:text-blue-darker
+                      active:text-navy leading-6 font-bold"
+               :class="{ 'hidden invisible': !(itemCount > 0) }"
+               href="<?= $escaper->escapeUrl($block->getUrl('catalog/product_compare/index')) ?>"
+               title="<?= $escaper->escapeHtml(__('Compare Products')) ?>"
+               @private-content-loaded.window="receiveCompareData($event.detail.data)"
+            >
+                <span class="relative">
+                    <i class="icon-compare text-inherit"></i>
+                    <span class="absolute top-0 left-3 min-w-4 h-4 text-[8px] leading-[12px] font-black px-1
+                                 text-center text-white uppercase transform translate-x-[-3px] translate-y-[-5px] rounded-full
+                                 bg-green border-2 border-white flex items-center justify-center"
+                          x-text="itemCount"></span>
+                </span>
+                <span class="text-sm underline-offset-0.75 group-hover:underline group-active:underline">
+                   <?= $escaper->escapeHtml(__('Compare')) ?>
+                </span>
+            </a>
+
+            <!--Wishlist button-->
+            <a id="wishlist-link"
+               class="clear group hidden invisible flex items-center space-x-2 text-gray hover:text-blue-darker
+                      active:text-navy leading-6 font-bold"
+               :class="{ 'hidden invisible': !(wishlistCount > 0) }"
+               href="<?= $escaper->escapeUrl($block->getUrl('wishlist')) ?>"
+               title="<?= $escaper->escapeHtml(__('Wish List')) ?>"
+               @private-content-loaded.window="receiveWishlistData($event.detail.data)"
+            >
+                <span class="relative">
+                    <i class="icon-heart text-inherit"></i>
+                    <span class="absolute top-0 left-3 min-w-4 h-4 text-[8px] leading-[12px] font-black px-1
+                                 text-center text-white uppercase transform translate-x-[-3px] translate-y-[-5px] rounded-full
+                                 bg-green border-2 border-white flex items-center justify-center"
+                          x-text="wishlistCount"></span>
+                </span>
+                <span class="text-sm underline-offset-0.75 group-hover:underline group-active:underline">
+                   <?= $escaper->escapeHtml(__('Wish List')) ?>
+                </span>
+            </a>
+        </div>
+    </div>
+</div>

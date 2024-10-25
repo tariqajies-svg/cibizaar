@@ -1,0 +1,136 @@
+.account {
+    .order-details-items {
+        .items.order-links {
+            @apply bg-transparent border-b border-gray-e6 text-navy;
+
+            li.item {
+                @apply py-0 px-0;
+
+                strong,
+                a {
+                    @apply px-4 py-2 inline-block text-navy no-underline
+                        lg:px-10 lg:py-2.75;
+                }
+            }
+
+            li.current {
+                @apply border-blue border-b-2;
+
+                strong {
+                    @apply text-blue;
+                }
+            }
+
+            @screen lg {
+                li:hover:not(.current) {
+                    @apply border-blue-darker border-b-2;
+
+                    a {
+                        @apply text-blue-darker;
+                    }
+                }
+            }
+
+            li:active:not(.current) {
+                @apply border-navy border-b-2;
+
+                a {
+                    @apply text-navy;
+                }
+            }
+        }
+
+        .actions-toolbar {
+            @apply border-t mt-4.75 lg:border-none lg:mt-0;
+        }
+
+        address {
+            @apply not-italic leading-7 lg:leading-9;
+
+            > a {
+                @apply font-semibold;
+            }
+        }
+
+        .order-items {
+            .order-item-row:not(:last-child) {
+                @apply border-b;
+            }
+
+            > div:not(.order-totals) {
+                @apply bg-transparent;
+            }
+
+            .price {
+                @apply font-bold text-navy;
+            }
+
+            .name-col {
+                @apply text-base;
+            }
+
+            @screen lg-max {
+                .order-item-row {
+                    @apply border rounded p-5 mb-2;
+                }
+
+                .name-col {
+                    @apply border-b;
+
+                    .item-options {
+                        @apply pb-1.75;
+
+                        .option-value,
+                        .option-label {
+                            @apply text-2xs;
+                        }
+
+                        .option-value {
+                            @apply text-navy font-bold;
+                        }
+
+                        > * {
+                            @apply items-center;
+
+                            &::before {
+                                content: '';
+
+                                @apply rounded-full mr-2 bg-gray-d4 w-1 h-1 inline-block;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .order-totals {
+            @apply bg-gray-f2;
+        }
+
+        .totals-grid {
+            > div:nth-child(odd) {
+                @apply text-left;
+            }
+
+            .grand_total {
+                @apply text-base lg:text-md;
+
+                .price {
+                    @apply text-blue;
+                }
+            }
+
+            .price {
+                @apply font-bold text-navy;
+            }
+        }
+    }
+}
+
+.sales-order-shipment,
+.sales-order-invoice,
+.sales-order-view {
+    .columns {
+        @apply mb-6.75 lg:mb-15;
+    }
+}

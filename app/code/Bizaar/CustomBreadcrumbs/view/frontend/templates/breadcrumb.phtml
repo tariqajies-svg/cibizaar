@@ -1,0 +1,67 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Theme\Block\Html\Breadcrumbs;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Breadcrumbs $block */
+/** @var array $crumbs */
+?>
+<?php $datalist = [];?>
+<?php if ($crumbs && is_array($crumbs)): ?>
+    <?php $i = 1;?>
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <div class="container">
+        <ol class="items clear py-3 lg:pt-5 flex flex-wrap text-gray text-xs lg:text-sm font-bold">
+            <?php foreach ($crumbs as $crumbName => $crumbInfo): ?>
+                <?php $datalist[]=array("@type"=>"ListItem","position"=>$i,"name"=>$escaper->escapeHtml($crumbInfo['label']),"item"=>($crumbInfo['link']!=="")?$escaper->escapeUrl($crumbInfo['link']):$block->getUrl().ltrim($block->getRequest()->getOriginalPathInfo(),"/"));?>
+            <?php $i++;?>
+                <li class="item flex <?= $escaper->escapeHtmlAttr($crumbName) ?>">
+                <?php if ($crumbInfo['link']): ?>
+                    <a href="<?= $escaper->escapeUrl($crumbInfo['link']) ?>"
+                        class="clear active:text-blue-darker lg:hover:text-blue lg:active:text-blue-darker"
+                        title="<?= $escaper->escapeHtmlAttr($crumbInfo['title']) ?>"
+                    ><?= $escaper->escapeHtml($crumbInfo['label']) ?></a>
+                <?php elseif ($crumbInfo['last']): ?>
+                    <span class="clear text-navy pointer-events-none"
+                        aria-current="page"
+                    ><?= $escaper->escapeHtml($crumbInfo['label']) ?></span>
+                <?php else: ?>
+                    <span>
+                        <?= $escaper->escapeHtml($crumbInfo['label']) ?>
+                    </span>
+                <?php endif; ?>
+                <?php if (!$crumbInfo['last']): ?>
+                    <span aria-hidden="true" class="separator flex items-center px-1.25 lg:px-2.25">
+                        <i class="icon-dropdown -rotate-90"></i>
+                    </span>
+                <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+
+</nav>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/", 
+  "@type": "BreadcrumbList", 
+  "itemListElement":<?php echo json_encode($datalist);?>
+}
+</script>
+<?php endif; ?>

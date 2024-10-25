@@ -1,0 +1,30 @@
+diff --git a/vendor/sendinblue/module-sendinblue/Model/SendinblueSib.php b/vendor/sendinblue/module-sendinblue/Model/SendinblueSib.php
+index 89e1be7..17b3137 100644
+--- a/vendor/sendinblue/module-sendinblue/Model/SendinblueSib.php
++++ b/vendor/sendinblue/module-sendinblue/Model/SendinblueSib.php
+@@ -1571,7 +1571,7 @@ class SendinblueSib extends \Magento\Framework\Model\AbstractModel
+     public function checkPortStatus()
+     {
+         try {
+-            $relay_port_status = fsockopen(‘smtp-relay.sendinblue.com’, 587);
++            $relay_port_status = fsockopen('smtp-relay.sendinblue.com', 587);
+             if (!$relay_port_status) {
+                 return 0;
+             }
+diff --git a/vendor/sendinblue/module-sendinblue/Model/SendinblueSibClient.php b/vendor/sendinblue/module-sendinblue/Model/SendinblueSibClient.php
+index dcda492..bb0ab5b 100644
+--- a/vendor/sendinblue/module-sendinblue/Model/SendinblueSibClient.php
++++ b/vendor/sendinblue/module-sendinblue/Model/SendinblueSibClient.php
+@@ -25,10 +25,10 @@ class SendinblueSibClient
+         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+         $model = $objectManager->create('Sendinblue\Sendinblue\Model\SendinblueSib');
+         if( empty($key) ) {
+-            $this->apiKey = trim($model->_getValueDefault->getValue('sendinblue/api_key_v3', $model->_scopeTypeDefault));            
++            $this->apiKey = trim((string) $model->_getValueDefault->getValue('sendinblue/api_key_v3', $model->_scopeTypeDefault));            
+         }
+         else {
+-            $this->apiKey = trim($key);
++            $this->apiKey = trim((string) $key);
+         }
+         $this->pluginVersion = $model->_getValueDefault->getValue('sendinblue/current_version', $model->_scopeTypeDefault);
+         if (empty($this->pluginVersion)) {

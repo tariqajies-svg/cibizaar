@@ -1,0 +1,47 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Sales\Block\Order\Totals;
+
+/**
+ * @var Escaper $escaper
+ * @var Totals $block
+ * @see Totals
+ */
+?>
+<?php foreach ($block->getTotals() as $_code => $_total): ?>
+    <?php if ($_total->getBlockName()): ?>
+        <?= $block->getChildHtml($_total->getBlockName(), false) ?>
+    <?php else: ?>
+        <tr class="<?= $escaper->escapeHtmlAttr($_code) ?>">
+            <th <?= /* @noEscape */ $block->getLabelProperties() ?> scope="row">
+                <?php if ($_total->getStrong()): ?>
+                    <strong><?= $escaper->escapeHtml($_total->getLabel()) ?></strong>
+                <?php else: ?>
+                    <?= $escaper->escapeHtml($_total->getLabel()) ?>
+                <?php endif ?>
+            </th>
+            <td <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $escaper->escapeHtmlAttr($_total->getLabel()) ?>">
+                <?php if ($_total->getStrong()): ?>
+                    <strong><?= /* @noEscape */
+                        $block->formatValue($_total) ?></strong>
+                <?php else: ?>
+                    <?= /* @noEscape */
+                    $block->formatValue($_total) ?>
+                <?php endif ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+<?php endforeach ?>

@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Hyva\Theme\Model\Modal\ModalBuilder;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/* Hyva compatability Aheadworks Requisition List modal */
+/* This template should be in scope of  */
+
+/** @var ModalBuilder $modal */
+$modal = $viewModels->require(Modal::class)->getModal();
+
+?>
+<div x-data="hyva.modal()"
+     @show-requisition-list-modal.window="show('requisition-list-modal')"
+     @hide-requisition-list-modal.window="hide('requisition-list-modal')">
+    <?= /** @noEscape  */ $modal->withTemplate('Magebit_HyvaRequisitionLists::requisition-list/modal.phtml')
+        ->withDialogRefName('requisition-list-modal'); ?>
+</div>

@@ -1,0 +1,8 @@
+.price-box {
+    .old-price {
+        .line-through {
+            /* text-decoration-color: theme('colors.error'); */
+            text-decoration-thickness: 1px;
+        }
+    }
+}

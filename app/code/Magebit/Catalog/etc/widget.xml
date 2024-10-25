@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_Catalog package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Catalog
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget id="magebit_catalog_menu" class="Magebit\Catalog\Block\Category\Widget\Menu">
+        <label>Category Menu</label>
+        <description>Display selected category link cards</description>
+        <parameters>
+            <parameter name="heading" xsi:type="text" visible="true" required="true"  sort_order="10">
+                <label>Heading</label>
+            </parameter>
+            <parameter name="description" xsi:type="text" visible="true" sort_order="20">
+                <label>Description</label>
+            </parameter>
+            <parameter name="template_type" xsi:type="select" visible="true" required="true" sort_order="20">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="category" value="widget/category-list.phtml" selected="true">
+                        <label>Category</label>
+                    </option>
+                    <option name="brand" value="widget/brand-list.phtml">
+                        <label>Brand</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="category_ids" xsi:type="multiselect" required="true" visible="true" sort_order="40"
+                       source_model="Magebit\Catalog\Model\System\Config\Source\Category">
+                <label>Categories</label>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

@@ -1,0 +1,214 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Hyva\Theme\ViewModel\Navigation;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Navigation $viewModelNavigation */
+$viewModelNavigation = $viewModels->require(Navigation::class, $block);
+
+/** @var HeroiconsSolid $heroiconsSolid */
+$heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
+
+$uniqueId = '_' . uniqid();
+
+// Order is important here: 1. build the menu data, 2. then set the cache tags from the view model identities
+$menuItems = $viewModelNavigation->getNavigation(5);
+$block->setData('cache_tags', $viewModelNavigation->getIdentities());
+
+?>
+<div x-data="initMenuDesktop<?= $escaper->escapeHtml($uniqueId) ?>()"
+     class="flex-shrink-0 z-20 order-2 w-auto navigation hidden lg:flex"
+>
+    <!-- desktop -->
+    <div x-ref="nav-desktop"
+         @load.window="setActiveMenu($root)"
+         class="justify-between mx-auto w-full"
+    >
+        <nav
+            class="-mx-2"
+            aria-label="<?= $escaper->escapeHtmlAttr(__('Main menu')) ?>"
+        >
+            <ul class="flex flex-wrap">
+                <?php foreach ($menuItems as $index => $itemLevel1): ?>
+                    <?php $singleItems = []; ?>
+                    <div class="level-0 flex items-center mx-2 transition transition-colors duration-500 group/parent xl:mx-4"
+                         @mouseover.stop="hoverTopPosition = $event.currentTarget.offsetTop + $event.currentTarget.getBoundingClientRect().height; menuMinHeight = 0;"
+                    >
+                        <a href="<?= $escaper->escapeUrl($itemLevel1['url']) ?>"
+                           @focus="hoverTopPosition = $event.currentTarget.parentNode.offsetTop + $event.currentTarget.parentNode.getBoundingClientRect().height"
+                           title="<?= $escaper->escapeHtmlAttr($itemLevel1['name']) ?>"
+                           class="level-0 block p-2 text-base clear text-black whitespace-nowrap font-regular">
+                            <span><?= $escaper->escapeHtml($itemLevel1['name']) ?></span>
+                        </a>
+                        <?php if (!empty($itemLevel1['childData'])): ?>
+                            <span class="inline items-center">
+                                <?= $heroiconsSolid->chevronDownHtml('w-5 h-5 inline', 25, 25, ['aria-hidden' => 'true']) ?>
+                            </span>
+
+                            <div class="lavel01 absolute left-0 top-full z-10 -mt-3 w-full opacity-0 transition-opacity ease-out pointer-events-none group-hover/parent:opacity-100 focus-within:opacity-100 group-hover/parent:pointer-events-auto shadow-sm"
+                                 :style="`margin-top: 0; top: ${hoverTopPosition}px;`"
+                            >
+                                <div class="py-2 mx-auto bg-white relative min-h-screen-50 py-4 mt-8 bg-[#F8F8F8]"
+                                     :style="`min-height: ${menuMinHeight}px`"
+                                >
+                                    <div class="container relative">
+                                        <ul class="w-60">
+                                            <?php foreach ($itemLevel1['childData'] as $itemLevel2): ?>
+                                                <?php $singleItems = []; ?>
+                                                <li class="group/child flex justify-between items-center w-full"
+                                                    <?php if (!empty($itemLevel2['childData'])): ?>
+                                                        @mouseover.stop="setMenuMinHeight($event.currentTarget)"
+                                                    <?php endif; ?>
+                                                >
+                                                    <a href="<?= $escaper->escapeUrl($itemLevel2['url']) ?>"
+                                                    class="w-full py-2 px-2 z-10 relative break-words clear font-semibold"
+                                                    @focus="setMenuMinHeight($event.currentTarget.parentNode)"
+                                                    >
+                                                        <?= $escaper->escapeHtml($itemLevel2['name']) ?>
+                                                    </a>
+                                                    <?php if (!empty($itemLevel2['childData'])): ?>
+                                                        <!-- <span class="inline-block z-10 relative py-2 px-2">
+                                                        <?//= $heroiconsSolid->chevronRightHtml('w-5 h-5 inline', 25, 25, ['aria-hidden' => 'true']) ?>
+                                                    </span> -->
+                                                        <div class="flex lavel02 container left-0 absolute w-full min-h-full top-0 opacity-0 focus-within:opacity-100 group-hover/child:opacity-100 pointer-events-none group-hover/child:pointer-events-auto">
+                                                            <ul class="ml-60 grid flex-1 grid-cols-4 gap-y-4 gap-x-8 px-4 pt-1 pb-5 h-fit">
+                                                                <?php foreach ($itemLevel2['childData'] as $itemLevel3): ?>
+                                                                    <?php if (empty($itemLevel3['childData'])): ?>
+                                                                        <?php $singleItems[] = $itemLevel3 ?>
+                                                                        <?php continue; ?>
+                                                                    <?php endif; ?>
+                                                                    <li class="level-1 min-w-48">
+                                                                        <a href="<?= $escaper->escapeUrl($itemLevel3['url']) ?>"
+                                                                        title="<?= $escaper->escapeHtmlAttr($itemLevel3['name']) ?>"
+                                                                        class="level-1 py-1 px-2 block text-base font-semibold leading-loose hover:underline clear text-black">
+                                                                            <?= $escaper->escapeHtml($itemLevel3['name']) ?>
+                                                                        </a>
+
+                                                                        <ul class="z-10 w-full">
+                                                                            <?php foreach ($itemLevel3['childData'] as $itemLevel4): ?>
+                                                                                <li class="level-2">
+                                                                                    <a href="<?= $escaper->escapeUrl($itemLevel4['url']) ?>"
+                                                                                    title="<?= $escaper->escapeHtmlAttr($itemLevel4['name']) ?>"
+                                                                                    class="level-2 py-1 px-2 block text-lg md:text-sm hover:underline clear text-black"><?= $escaper->escapeHtml($itemLevel4['name']) ?></a>
+                                                                                </li>
+                                                                            <?php endforeach; ?>
+                                                                        </ul>
+
+                                                                    </li>
+                                                                <?php endforeach; ?>
+                                                                <?php if ($singleItems): ?>
+                                                                <li class="level-1 min-w-48">
+                                                                    <?php foreach ($singleItems as $item): ?>
+                                                                        <a href="<?= $escaper->escapeUrl($item['url']) ?>"
+                                                                        title="<?= $escaper->escapeHtmlAttr($item['name']) ?>"
+                                                                        class="level-1 p-1 block text-base font-semibold leading-loose hover:underline clear text-black">
+                                                                            <?= $escaper->escapeHtml($item['name']) ?>
+                                                                        </a>
+                                                                    <?php endforeach; ?>
+                                                                <?php endif; ?>
+                                                            </ul>
+                                                            <ul class="k max-w-sm p-5">
+                                                                <li><?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('sub-menu-image')->toHtml();?></li></ul>
+                                                        </div>
+                                                    <?php endif ?>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+<script>
+    'use strict';
+
+    const initMenuDesktop<?= $escaper->escapeHtml($uniqueId) ?> = () => {
+        return {
+            hoverTopPosition: '100%',
+            menuMinHeight: 0,
+            setMenuMinHeight(targetElement) {
+                const childMenu = targetElement.querySelector('div.container.absolute');
+                childMenu && (this.menuMinHeight = childMenu.getBoundingClientRect().height);
+            },
+            setActiveMenu(menuNode) {
+                Array.from(menuNode.querySelectorAll('a')).filter(link => {
+                    return link.href === window.location.href.split('?')[0];
+                }).map(item => {
+                    if (!item.classList.contains('level-0')) {
+                        item.classList.add('underline');
+                    }
+                    item.closest('div.level-0') &&
+                    item.closest('div.level-0').classList.add('border-secondary');
+                });
+            }
+        }
+    }
+</script>
+
+<style>
+    nav ul .level-0:hover .lavel01 {
+        opacity: 1;
+        pointer-events: inherit;
+    }
+    nav ul .level-0 .lavel01 ul li:hover .lavel02 {
+        opacity: 1;
+        pointer-events: inherit;
+    }
+    nav .lavel01 ul li > a, nav .lavel01 ul li span {
+        color: #343434;
+    }
+    nav .lavel01 ul li:hover > a, nav .lavel01 ul li:hover span {
+        color: #0165FF;
+    }
+    nav .lavel01 ul li ul .level-1 > a {
+        color: #1A4668;
+        font-size: 14px;
+    }
+    nav .lavel01 ul li ul .level-1:hover > a {
+        color: #0165FF;
+    }
+    nav .lavel01 ul li ul .level-2:hover > a {
+        color: #0165FF;
+    }
+    /* nav ul .level-0:hover .lavel01,
+    nav ul .level-0:hover .lavel01 a {
+        color: #343434;
+    }
+    nav ul .level-0 .lavel01:hover,
+    nav ul .level-0 .lavel01:hover > a {
+        color: #0165FF;
+    } */
+    .level-0:last-child a b {
+        background: #1A4668;
+        display: flex;
+        margin: 0 -26px -24px;
+        justify-content: center;
+        padding: 0 5px;
+        border-radius: 4px;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #fff;
+        line-height: 24px;
+    }
+</style>

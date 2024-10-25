@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="2columns-left">
+    <update handle="customer_account"/>
+    <body>
+        <referenceBlock name="customer_account_navigation">
+            <action method="setActive">
+                <argument name="path" xsi:type="string">aw_ca/role</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content" htmlClass="aw-ca-role-create" htmlTag="div">
+            <block class="Aheadworks\Ca\Block\Form"
+                   name="aw_ca.role.edit"
+                   cacheable="false"
+                   template="Magebit_HyvaAheadworksCa::role/edit.phtml">
+                <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+                <arguments>
+                    <argument name="form_view_model" xsi:type="object">Aheadworks\Ca\ViewModel\Role\Form</argument>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="awCaForm" xsi:type="array">
+                                <item name="component" xsi:type="string">Aheadworks_Ca/js/ui/form/form</item>
+                                <item name="deps" xsi:type="array">
+                                    <item name="0" xsi:type="string">awCaRoleProvider</item>
+                                </item>
+                                <item name="dataScope" xsi:type="string">data</item>
+                                <item name="children" xsi:type="array">
+                                    <item name="fieldset" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/fieldset</item>
+                                        <item name="label" xsi:type="string" translate="true">General Information</item>
+                                        <item name="template" xsi:type="string">Aheadworks_Ca/form/element/fieldset</item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="id" xsi:type="array">
+                                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                                                <item name="dataScope" xsi:type="string">id</item>
+                                                <item name="provider" xsi:type="string">awCaRoleProvider</item>
+                                                <item name="template" xsi:type="string">ui/form/field</item>
+                                                <item name="label" xsi:type="string" translate="true">Id</item>
+                                                <item name="sortOrder" xsi:type="number">5</item>
+                                                <item name="visible" xsi:type="boolean">false</item>
+                                            </item>
+                                            <item name="name" xsi:type="array">
+                                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                                                <item name="dataScope" xsi:type="string">name</item>
+                                                <item name="provider" xsi:type="string">awCaRoleProvider</item>
+                                                <item name="template" xsi:type="string">ui/form/field</item>
+                                                <item name="label" xsi:type="string" translate="true">Role Name</item>
+                                                <item name="validation" xsi:type="array">
+                                                    <item name="required-entry" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="sortOrder" xsi:type="number">10</item>
+                                            </item>
+                                            <item name="default" xsi:type="array">
+                                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/single-checkbox</item>
+                                                <item name="dataScope" xsi:type="string">default</item>
+                                                <item name="provider" xsi:type="string">awCaRoleProvider</item>
+                                                <item name="description" xsi:type="string" translate="true">Set as Default</item>
+                                                <item name="template" xsi:type="string">ui/form/field</item>
+                                                <item name="sortOrder" xsi:type="number">15</item>
+                                                <item name="valueMap" xsi:type="array">
+                                                    <item name="true" xsi:type="number">1</item>
+                                                    <item name="false" xsi:type="number">0</item>
+                                                </item>
+                                                <item name="default" xsi:type="number">0</item>
+                                                <item name="additionalClasses" xsi:type="string">aw-ca__role-is-default</item>
+                                                <item name="imports" xsi:type="array">
+                                                    <item name="disabled" xsi:type="string">${ $.provider }:data.is_default_disabled</item>
+                                                </item>
+                                            </item>
+                                            <item name="order_base_amount_limit" xsi:type="array">
+                                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                                                <item name="dataScope" xsi:type="string">order_base_amount_limit</item>
+                                                <item name="provider" xsi:type="string">awCaRoleProvider</item>
+                                                <item name="template" xsi:type="string">ui/form/field</item>
+                                                <item name="label" xsi:type="string" translate="true">Order Limit per Role</item>
+                                                <item name="sortOrder" xsi:type="number">16</item>
+                                                <item name="validation" xsi:type="array">
+                                                    <item name="required-entry" xsi:type="boolean">true</item>
+                                                    <item name="number" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="tooltip" xsi:type="array">
+                                                    <item name="description" xsi:type="string" translate="true">Enter starting order value that must be approved by company admin. Leave empty to disable order limit. Set to zero to require approval for every order.</item>
+                                                </item>
+                                            </item>
+                                            <item name="permissions" xsi:type="array">
+                                                <item name="component" xsi:type="string">Aheadworks_Ca/js/ui/form/element/tree</item>
+                                                <item name="template" xsi:type="string">ui/form/field</item>
+                                                <item name="provider" xsi:type="string">awCaRoleProvider</item>
+                                                <item name="dataScope" xsi:type="string">permissions</item>
+                                                <item name="label" xsi:type="string" translate="true">Permissions to the Role</item>
+                                                <item name="sortOrder" xsi:type="number">20</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                    <item name="aw_stc_fieldset" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/fieldset</item>
+                                        <item name="label" xsi:type="string" translate="true">Store Credit and Refund</item>
+                                        <item name="template" xsi:type="string">Aheadworks_Ca/form/element/fieldset</item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="aw_stc_base_amount_limit" xsi:type="array">
+                                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                                                <item name="dataScope" xsi:type="string">aw_stc_base_amount_limit</item>
+                                                <item name="provider" xsi:type="string">awCaRoleProvider</item>
+                                                <item name="template" xsi:type="string">ui/form/field</item>
+                                                <item name="label" xsi:type="string" translate="true">Limit Per Order</item>
+                                                <item name="sortOrder" xsi:type="number">10</item>
+                                                <item name="validation" xsi:type="array">
+                                                    <item name="validate-zero-or-greater" xsi:type="boolean">true</item>
+                                                    <item name="validate-number" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="tooltip" xsi:type="array">
+                                                    <item name="description" xsi:type="string" translate="true">This option is enabled only if permission Total Company Store Credit is selected to the Role</item>
+                                                </item>
+                                                <item name="notice" xsi:type="string" translate="true">0 for unlimited usage</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                    <item name="aw_rp_fieldset" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/fieldset</item>
+                                        <item name="label" xsi:type="string" translate="true">Reward Points</item>
+                                        <item name="template" xsi:type="string">Aheadworks_Ca/form/element/fieldset</item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="aw_rp_base_amount_limit" xsi:type="array">
+                                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                                                <item name="dataScope" xsi:type="string">aw_rp_base_amount_limit</item>
+                                                <item name="provider" xsi:type="string">awCaRoleProvider</item>
+                                                <item name="template" xsi:type="string">ui/form/field</item>
+                                                <item name="label" xsi:type="string" translate="true">Limit Per Order</item>
+                                                <item name="sortOrder" xsi:type="number">10</item>
+                                                <item name="validation" xsi:type="array">
+                                                    <item name="validate-zero-or-greater" xsi:type="boolean">true</item>
+                                                    <item name="validate-number" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="tooltip" xsi:type="array">
+                                                    <item name="description" xsi:type="string" translate="true">This option is enabled only if permission Total Company Reward Points is selected to the Role</item>
+                                                </item>
+                                                <item name="notice" xsi:type="string" translate="true">0 for unlimited usage</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                    <item name="save" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                                        <item name="provider" xsi:type="string">awCaRoleProvider</item>
+                                        <item name="title" xsi:type="string" translate="true">Save</item>
+                                        <item name="sortOrder" xsi:type="number">30</item>
+                                        <item name="buttonClasses" xsi:type="string">action primary</item>
+                                        <item name="actions" xsi:type="array">
+                                            <item name="0" xsi:type="array">
+                                                <item name="targetName" xsi:type="string">awCaForm</item>
+                                                <item name="actionName" xsi:type="string">save</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                            <item name="awCaRoleProvider" xsi:type="array">
+                                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+                                <item name="clientConfig" xsi:type="array">
+                                    <item name="urls" xsi:type="array">
+                                        <item name="save" xsi:type="url" path="aw_ca/role/savePost"/>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

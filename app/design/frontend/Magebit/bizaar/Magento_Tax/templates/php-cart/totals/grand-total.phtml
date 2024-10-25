@@ -1,0 +1,53 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+/**
+ * The AlpineJS scope of this file is the method `initCartTotals()` in Magento_Checkout::php-cart/totals.phtml
+ */
+?>
+<!-- display subtotal excluding tax -->
+<template x-if="segment.code === 'grand_total' && checkoutConfig.includeTaxInGrandTotal">
+    <div>
+        <div class="flex pb-1.25 mx-auto text-base lg:text-md md:grid md:grid-cols-2 md:w-full border-container">
+            <div class="w-7/12 font-semibold text-left md:w-auto"
+                 x-html="`${segment.title} ${includingTaxMessage}` "
+            ></div>
+            <div class="w-5/12 text-right md:w-auto text-navy font-bold"
+                 x-text="hyva.formatPrice(segment.value)"
+            ></div>
+        </div>
+
+        <div class="flex pb-1.25 mx-auto text-base lg:text-md md:grid md:grid-cols-2 md:w-full">
+            <div class="w-7/12 text-left md:w-auto"
+                 x-html="`${segment.title} ${excludingTaxMessage}` "
+            ></div>
+            <div class="w-5/12 font-bold text-right md:w-auto text-navy font-bold"
+                 x-text="hyva.formatPrice(totalsData.grand_total)"
+            ></div>
+        </div>
+    </div>
+</template>
+
+<!-- display subtotal including tax -->
+<template x-if="segment.code === 'grand_total' && !checkoutConfig.includeTaxInGrandTotal">
+    <div class="flex pb-1.25 mx-auto text-sm md:grid md:items-center md:grid-cols-2 md:w-full mt-2.5 pt-2.5 border-t-[3px] border-t-[#D9D9D9] border-solid">
+
+        <div class="w-7/12 font-normal text-black text-left md:w-auto"
+             x-html="`${segment.title}`"
+        ></div>
+        <div class="w-5/12 font-medium text-right md:w-auto text-navy text-lg"
+             x-text="hyva.formatPrice(segment.value)"
+        ></div>
+    </div>
+</template>

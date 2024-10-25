@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="aw_ctq.quote.history.render"
+                        template="Magebit_HyvaAheadworksCtq::history/render.phtml">
+            <referenceBlock name="aw_ctq.quote.history.actions.renderers.default"
+                            template="Magebit_HyvaAheadworksCtq::history/action/default.phtml"/>
+            <referenceBlock name="aw_ctq.quote.history.actions.renderers.comment"
+                            template="Magebit_HyvaAheadworksCtq::history/action/comment_renderer.phtml"/>
+            <referenceBlock name="aw_ctq.quote.history.actions.renderers.product"
+                            template="Magebit_HyvaAheadworksCtq::history/action/product_renderer.phtml"/>
+            <referenceBlock name="aw_ctq.quote.history.actions.renderers.shipping.address"
+                            template="Magebit_HyvaAheadworksCtq::history/action/shipping_address.phtml"/>
+            <referenceBlock name="aw_ctq.quote.history.actions.renderers.admin"
+                            template="Magebit_HyvaAheadworksCtq::history/action/admin_renderer.phtml"/>
+        </referenceBlock>
+    </body>
+</page>

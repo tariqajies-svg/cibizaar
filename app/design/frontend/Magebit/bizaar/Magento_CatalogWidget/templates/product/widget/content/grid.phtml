@@ -1,0 +1,79 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Block\Product\ListProduct;
+use Magento\Catalog\Block\Product\ReviewRendererInterface;
+use Magento\Framework\Escaper;
+
+/** @var ListProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$productViewModel         = $viewModels->require(ProductPage::class);
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+?>
+<?php if ($block->getProductCollection() && $block->getProductCollection()->getSize()): ?>
+    <?php
+    $type = 'widget-product-grid';
+    $mode = 'grid';
+    $image = 'new_products_content_widget_grid';
+    $items = $block->getProductCollection()->getItems();
+    $templateType = ReviewRendererInterface::SHORT_VIEW;
+    $description = false;
+    $totalCount = count($items);
+    $lgBottomRight = $totalCount - ($totalCount % 4);
+    $smBottomRight = $totalCount - ($totalCount % 2);
+    $itemIndex = 0;
+    ?>
+    <div class="block widget block-products-list <?= /* @noEscape */ $mode ?>">
+        <?php if ($block->getTitle()): ?>
+            <div class="block-title">
+                <strong><?= $escaper->escapeHtml(__($block->getTitle())) ?></strong>
+            </div>
+        <?php endif ?>
+        <div class="block-content">
+            <div class="mx-auto grid lg:gap-px product-widget-grid <?= $mode === 'grid' ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1' ?>">
+                    <?php foreach ($items as $item): ?>
+                        <?php
+                        $itemIndex++;
+                        $extraClasses = [];
+                        if ($itemIndex === $lgBottomRight) {
+                            $extraClasses[] = 'lg-item-br-round';
+                        }
+
+                        if ($itemIndex === $smBottomRight) {
+                            $extraClasses[] = 'sm-item-br-round';
+                        }
+
+                        ?>
+                        <?= $productListItemViewModel->getItemHtml(
+                            $item,
+                            $block,
+                            $mode,
+                            $templateType,
+                            $image,
+                            $description,
+                            [ 'classes' => implode(' ', $extraClasses) ]
+                        ) ?>
+                    <?php endforeach ?>
+            </div>
+            <?= $block->getPagerHtml() ?>
+        </div>
+    </div>
+<?php endif ?>

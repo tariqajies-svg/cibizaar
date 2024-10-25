@@ -1,0 +1,256 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+$gliderUrl = $block->getViewFileUrl('Magento_PageBuilder::js/glider.min.js');
+?>
+<script>
+    'use strict';
+
+    (() => {
+        const initCarousels = (elements) => {
+            if (!Glider) {
+                return;
+            }
+
+            Glider.prototype.buildDots = function () {
+                var _ = this
+
+                if (!_.opt.dots) {
+                if (_.dots) _.dots.innerHTML = ''
+                return
+                }
+
+                if (typeof _.opt.dots === 'string') {
+                _.dots = document.querySelector(_.opt.dots)
+                } else _.dots = _.opt.dots
+                if (!_.dots) return
+
+                _.dots.innerHTML = ''
+                _.dots.classList.add('glider-dots')
+
+                for (var i = 0; i < Math.ceil(_.slides.length / _.opt.slidesToShow); ++i) {
+                var dot = document.createElement('button')
+                dot.dataset.index = i
+                dot.setAttribute('aria-label', 'Page ' + (i + 1))
+                dot.className = 'glider-dot ' + (i ? '' : 'active')
+                dot.setAttribute('role', 'tab');
+                _.event(dot, 'add', {
+                    click: _.scrollItem.bind(_, i, true)
+                })
+                _.dots.appendChild(dot)
+                }
+            }
+
+            const initProductCarousel = (carousel) => {
+                const gliderElement = carousel.querySelector('[data-role="glider-content"]');
+
+                if (!gliderElement) {
+                    return;
+                }
+
+                const gliderDots = carousel.querySelector('.glider-dots');
+                const gliderPrev = carousel.querySelector('.glider-prev');
+                const gliderNext = carousel.querySelector('.glider-next');
+
+
+               var slidesToShow = carousel.dataset.slidesToShow ? carousel.dataset.slidesToShow : 4;
+               var slidesToShowTablet = carousel.dataset.slidesToShowTablet ? carousel.dataset.slidesToShowTablet : 3;
+               var slidesToShowMobile = carousel.dataset.slidesToShowMobile ? carousel.dataset.slidesToShowMobile : 1;
+
+                const glider = new Glider(gliderElement, {
+                    slidesToShow: slidesToShowMobile,
+                    slidesToScroll: 1,
+                    scrollLock: false,
+                    draggable: true,
+                    dragVelocity: 2.5,
+                    dots: gliderDots,
+                    arrows: {
+                        prev: gliderPrev,
+                        next: gliderNext,
+                    },
+                    responsive: [
+                        {
+                            breakpoint: 768,
+                            settings: {
+                                slidesToShow: slidesToShowTablet,
+                                slidesToScroll: 1,
+                            }
+                        },                       
+                        {
+                            breakpoint: 1368,
+                            settings: {
+                                draggable: false,
+                                slidesToShow: slidesToShow,
+                                slidesToScroll: 1,
+                            }
+                        },
+                    ],
+                });
+
+                carousel && carousel.classList.remove('overflow-x-scroll');
+                gliderPrev && gliderPrev.classList.remove('hidden');
+                gliderNext && gliderNext.classList.remove('hidden');
+
+                if (carousel.dataset.autoplay !== 'false') {
+                    gliderAutoplay(
+                        glider,
+                        carousel.dataset.autoplaySpeed,
+                        carousel.dataset.infiniteLoop
+                    );
+                }
+            };
+
+            const initSliderCarousel = (slider) => {
+                slider.innerHTML = `<div data-role="glider-content">${slider.innerHTML}</div>`;
+                slider.classList.add('glider-contain');
+
+                slider.insertAdjacentHTML(
+                    'beforeend',
+                    '<?= $escaper->escapeJs($block->getBlockHtml('pagebuilder.carousel.nav')) ?>'
+                );
+
+                const gliderElement = slider.querySelector('[data-role="glider-content"]');
+                const gliderDots = slider.querySelector('.glider-dots');
+                const gliderPrev = slider.querySelector('.glider-prev');
+                const gliderNext = slider.querySelector('.glider-next');
+
+                const glider = new Glider(gliderElement, {
+                    slidesToShow: 2.5,
+                    slidesToScroll: 1,
+                    peek: 300,
+                    scrollLock: true,
+                    scrollLockDelay: 250,
+                    draggable: true,
+                    dragVelocity: 2.5,
+                    dots: gliderDots,
+                    arrows: {
+                        prev: gliderPrev,
+                        next: gliderNext,
+                    },
+                });
+
+                slider.classList.add('glider-initialized');
+                if (slider.dataset.showArrows === 'true') {
+                    gliderPrev.classList.remove('hidden');
+                    gliderNext.classList.remove('hidden');
+                }
+
+                if (slider.dataset.autoplay !== 'false') {
+                    gliderAutoplay(
+                        glider,
+                        slider.dataset.autoplaySpeed,
+                        slider.dataset.infiniteLoop
+                    );
+                }
+            };
+
+            const gliderAutoplay = (glider, milliseconds, loop) => {
+                const pagesCount = glider.track.childElementCount;
+                let slideTimeout = null;
+                let nextIndex = 1;
+                let paused = true;
+
+                const slide = () => {
+                    slideTimeout = setTimeout(
+                        () => {
+                            if (loop && nextIndex >= pagesCount) {
+                                nextIndex = 0;
+                            }
+                            glider.scrollItem(nextIndex);
+                        },
+                        parseInt(milliseconds)
+                    );
+                };
+
+                glider.ele.addEventListener('glider-animated', () => {
+                    nextIndex = glider.slide + glider.opt.slidesToScroll;
+                    window.clearInterval(slideTimeout);
+                    if (!paused && (loop || nextIndex < pagesCount)) {
+                        slide();
+                    }
+                });
+
+                const pause = () => {
+                    if (!paused) {
+                        clearInterval(slideTimeout);
+                        paused = true;
+                    }
+                };
+
+                const unpause = () => {
+                    if (paused) {
+                        slide();
+                        paused = false;
+                    }
+                };
+
+                glider.ele.parentElement.addEventListener('mouseover', pause, {passive: true});
+                glider.ele.parentElement.addEventListener('touchstart', pause, {passive: true});
+                glider.ele.parentElement.addEventListener('mouseout', unpause, {passive: true});
+                glider.ele.parentElement.addEventListener('touchend', unpause, {passive: true});
+
+                setTimeout(() => {paused = false; slide();}, 5000); // Auto scroll starts only 5s after init
+            };
+
+            elements.forEach(element => {
+                if (element.dataset.contentType === 'products') {                    
+                    initProductCarousel(element);
+                }
+                if (element.dataset.contentType === 'slider') {
+                    initSliderCarousel(element);
+                }
+            });
+        };
+
+        let scriptLoaded = false;
+        const loadGliderJs = (event) => {
+            let carouselElements;
+            if (event.detail) {
+                carouselElements = event.detail.querySelectorAll(
+                    '[data-content-type="products"][data-appearance="carousel"],[data-content-type="slider"]'
+                );
+            } else {
+                carouselElements = document.querySelectorAll(
+                    '[data-content-type="products"][data-appearance="carousel"],[data-content-type="slider"]'
+                );
+            }
+
+            if (carouselElements.length > 0 && !scriptLoaded) {
+                scriptLoaded = true;
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+
+                script.addEventListener('load', () => {
+                    initCarousels(carouselElements);
+                });
+
+                script.src = '<?= $escaper->escapeJs($escaper->escapeUrl($gliderUrl)) ?>';
+                document.head.appendChild(script);
+            } else if (carouselElements.length > 0 && scriptLoaded) {
+                initCarousels(carouselElements);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadGliderJs);
+        window.addEventListener('load-glider-js', loadGliderJs);
+    })();
+</script>

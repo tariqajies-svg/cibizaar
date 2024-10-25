@@ -1,0 +1,90 @@
+.account-nav ul li a,
+.account-nav ul li strong {
+    @apply flex justify-between text-secondary py-1;
+}
+
+.account-nav ul li strong {
+    @apply underline text-black font-normal;
+}
+
+.actions-toolbar {
+    @apply pt-5 lg:pt-12 border-t flex gap-5 justify-between flex-col sm:flex-row-reverse items-end sm:items-center;
+}
+
+
+@layer components {
+    .actions-toolbar .primary button {
+        @apply btn btn-primary;
+    }
+}
+
+.actions-toolbar .secondary a {
+    @apply font-bold text-base;
+}
+
+.link-button-lg {
+    @screen lg {
+        &:not(.no-underline) {
+            &.hover,
+            &.active,
+            &:hover,
+            &:active {
+                @apply underline cursor-pointer;
+
+                text-underline-offset: 3px;
+                text-decoration-color: theme('colors.currentColor');
+            }
+        }
+    }
+}
+body.account{
+    .set-bdr{
+        @apply border border-solid border-[#bcbcbc] rounded-[5px];
+        .form-input{
+            @apply !border-0;
+        }
+    }
+    .account-download form{
+        @apply md-max:w-full;
+        button{
+            @apply md-max:w-full lg-max:px-2.5;
+        }
+    }
+    .page-main {
+        .before-icon-arrow-left {
+            @apply font-bold;
+        }
+        .form-input {
+            @apply border text-sm text-[#737373] px-4 py-[9px] rounded-[5px] font-normal border-solid border-[#D9D9D9];
+        }
+        label {
+            @apply text-sm text-black font-normal leading-5 mt-0 mb-2 mx-0 p-0;
+        }
+        h2{
+            @apply text-2xl font-semibold;
+        }
+    }
+    &.amasty_quote-account-index {
+        .card.grid.grid-cols-3.flex {
+            @apply lg:grid-cols-5;
+        }
+        .card.grid.grid-cols-4.flex {
+            @apply lg:grid-cols-6;
+        }
+        .quote-products-toolbar.toolbar {
+            .pager {
+                @apply flex justify-between;
+                .field.limiter label {
+                    @apply mb-0;
+                }
+            }
+        }
+    }
+    &.amasty_quote-account-view {
+        .quote-items.order-items {
+            .grid-cols-8 {
+                @apply grid-cols-8 text-sm;
+            }
+        }
+    }
+}

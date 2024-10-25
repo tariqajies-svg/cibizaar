@@ -1,0 +1,121 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Cart\Items as CartItems;
+use Hyva\Theme\ViewModel\ProductList;
+use Hyva\Theme\ViewModel\Slider;
+use Hyva\Theme\ViewModel\Store;
+use Magento\Catalog\Model\Product\Visibility as ProductVisibility;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Slider $sliderViewModel */
+/** @var ProductList $productListViewModel */
+/** @var Store $storeViewModel */
+
+$sliderViewModel      = $viewModels->require(Slider::class);
+$productListViewModel = $viewModels->require(ProductList::class);
+$storeViewModel       = $viewModels->require(Store::class);
+
+$categoryIds       = $block->getData('category_ids') ?: '';
+$pageSize          = $block->getData('page_size') ?: 10;
+$priceFrom         = $block->getData('price_from');
+$priceTo           = $block->getData('price_to');
+$sortAttribute     = $block->getData('sort_attribute') ?: '';
+$sortDirection     = $block->getData('sort_direction') ?: 'ASC';
+$title             = $block->getData('title') ?: '';
+$subtitle          = $block->getData('subtitle') ?: '';
+$type              = $block->getData('type');
+$skusFilter        = $block->getData('product_skus') ? explode(',', $block->getData('product_skus')) : [];
+$additionalFilters = (array) $block->getData('additional_filters');
+$itemTemplate      = $block->getData('item_template') ?? 'Magento_Catalog::product/list/item.phtml';
+$containerTemplate = $block->getData('container_template')
+    ?? 'Magento_Catalog::product/slider/product-slider-container.phtml';
+
+if ($categoryIds) {
+    $productListViewModel->addFilter('category_id', $categoryIds, 'in');
+}
+
+if ($priceFrom) {
+    $productListViewModel->addFilter('price', $priceFrom, 'gteq');
+}
+
+if ($priceTo) {
+    $productListViewModel->addFilter('price', $priceTo, 'lteq');
+}
+
+if ($skusFilter) {
+    $productListViewModel->addFilter('sku', array_map('trim', $skusFilter), 'in');
+}
+
+foreach ($additionalFilters as $filter) {
+    $productListViewModel->addFilter($filter['field'], $filter['value'], $filter['conditionType'] ?? 'eq');
+}
+
+$productListViewModel->setPageSize($pageSize);
+$productListViewModel->addFilter('website_id', $storeViewModel->getWebsiteId());
+$productListViewModel->addFilter('visibility', [
+    ProductVisibility::VISIBILITY_IN_CATALOG,
+    ProductVisibility::VISIBILITY_IN_SEARCH,
+    ProductVisibility::VISIBILITY_BOTH,
+], 'in');
+if ($sortAttribute) {
+    $sortDirection === 'ASC'
+        ? $productListViewModel->addAscendingSortOrder($sortAttribute)
+        : $productListViewModel->addDescendingSortOrder($sortAttribute);
+}
+
+if (in_array($type, ['related', 'upsell', 'crosssell'], true)) {
+
+    $items = $type === 'crosssell'
+        ? $productListViewModel->getCrosssellItems(...$viewModels->require(CartItems::class)->getCartItems())
+        : $productListViewModel->getLinkedItems($type, $block->getProduct());
+
+} else {
+    $items = $productListViewModel->getItems();
+}
+
+$sliderHtml = $sliderViewModel->getSliderForItems($itemTemplate, $items, $containerTemplate)->toHtml();
+
+if (empty($sliderHtml)) {
+    return '';
+}
+?>
+<div class="product-slider border-t pt-7.75 lg:pt-11.75 pb-4">
+    <div class="container flex justify-between items-center see-all">
+        <h2 class="mb-1">
+            <?= $escaper->escapeHtml($title); ?>
+        </h2>
+        <p><a class="text-md font-normal leading-5 clear" title="See all" href="#"><?php echo __('See all') ?><i class="icon icon-arrow-right"></i></a></p>
+        <!-- <p>
+            <?//= $escaper->escapeHtml($subtitle); ?>
+        </p> -->
+    </div>
+
+    <div class="product-slider container pt-5 lg:py-8"
+         data-content-type="products"
+         data-appearance="carousel"
+         data-autoplay="false"
+         data-infinite-loop="false"
+         data-carousel-mode="default"
+    >
+        <?= /* @noEscape */ $sliderHtml ?>
+    </div>
+</div>

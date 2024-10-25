@@ -1,0 +1,21 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+
+$cssFileUrl = $block->getViewFileUrl('css/styles.css');
+?>
+<link rel="preload" href="<?=  $escaper->escapeUrl($cssFileUrl) ?>" as="style">
+
+<?= $block->getChildHtml() ?>

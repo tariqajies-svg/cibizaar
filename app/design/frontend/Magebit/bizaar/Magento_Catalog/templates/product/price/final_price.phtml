@@ -1,0 +1,46 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Catalog\Pricing\Render\FinalPriceBox;
+use Magento\Framework\Pricing\Price\PriceInterface;
+
+/** @var FinalPriceBox $block */
+
+/** @var PriceInterface $priceModel */
+$priceModel = $block->getPriceType('regular_price');
+/** @var PriceInterface $finalPriceModel */
+$finalPriceModel = $block->getPriceType('final_price');
+
+$idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
+$finalPrice = $finalPriceModel->getAmount();
+$price = $priceModel->getAmount();
+?>
+<div class="price-box price-final_price flex flex-wrap">
+    <div class="final-price mr-1">
+        <span id="product-price-<?= (int)$idSuffix ?>"
+                class="price-wrapper font-bold text-navy text-sm lg:text-base">
+            <span class="price block" x-html="hyva.formatPrice(<?= (float)$finalPrice->getValue() ?>)"></span>
+        </span>
+    </div>
+    <?php if ($block->hasSpecialPrice()): ?>
+        <div class="old-price flex">
+            <span id="product-price-<?= (int)$idSuffix ?>"
+                  class="price-wrapper flex items-end font-bold line-through text-navy text-xs lg:text-sm pb-0.5 lg:pb-0.25">
+                <span class="price block" x-html="hyva.formatPrice(<?= (float)$price->getValue() ?>)"></span>
+            </span>
+        </div>
+    <?php endif; ?>
+</div>

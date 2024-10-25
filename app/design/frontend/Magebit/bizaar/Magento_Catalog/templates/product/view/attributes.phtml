@@ -1,0 +1,64 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\Catalog\Product\View\Attributes;
+use Magebit\Catalog\ViewModel\AttributeGroups;
+use Magento\Catalog\Helper\Output as CatalogOutputHelper;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var Escaper $escaper */
+/** @var CatalogOutputHelper $output */
+/** @var Attributes $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var CatalogOutputHelper $catalogOutputHelper */
+/** @var Product $product */
+
+$attributeGroupsViewModel = $viewModels->require(AttributeGroups::class);
+$catalogOutputHelper = $this->helper(CatalogOutputHelper::class);
+$product = $block->getProduct();
+?>
+<?php if ($attributes = $block->getAdditionalData()): ?>
+    <?php $attributes = $attributeGroupsViewModel->addGroupName($attributes) ?>
+    <?php $groups = $attributeGroupsViewModel->groupByGroup($attributes) ?>
+    <div id="product-attributes"
+         class="mt-4.75 rounded">
+        <?php foreach ($groups as $group): ?>
+            <div class="mb-5 pb-4.5 border-b last:border-b-0 last:mb-0 last:pb-0 lg:pb-4.75 lg:mb-5.25">
+                <?php if (!empty($group['group_name'])): ?>
+                    <h4 class="mb-5.25 lg:mb-4.75 text-md font-medium"><?= $escaper->escapeHtml($group['group_name']) ?></h4>
+                <?php endif; ?>
+                <table class="table-auto w-auto text-sm bg-white border border-gray-300">
+                    <tbody>
+                        <?php foreach ($group['attributes'] as $attribute): ?>
+                        <tr>
+                            <td class="border border-gray-300 px-4 py-2 font-medium text-black bg-gray-50">
+                                <?= $escaper->escapeHtml($attribute['label']) ?>
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $attribute['value'], $attribute['code']) ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>

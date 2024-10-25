@@ -1,0 +1,39 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Aheadworks\Ca\ViewModel\Company\Customer;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Customer $customerViewModel */
+/** @var Escaper $escaper */
+
+$customerViewModel = $block->getCustomerViewModel();
+?>
+
+<?php if ($customerViewModel->isCurrentUserCompanyAdmin()): ?>
+    <section>
+        <div class="block block-domains mb-8">
+            <div class="block-title border-container border-b pb-2 mb-2">
+                <strong class="text-2xl font-normal"><?= $escaper->escapeHtml(__('Company Domains')) ?></strong>
+            </div>
+            <div class="block-content">
+                <?= $block->getChildHtml() ?>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>

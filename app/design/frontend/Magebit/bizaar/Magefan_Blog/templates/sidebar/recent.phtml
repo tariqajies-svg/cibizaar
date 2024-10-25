@@ -1,0 +1,101 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magefan\Blog\Block\Post\PostList\AbstractList;
+use Magefan\Blog\Helper\Image;
+use Magebit\MagefanBlog\ViewModel\PlaceholderImage;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/**
+ * Blog sidebar posts list template
+ */
+
+/** @var AbstractList $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$placeholderViewModel = $viewModels->require(PlaceholderImage::class);
+
+$_postCollection = $block->getPostCollection();
+
+$width = (int)$block->getBlockImageWidth() ?: 80;
+$height = (int)$block->getBlockImageheight() ?: 80;
+$imageHelper = $this->helper(Image::class);
+
+if ($_postCollection->count()): ?>
+<div class="widget block block-<?= $escaper->escapeHtml(str_replace('_', '-', $block->getWidgetKey())) ?> block-list-posts
+p-5 bg-gray-f2 relative first:rounded-t-[5px] last:rounded-b-[5px] lg:px-8">
+    <div class="block-title mb-5 uppercase">
+        <h5>
+            <?= $escaper->escapeHtml(__($block->getBlockTitle() ?: 'Recent Posts')) ?>
+        </h5>
+    </div>
+    <div class="block-content">
+        <?php foreach ($_postCollection as $_post):
+                $_postUrl = $escaper->escapeUrl($_post->getPostUrl());
+                $_postName = $escaper->escapeHtml($_post->getTitle());
+            ?>
+            <div class="item clearfix mb-1 lg:mb-2">
+                <?php if ($block->getDisplayImage()): ?>
+                    <?php $featuredImage = $_post->getFeaturedListImage() ?: $_post->getFeaturedImage(); ?>
+                    <div class="post-image relative float-left mr-4 rounded-[5px] w-[80px] h-[80px]">
+                        <?php
+                        $featuredImgAlt = $_post->getData('featured_list_img_alt') ?: $_post->getData('featured_img_alt');
+
+                        if (!$featuredImgAlt):
+                            $featuredImgAlt =  $_postName;
+                        endif;
+                        ?>
+                        <a class="post-item-link"
+                           title="<?= $escaper->escapeHtml($_postName) ?>"
+                           href="<?= $escaper->escapeUrl($_postUrl) ?>">
+                            <?php
+                            if ($featuredImage) {
+                                $featuredImageUrl = $imageHelper->init($_post->getFeaturedListImg() ?: $_post->getFeaturedImg())->resize($width, $height);
+                            } else {
+                                $featuredImageUrl = $placeholderViewModel->getImage();
+                            }
+                            ?>
+                            <img class="absolute w-full bg-white h-full object-cover top-0 left-0 rounded-[5px]"
+                                 width="<?= $escaper->escapeHtmlAttr($width) ?>"
+                                 height="<?= $escaper->escapeHtmlAttr($height) ?>"
+                                 layout="responsive"
+                                 loading="lazy"
+                                 src="<?= $escaper->escapeUrl($featuredImageUrl) ?>"
+                                 alt="<?= $escaper->escapeHtml($featuredImgAlt) ?>" />
+                        </a>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($block->getDisplayImage() && $_post->isPublishDateEnabled()): ?>
+                    <div class="post-item-date text-xs lg:text-sm">
+                        <span class="value"><?= $escaper->escapeHtml($_post->getPublishDate()) ?></span>
+                    </div>
+                <?php endif; ?>
+
+                <a class="post-item-link !text-navy font-semibold"
+                   title="<?= $escaper->escapeHtmlAttr($_postName) ?>"
+                   href="<?= $escaper->escapeUrl($_postUrl) ?>">
+                    <?= /* @noEscape */ $_postName ?>
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>

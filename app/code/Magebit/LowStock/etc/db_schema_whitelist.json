@@ -1,0 +1,15 @@
+{
+  "magebit_low_stock_notification": {
+    "column": {
+      "id": true,
+      "sku": true,
+      "created_at": true
+    },
+    "index": {
+      "MAGEBIT_LOW_STOCK_NOTIFICATION_ID": true
+    },
+    "constraint": {
+      "PRIMARY": true
+    }
+  }
+}

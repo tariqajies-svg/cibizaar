@@ -1,0 +1,75 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Magento\Customer\Block\Address\Book;
+use Magento\Framework\Escaper;
+
+/** @var Book $block */
+/** @var Escaper $escaper */
+?>
+<div class="block block-addresses-default mb-7 lg:mb-12">
+    <h2><?= $escaper->escapeHtml(__('Default Addresses')) ?></h2>
+    <div class="grid sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 block-content gap-2 lg:gap-6 my-5 lg:my-6">
+        <div class="box box-address-billing card grid gap-y-4 lg:gap-y-5">
+            <span class="font-bold text-navy">
+                <?= $escaper->escapeHtml(__('Default Billing Address')) ?>
+            </span>
+        <?php if ($customerDefaultBillingAddress = $block->getDefaultBilling()): ?>
+            <div class="box-content">
+                <address class="not-italic">
+                    <?= $block->getAddressHtml($block->getAddressById($customerDefaultBillingAddress)) ?>
+                </address>
+            </div>
+            <div class="box-actions mt-auto">
+                <a href="<?= $escaper->escapeUrl($block->getAddressEditUrl($customerDefaultBillingAddress)) ?>"
+                   class="btn btn-secondary w-full sm:w-fit">
+                    <span>
+                        <?= $escaper->escapeHtml(__('Change Billing Address')) ?>
+                    </span>
+                </a>
+            </div>
+        <?php else: ?>
+            <div class="box-content">
+                <p><?= $escaper->escapeHtml(__('You have no default billing address in your address book.')) ?></p>
+            </div>
+        <?php endif ?>
+        </div>
+
+        <div class="box box-address-shipping card grid gap-y-5">
+            <span class="font-bold text-navy">
+                <?= $escaper->escapeHtml(__('Default Shipping Address')) ?>
+            </span>
+
+            <?php if ($customerDefaultBillingAddress = $block->getDefaultShipping()): ?>
+            <div class="box-content">
+                <address class="not-italic">
+                    <?= $block->getAddressHtml($block->getAddressById($customerDefaultBillingAddress)) ?>
+                </address>
+            </div>
+            <div class="box-actions mt-auto">
+                <a href="<?= $escaper->escapeUrl($block->getAddressEditUrl($customerDefaultBillingAddress)) ?>"
+                   class="btn btn-secondary  w-full sm:w-fit">
+                    <span><?= $escaper->escapeHtml(__('Change Shipping Address')) ?></span>
+                </a>
+            </div>
+            <?php else: ?>
+            <div class="box-content">
+                <p>
+                    <?= $escaper->escapeHtml(__('You have no default shipping address in your address book.')) ?>
+                </p>
+            </div>
+            <?php endif ?>
+        </div>
+    </div>
+</div>

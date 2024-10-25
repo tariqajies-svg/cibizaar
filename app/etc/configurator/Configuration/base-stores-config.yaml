@@ -1,0 +1,10 @@
+stores:
+  default:
+    - path: general/locale/code
+      value: en_GB
+  biz_fr:
+    - path: general/locale/code
+      value: fr_FR
+  biz_ar:
+    - path: general/locale/code
+      value: ar_SA

@@ -1,0 +1,31 @@
+From 7a922ab607a89db34fd15dbe8afcf876619a0637 Mon Sep 17 00:00:00 2001
+From: Igors Kolcins <igors.kolcins@magebit.com>
+Date: Tue, 27 Feb 2024 17:32:33 +0200
+Subject: [PATCH] Fix PB error
+
+---
+ view/adminhtml/web/js/stage-builder.js | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/view/adminhtml/web/js/stage-builder.js b/view/adminhtml/web/js/stage-builder.js
+index cab6f9a..7d3787d 100644
+--- a/view/adminhtml/web/js/stage-builder.js
++++ b/view/adminhtml/web/js/stage-builder.js
+@@ -49,9 +49,11 @@ define(["mage/translate", "Magento_PageBuilder/js/events", "Magento_Ui/js/modal/
+       _.each(styles, function (stylesArray, selector) {
+         var element = document.querySelector(selector);
+ 
+-        _.each(stylesArray, function (style) {
+-          element.setAttribute("data-" + name + "-style", element.getAttribute("data-" + name + "-style") ? element.getAttribute("data-" + name + "-style") + style.cssText : style.cssText);
+-        });
++        if (element) {
++          _.each(stylesArray, function (style) {
++            element.setAttribute("data-" + name + "-style", element.getAttribute("data-" + name + "-style") ? element.getAttribute("data-" + name + "-style") + style.cssText : style.cssText);
++          });
++        }
+       });
+     });
+
+--
+2.25.1
+

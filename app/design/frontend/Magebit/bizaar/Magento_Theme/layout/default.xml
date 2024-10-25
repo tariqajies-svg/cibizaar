@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page layout="3columns"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_modal"/>
+    <update handle="hyva_form_validation"/>
+    <body>
+        <referenceContainer name="before.body.end">
+            <block name="add.dynamic.accessibility.attributes" template="Magento_Theme::html/update_content.phtml" after="-"/>
+        </referenceContainer>
+        <referenceContainer name="page.messages">
+            <block class="Magento\Framework\View\Element\Messages"
+                   name="messages"
+                   as="messages"
+                   template="Magento_Theme::messages.phtml"
+            />
+        </referenceContainer>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Cms\Block\Block" name="social-tools"> 
+                <arguments> 
+                <argument name="block_id" xsi:type="string">social-tools</argument> 
+                </arguments> 
+            </block> 
+        </referenceContainer>
+        <referenceContainer name="header.top.container">
+            <block class="Magento\Cms\Block\Block" name="header-top-message">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">header-top-message</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Framework\View\Element\Template"
+                   name="header-top"
+                   template="Magento_Theme::html/header-top.phtml">
+                <block class="Magento\Cms\Block\Block" name="header-top-info">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">header-top-info</argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Cms\Block\Block" name="header-top-links-block">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">header-top-links-block</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="footer-content">
+            <block class="Magento\Cms\Block\Block" name="footer-main-branding">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">footer-branding-block</argument>
+                </arguments>
+            </block>
+            <block name="footer-main-categories" template="Magento_Theme::html/footer/categories.phtml" />
+            <block class="Magento\Cms\Block\Block" name="footer-main-customer-service">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">footer-customer-service-block</argument>
+                </arguments>
+            </block>
+            <block name="footer-main-static-links" template="Magento_Theme::html/footer/links.phtml"/>
+            <!-- <block class="Magento\Cms\Block\Block" name="footer-bottom-links">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">footer-bottom-links-block</argument>
+                </arguments>
+            </block> -->
+            <block class="Magento\Cms\Block\Block" name="footer-bottom-payments">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">footer-bottom-payments-block</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceContainer name="header.container" htmlClass="sticky top-0 z-40" />
+        <!-- <referenceContainer name="header-wrapper" remove="true" /> -->
+        <referenceBlock name="header.customer" remove="true" />
+        <referenceBlock name="elasticsuite_footer" remove="true" />
+        <referenceBlock name="footer-column-store" remove="true" />
+        <referenceBlock name="footer-column-directory" remove="true" />
+        <referenceBlock name="footer-copyright" remove="true" />
+        <referenceBlock name="catalog.compare.sidebar" remove="true" />
+        <referenceBlock name="wishlist_sidebar" remove="true" />
+        <referenceBlock name="bizaar_ai" remove="true" />
+    </body>
+</page>

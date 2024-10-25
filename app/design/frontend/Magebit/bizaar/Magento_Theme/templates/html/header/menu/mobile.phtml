@@ -1,0 +1,388 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use CtiDigital\Configurator\ViewModel\Cms;
+use Magebit\HyvaTheme\ViewModel\BrandsNavigation;
+use Magebit\HyvaTheme\ViewModel\Navigation;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Navigation $navigation */
+$navigation = $viewModels->require(Navigation::class);
+$brandsNavigation = $viewModels->require(BrandsNavigation::class);
+$cms = $viewModels->require(Cms::class);
+
+$uniqueId = '_' . uniqid();
+
+$rootCategoryId = $navigation->getRootCategoryId();
+$mainCategoryId = $navigation->getMainCategoryId();
+$brandsCategoryId = $brandsNavigation->getBrandsCategoryId();
+
+/* Do not render menu if default category hasn't required sub-categories */
+if (!$mainCategoryId || !$brandsCategoryId) {
+    return '';
+}
+
+/* Prepare main category menu data */
+$categoryMenu = $navigation->getCustomNavigation([$rootCategoryId, $mainCategoryId], 5);
+
+/* Prepare brand category menu data */
+$brandMenu = $navigation->getCustomNavigation([$rootCategoryId, $brandsCategoryId], 3);
+$brandSubMenuItems = $brandsNavigation->getCustomNavigation([$rootCategoryId, $brandsCategoryId], 5, 4, $brandMenu);
+
+$block->setData('cache_tags', $navigation->getIdentities());
+?>
+<div class="z-20 order-1 lg:order-2 navigation lg:hidden"
+     x-cloak x-show="mobile.open"
+>
+    <!-- mobile -->
+    <div @load.window="mobile.setActiveMenu($el)"
+         @private-content-loaded.window="mobile.receiveWishlistData($event.detail.data)"
+         id="menu-mobile"
+         x-ref="menu-mobile"
+         class="bg-container-lighter"
+         :class="{'overflow-x-hidden overflow-y-auto fixed top-0 bottom-0 left-0 w-full' : mobile.open}"
+         @keydown.window.escape="closeMobileMenu()"
+         @resize.window="window.innerWidth > 1024 && closeMobileMenu()"
+    >
+        <div class="flex items-baseline justify-between menu-icon relative">
+            <div class="flex justify-end w-full block absolute top-0 right-0">
+                <button @click="closeMobileMenu()"
+                        class="flex items-center justify-center cursor-pointer text-blue no-underline z-10"
+                        :class="{ 'ml-auto': mobile.open }"
+                        aria-label="<?= $escaper->escapeHtml(__('Menu')) ?>">
+                    <i class="icon-close text-gray p-3 bg-gray-f2 rounded-bl active:text-navy"></i>
+                </button>
+            </div>
+            <div class="container w-full py-5 space-y-5 relative">
+                <h3>
+                    <span x-show="!mobile.mobilePanelActiveRoot"><?= $escaper->escapeHtml(__('Menu')) ?></span>
+                    <span x-show="mobile.mobilePanelActiveRoot && !mobile.openTree.length" class="flex items-center">
+                        <i class="icon-arrow-left text-gray active:text-navy p-5 pr-4 -m-5 mr-0 cursor-pointer"
+                           @click="mobile.mobilePanelActiveRoot = null"></i>
+                        <span><?= $escaper->escapeHtml(__('Product Catalogue')) ?></span>
+                    </span>
+                    <span x-show="mobile.openTree.length" class="flex items-center">
+                        <i class="icon-arrow-left text-gray active:text-navy p-5 pr-4 -m-5 mr-0 cursor-pointer"
+                           @click="mobile.goBack()"></i>
+                        <span x-text="mobile.openTree[mobile.openTree.length - 1]?.name"></span>
+                    </span>
+                </h3>
+                <button class="btn btn-primary w-full"
+                        @click="mobile.openCatalogue()"
+                        x-show="!mobile.mobilePanelActiveRoot">
+                    <i class="icon-menu"></i>
+                    <span><?= $escaper->escapeHtml(__('Product Catalogue')) ?></span>
+                </button>
+                <div x-show="mobile.mobilePanelActiveRoot"
+                     class="flex w-full">
+                    <button @click="mobile.openBrands()"
+                            class="btn rounded-r-none w-full px-5"
+                            :class="{
+                                'btn-primary pointer-events-none': mobile.mobilePanelActiveRoot == '<?= /* @noEscape */ $brandsCategoryId ?>',
+                                'btn-secondary text-gray': mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $brandsCategoryId ?>'
+                            }"
+                            :disabled="'<?= /* @noEscape */ $brandsCategoryId ?>' == 0">
+                        <?= $escaper->escapeHtml(__('Brands')) ?>
+                    </button>
+                    <button @click="mobile.openCatalogue()"
+                            class="btn rounded-none w-full px-5"
+                            :class="{
+                                'btn-primary pointer-events-none': mobile.mobilePanelActiveRoot == '<?= /* @noEscape */ $mainCategoryId ?>',
+                                'btn-secondary text-gray': mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $mainCategoryId ?>'
+                            }"
+                            :disabled="'<?= /* @noEscape */ $mainCategoryId ?>' == 0">
+                        <?= $escaper->escapeHtml(__('Categories')) ?>
+                    </button>
+                    <a href="<?php echo $block->getBaseUrl().'sale'; ?>" class="btn px-5 rounded-l-none btn-secondary text-gray border-l-0 w-full"><?php echo __('Sale') ?></a>
+                </div>
+            </div>
+        </div>
+        <nav class="w-full duration-1000 ease-in-out transform border-t transition-display relative overflow-hidden">
+            <div class="w-full" :class="{'hidden': mobile.mobilePanelActiveRoot}">
+                <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('header-top-info')->toHtml();?>
+                <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('header-top-links-block')->toHtml();?>
+                <?php echo $this->getLayout()->createBlock("Magento\Framework\View\Element\Template")->setTemplate("Magento_Theme::html/switcher_mobile.phtml")->toHtml() ?>
+                <!-- <?//= $block->getChildHtml('menu-mobile-links-block') ?>
+                <a href="<?//= $escaper->escapeUrl($block->getUrl('aw_quick_order')) ?>"
+                   class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white">
+                    <?//= $escaper->escapeHtml(__('Quick Order')) ?>
+                </a>
+                <a href="<?//= $escaper->escapeUrl($block->getUrl('wishlist')) ?>" x-show="mobile.wishlistCount"
+                   class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white">
+                    <span class="relative">
+                        <?//= $escaper->escapeHtml(__('Wish List')) ?>
+                        <span class="absolute -top-1 left-auto -right-4 min-w-4 h-4 text-[8px] leading-[12px]
+                            text-center text-white uppercase rounded-full bg-green border-2 border-white flex font-black px-1
+                            items-center justify-center"
+                              x-text="mobile.wishlistCount">
+                        </span>
+                    </span>
+                </a> -->
+            </div>
+            <?php foreach ($brandMenu as $menuItem): ?>
+                <div class="level-0 relative">
+                    <span class="flex items-center group"
+                          :class="{
+                            'hidden' : mobile.mobilePanelActiveId
+                                || !mobile.mobilePanelActiveRoot
+                                || mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                || mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $menuItem['parent_id'] ?>',
+                            'block' : !mobile.mobilePanelActiveId
+                                && mobile.mobilePanelActiveRoot
+                                && mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                && mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $menuItem['parent_id'] ?>'
+                    }">
+                        <div class="relative link text-gray flex items-center container w-full pt-4 pb-3.75 border-b
+                                cursor-pointer bg-white level-0"
+                             data-brand="true"
+                             data-id="<?= $escaper->escapeHtmlAttr($menuItem['id']) ?>"
+                             @click="mobile.openPanel('<?= /* @noEscape */ $menuItem['id'] ?>',
+                                                      '<?= /* @noEscape */ $menuItem['name'] ?>');
+                                     mobile.selectedBrandUrl = '<?= $escaper->escapeJs($menuItem['url']) ?>';"
+                        >
+                            <?= $escaper->escapeHtml($menuItem['name']) ?>
+                            <i class="absolute cursor-pointer right-0 top-0 icon-arrow-right p-5 md:pr-8
+                                    active:text-navy group-active:text-navy"></i>
+                        </div>
+                    </span>
+                    <div class="level-1 relative">
+                        <span class="flex items-center"
+                              :class="{
+                                'hidden' : !mobile.mobilePanelActiveId
+                                    || mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                    || mobile.mobilePanelActiveId !== '<?= /* @noEscape */ $menuItem['id'] ?>',
+                                'block' : mobile.mobilePanelActiveId
+                                    && mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                    && mobile.mobilePanelActiveId === '<?= /* @noEscape */ $menuItem['id'] ?>'
+                        }">
+                            <a :href="'<?= $escaper->escapeUrl($menuItem['url']) ?>'"
+                               data-catalogue="true"
+                               title="<?= $escaper->escapeHtmlAttr($menuItem['name']) ?>"
+                               class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white">
+                                <?= $escaper->escapeHtml(__('View All')) ?>
+                            </a>
+                        </span>
+                    </div>
+
+                </div>
+            <?php endforeach; ?>
+            <?php foreach ($brandSubMenuItems as $brandSubMenuItem): ?>
+                <div class="level-1 relative">
+                    <span class="flex items-center group"
+                          :class="{
+                            'hidden' : !mobile.mobilePanelActiveId
+                                || mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                || ![<?= /* @noEscape */ implode(', ', $brandSubMenuItem['parent_ids']) ?>].includes(parseInt(mobile.mobilePanelActiveId)),
+                            'block' : mobile.mobilePanelActiveId
+                                && mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                && [<?= /* @noEscape */ implode(', ', $brandSubMenuItem['parent_ids']) ?>].includes(parseInt(mobile.mobilePanelActiveId))
+                    }">
+                        <?php if ($brandSubMenuItem['has_child']): ?>
+                            <div class="link text-gray flex items-center container w-full pt-4 pb-3.75 border-b
+                                cursor-pointer bg-white level-1"
+                                 data-id="<?= /* @noEscape */ $brandSubMenuItem['id'] ?>"
+                                 @click="mobile.openPanel(
+                                    '<?= /* @noEscape */ $brandSubMenuItem['id'] ?>',
+                                    '<?= /* @noEscape */ $brandSubMenuItem['name'] ?>'
+                                 )"
+                            >
+                                <?= $escaper->escapeHtml($brandSubMenuItem['name']) ?>
+                                <i class="absolute cursor-pointer right-0 top-0 icon-arrow-right p-5 md:pr-8
+                                    active:text-navy group-active:text-navy"></i>
+                            </div>
+                        <?php else: ?>
+                            <a class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white level-1"
+                               data-catalogue="true"
+                               href="<?= $escaper->escapeUrl($brandSubMenuItem['url']) ?>"
+                               title="<?= $escaper->escapeHtmlAttr($brandSubMenuItem['name']) ?>"
+                            >
+                                <?= $escaper->escapeHtml($brandSubMenuItem['name']) ?>
+                            </a>
+                        <?php endif; ?>
+                    </span>
+                    <?php if ($brandSubMenuItem['has_child']): ?>
+                        <div class="level-2"
+                             :class="{
+                                 'hidden' : mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                     || mobile.mobilePanelActiveId !== '<?= /* @noEscape */ $brandSubMenuItem['id'] ?>',
+                                 'block' : mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                     && mobile.mobilePanelActiveId === '<?= /* @noEscape */ $brandSubMenuItem['id'] ?>',
+                        }">
+                            <a :href="mobile.buildCategoryUrl(['<?= /** @noEscape */ $brandSubMenuItem['url_key'] ?>'])"
+                               data-catalogue="true"
+                               title="<?= $escaper->escapeHtmlAttr($brandSubMenuItem['name']) ?>"
+                               class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white"
+                            >
+                                <?= $escaper->escapeHtml(__('View All')) ?>
+                            </a>
+                            <?php foreach ($brandSubMenuItem['childData'] as $brandSubMenuChildItem): ?>
+                                <a :href="mobile.buildCategoryUrl(['<?= /** @noEscape */ $brandSubMenuItem['url_key'] ?>', '<?= /** @noEscape */ $brandSubMenuChildItem['url_key'] ?>'])"
+                                   data-catalogue="true"
+                                   title="<?= $escaper->escapeHtmlAttr($brandSubMenuChildItem['name']) ?>"
+                                   class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white"
+                                   :class="{
+                                            'hidden' : mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                                || ![<?= /* @noEscape */ implode(', ', $brandSubMenuChildItem['parent_ids']) ?>].includes(parseInt(mobile.openTree[0]?.id)),
+                                            'block' : mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $brandsCategoryId ?>'
+                                                && [<?= /* @noEscape */ implode(', ', $brandSubMenuChildItem['parent_ids']) ?>].includes(parseInt(mobile.openTree[0]?.id)),
+                                }">
+                                    <?= $escaper->escapeHtml($brandSubMenuChildItem['name']) ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+            <?php foreach ($categoryMenu as $menuItem): ?>
+                <div class="level-0 relative">
+                    <span class="flex items-center group"
+                          :class="{
+                            'hidden' : mobile.mobilePanelActiveId
+                                || !mobile.mobilePanelActiveRoot
+                                || mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $mainCategoryId ?>'
+                                || mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $menuItem['parent_id'] ?>',
+                            'block' : !mobile.mobilePanelActiveId
+                                && mobile.mobilePanelActiveRoot
+                                && mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $mainCategoryId ?>'
+                                && mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $menuItem['parent_id'] ?>'
+                        }">
+                        <?php if ($menuItem['has_child']): ?>
+                            <div class="relative link text-gray flex items-center container w-full pt-4 pb-3.75 border-b
+                                cursor-pointer bg-white level-0"
+                                 data-id="<?= $escaper->escapeHtmlAttr($menuItem['id']) ?>"
+                                 @click="mobile.openPanel('<?= /* @noEscape */ $menuItem['id'] ?>', '<?= /* @noEscape */ $menuItem['name'] ?>')"
+                            >
+                                <?= $escaper->escapeHtml($menuItem['name']) ?>
+                                <i class="absolute cursor-pointer right-0 top-0 icon-arrow-right p-5 md:pr-8
+                                    active:text-navy group-active:text-navy"></i>
+                            </div>
+                        <?php else: ?>
+                            <a class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white level-0"
+                               data-catalogue="true"
+                               href="<?= $escaper->escapeUrl($menuItem['url']) ?>"
+                               title="<?= $escaper->escapeHtmlAttr($menuItem['name']) ?>"
+                            >
+                                <?= $escaper->escapeHtml($menuItem['name']) ?>
+                            </a>
+                        <?php endif; ?>
+                    </span>
+                    <?php if (!empty($menuItem['childData'])): ?>
+                        <div class="level-1 relative">
+                            <span class="flex items-center"
+                                  :class="{
+                                    'hidden' : !mobile.mobilePanelActiveId
+                                        || mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $mainCategoryId ?>'
+                                        || mobile.mobilePanelActiveId !== '<?= /* @noEscape */ $menuItem['id'] ?>',
+                                    'block' : mobile.mobilePanelActiveId
+                                        && mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $mainCategoryId ?>'
+                                        && mobile.mobilePanelActiveId === '<?= /* @noEscape */ $menuItem['id'] ?>'
+                            }">
+                                <a href="<?= $escaper->escapeUrl($menuItem['url']) ?>"
+                                   data-catalogue="true"
+                                   title="<?= $escaper->escapeHtmlAttr($menuItem['name']) ?>"
+                                   class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white">
+                                    <?= $escaper->escapeHtml(__('View All')) ?>
+                                </a>
+                            </span>
+                        </div>
+                        <?php foreach ($menuItem['childData'] as $subMenuItem): ?>
+                            <div class="level-1 relative">
+                                <span class="flex items-center group"
+                                      :class="{
+                                        'hidden' : !mobile.mobilePanelActiveId
+                                            || mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $mainCategoryId ?>'
+                                            || mobile.mobilePanelActiveId !== '<?= /* @noEscape */ $subMenuItem['parent_id'] ?>',
+                                        'block' : mobile.mobilePanelActiveId
+                                            && mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $mainCategoryId ?>'
+                                            && mobile.mobilePanelActiveId === '<?= /* @noEscape */ $subMenuItem['parent_id'] ?>'
+                                    }">
+                                    <?php if ($subMenuItem['has_child']): ?>
+                                        <div class="link text-gray flex items-center container w-full pt-4 pb-3.75 border-b
+                                            cursor-pointer bg-white level-1"
+                                             data-id="<?= /* @noEscape */ $subMenuItem['id'] ?>"
+                                             @click="mobile.openPanel(
+                                                '<?= /* @noEscape */ $subMenuItem['id'] ?>',
+                                                '<?= /* @noEscape */ $subMenuItem['name'] ?>'
+                                             )">
+                                            <?= $escaper->escapeHtml($subMenuItem['name']) ?>
+                                            <i class="absolute cursor-pointer right-0 top-0 icon-arrow-right p-5 md:pr-8
+                                                active:text-navy group-active:text-navy"></i>
+                                        </div>
+                                    <?php else: ?>
+                                        <a class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white level-1"
+                                           data-catalogue="true"
+                                           href="<?= $escaper->escapeUrl($subMenuItem['url']) ?>"
+                                           title="<?= $escaper->escapeHtmlAttr($subMenuItem['name']) ?>">
+                                            <?= $escaper->escapeHtml($subMenuItem['name']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                </span>
+                                <?php if (!empty($subMenuItem['childData'])): ?>
+                                    <div class="level-2"
+                                         :class="{
+                                            'hidden' : mobile.mobilePanelActiveRoot !== '<?= /* @noEscape */ $mainCategoryId ?>'
+                                                || mobile.mobilePanelActiveId !== '<?= /* @noEscape */ $subMenuItem['id'] ?>',
+                                            'block' : mobile.mobilePanelActiveRoot === '<?= /* @noEscape */ $mainCategoryId ?>'
+                                                && mobile.mobilePanelActiveId === '<?= /* @noEscape */ $subMenuItem['id'] ?>',
+                                    }">
+                                        <a href="<?= $escaper->escapeUrl($subMenuItem['url']) ?>"
+                                           data-catalogue="true"
+                                           title="<?= $escaper->escapeHtmlAttr($subMenuItem['name']) ?>"
+                                           class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white"
+                                        >
+                                            <?= $escaper->escapeHtml(__('View All')) ?>
+                                        </a>
+                                        <?php foreach ($subMenuItem['childData'] as $subMenuChildItem): ?>
+                                            <a href="<?= $escaper->escapeUrl($subMenuChildItem['url']) ?>"
+                                               data-catalogue="true"
+                                               title="<?= $escaper->escapeHtmlAttr($subMenuChildItem['name']) ?>"
+                                               class="gray flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white"
+                                            >
+                                                <?= $escaper->escapeHtml($subMenuChildItem['name']) ?>
+                                            </a>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+            <?php if ($saleCategory = $cms->getCategory('sale')): ?>
+                <?php if ($saleCategory->getIsActive()): ?>
+                    <div class="level-0 relative">
+                        <span class="flex items-center"
+                              :class="mobile.mobilePanelActiveRoot == '<?= (int) $brandsCategoryId ?>'
+                                || mobile.mobilePanelActiveRoot == '<?= (int) $mainCategoryId ?>'
+                                && mobile.mobilePanelActiveId == null ? 'block' : 'hidden'"
+                        >
+                            <a class="text-blue flex items-center container w-full pt-4 pb-3.75 border-b cursor-pointer bg-white level-0"
+                               href="<?= $escaper->escapeUrl($saleCategory->getUrl()) ?>"
+                               title="<?= $escaper->escapeHtmlAttr(__('Sale')) ?>">
+                                <i class="icon-discount pr-2"></i>
+                                <span><?= $escaper->escapeHtml(__('Sale')) ?></span>
+                            </a>
+                        </span>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+        </nav>
+    </div>
+</div>

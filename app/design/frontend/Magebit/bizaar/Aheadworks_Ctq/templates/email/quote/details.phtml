@@ -1,0 +1,57 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ctq\Block\Email\Quote\Details as QuoteDetails;
+use Aheadworks\Ctq\ViewModel\Email\Quote\Details as QuoteDetailsViewModel;
+use Magento\Framework\Escaper;
+
+/** @var $block QuoteDetails */
+/** @var $viewModel QuoteDetailsViewModel */
+/** @var $escaper Escaper */
+
+$viewModel = $block->getViewModel();
+$quote = $block->getQuote();
+$store = $block->getStore();
+?>
+<?php if ($quote && $store): ?>
+    <?php $cart = $viewModel->getCart($quote); ?>
+    <?php if ($cart): ?>
+        <div class="aw-ctq__email-quote-details">
+            <div class="aw-ctq__quote-id">
+                <label><?= $escaper->escapeHtml(__('Quote #:')) ?></label>
+                <span><?= $escaper->escapeHtml($quote->getId()) ?></span>
+            </div>
+        </div>
+        <table class="aw-ctq__email-quote-items data table abs-table-striped">
+            <thead>
+            <tr>
+                <th class="col name"><?= $escaper->escapeHtml(__('Product Name')) ?></th>
+                <th class="col price"><?= $escaper->escapeHtml(__('Price')) ?></th>
+                <th class="col qty"><?= $escaper->escapeHtml(__('Qty')) ?></th>
+                <th class="col subtotal"><?= $escaper->escapeHtml(__('Subtotal')) ?></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($viewModel->getItemsToRender($cart) as $cartItem): ?>
+                <?= /* @noEscape */ $block->getItemHtml($cartItem, $viewModel->getItemType($cartItem)) ?>
+            <?php endforeach; ?>
+            </tbody>
+            <tfoot class="quote-totals">
+            <?= /* @noEscape */ $block->getTotalsHtml($cart) ?>
+            </tfoot>
+        </table>
+    <?php endif; ?>
+<?php endif; ?>

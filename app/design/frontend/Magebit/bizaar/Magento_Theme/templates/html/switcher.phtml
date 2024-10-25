@@ -1,0 +1,132 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Currency;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Hyva\Theme\ViewModel\StoreSwitcher;
+use Magebit\HyvaTheme\ViewModel\CurrencySymbol;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$storeSwitcher = $viewModels->require(StoreSwitcher::class);
+$currencySymbol = $viewModels->require(CurrencySymbol::class);
+$currency = $viewModels->require(Currency::class);
+$storeConfig = $viewModels->require(StoreConfig::class);
+$currentStore = $storeSwitcher->getStore();
+?>
+<script>
+    function initSwitcher() {
+        return {
+            stores: JSON.parse('<?= /** @noEscape */ json_encode($storeSwitcher->getRawStoresArray()) ?>'),
+            storeId: '<?= /** @noEscape */ $currentStore->getId() ?>',
+            groupId: '<?= /** @noEscape */ $storeSwitcher->getCurrentGroupId() ?>',
+            localeCode: '<?= /** @noEscape */ $storeConfig->getStoreConfig('general/locale/code') ?>',
+            currencyCode: '<?= /** @noEscape */ $currency->getCurrentCurrencyCode() ?>',
+            changeGroup(el) {
+                this.groupId = el.value;
+            },
+            get currentLocale() {
+                const storeArray = Object.values(this.stores[this.groupId]);     
+                const store = storeArray.find(store => store.locale === this.localeCode);                
+                return store ? store.name : 'En';
+            },
+            switchAction() {
+                const toStore = this.$refs.store.value;
+                const toCurrency = this.$refs.currency.value;
+
+                if (this.currencyCode != toCurrency) {
+                    fetch(BASE_URL + 'directory/currency/switch/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: new URLSearchParams({currency: toCurrency})
+                    }).then(response => {
+                        return window.location.replace(this.stores[this.groupId][toStore].redirect);
+                    });
+                } else {
+                    return window.location.replace(this.stores[this.groupId][toStore].redirect);
+                }
+
+                document.body.click();
+            },
+            switchcurrencyAction(switchcurrencyvalue) {
+                
+                const storeArray = Object.values(this.stores[this.groupId]);     
+                const store = storeArray.find(store => store.locale === this.localeCode);
+                const toStore = store.id;
+                const toCurrency = switchcurrencyvalue;
+                
+
+                if (this.currencyCode != toCurrency) {
+                    fetch(BASE_URL + 'directory/currency/switch/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: new URLSearchParams({currency: toCurrency})
+                    }).then(response => {
+                        return window.location.replace(this.stores[this.groupId][toStore].redirect);
+                    });
+                } else {
+                    return window.location.replace(this.stores[this.groupId][toStore].redirect);
+                }
+
+                document.body.click();
+            }
+        };
+    }
+</script>
+<div x-data="initSwitcher()">
+    <div class="currency-switcher-main flex">
+        <!-- <div class="switcher-box-lang cursor-pointer"  x-data="{ isActive: false }" x-ref="store" :class="{ 'active': isActive }">            
+            <div x-text="currentLocale" @click="isActive = !isActive" ></div>
+            <div class="form-select shadow bg-white absolute z-50 p-2 w-[70px] rounded-md rounded-t-none top-8 hidden" :class="{ 'block': isActive,
+                       'hidden': !isActive }">
+            <template x-for="{id, locale, name,redirect} in Object.values(stores[groupId])">
+                <div :value="id" :selected="(storeId == id || localeCode == locale) && 'selected'" >
+                    <a x-bind:href="redirect"><span class="font-medium text-black" x-text="name"></span></a>
+                </div>
+            </template>
+            </div>
+        </div> -->
+        <div class="switcher-box-store cursor-pointer" x-data="{ isActive: false }" :class="{ 'active': isActive }">
+            <div class="hidden lg:flex items-center gap-1" @click="isActive = !isActive">
+                <img src="<?php echo $block->getBaseUrl().'media/wysiwyg/currency-'.$currency->getCurrentCurrencyCode().'.svg' ?>" alt="">
+                <?= $currencySymbol->getCurrencySymbol($currency->getCurrentCurrencyCode()).''.$currency->getCurrentCurrencyCode(); ?>
+            </div>
+            <div class="form-select flex lg:shadow lg:bg-white lg:absolute lg:z-50 md-max:px-5 px-8 py-5 lg:p-2 lg:w-[100px] lg:rounded-md lg:rounded-t-none lg:top-8 border-0 lg:border" x-ref="currency" id="currencyField" 
+            :class="{ 'lg:block': isActive,
+                       'lg:hidden': !isActive }">
+            <?php foreach ($currency->getCurrencies() as $code => $name): ?>
+            <div class="store-value" value="<?= $escaper->escapeHtml($code) ?>">
+                <a href="#" @click="switchcurrencyAction('<?= $escaper->escapeHtml($code); ?>')" class="no-underline">
+                    <span class="font-medium text-black">
+                    <?= $escaper->escapeHtml($currencySymbol->getCurrencySymbol($code)).''.$escaper->escapeHtml($code)  ?>                            
+                    </span>
+                </a>
+            </div>
+                    <?php endforeach; ?>
+            </div>           
+            
+        </div>
+    </div>
+</div>

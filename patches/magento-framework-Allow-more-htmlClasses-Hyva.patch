@@ -1,0 +1,24 @@
+From 0eae94931dbaf4596db7dc55bf18d7f1ea7c2ae0 Mon Sep 17 00:00:00 2001
+From: Igors Kolcins <igors.kolcins@magebit.com>
+Date: Mon, 12 Feb 2024 12:10:37 +0200
+Subject: [PATCH] Hyva Allow more htmlClasses
+
+---
+ View/Layout/etc/elements.xsd | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git View/Layout/etc/elements.xsd View/Layout/etc/elements.xsd
+index e1bdfb8..d32faaf 100755
+--- View/Layout/etc/elements.xsd
++++ View/Layout/etc/elements.xsd
+@@ -119,7 +119,7 @@
+ 
+     <xs:simpleType name="htmlClassType">
+         <xs:restriction base="xs:string">
+-            <xs:pattern value="[a-zA-Z][a-zA-Z\d\-_:]*(\s[a-zA-Z][a-zA-Z\d\-_:]*)*"/>
++            <xs:pattern value="[a-zA-Z\d\-_/:.\[\]&amp;@()! ]*"/>
+         </xs:restriction>
+     </xs:simpleType>
+ 
+-- 
+2.25.1

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_TwoFa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_TwoFa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="twofa" translate="label" sortOrder="401">
+            <label>2FA</label>
+        </tab>
+        <section id="twofa" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>General</label>
+            <tab>twofa</tab>
+            <resource>Magebit_TwoFa::management</resource>
+            <group id="general" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enable" translate="label" type="select" sortOrder="1" showInDefault="1">
+                    <label>Enable 2FA</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="code" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Code Generation</label>
+                <depends>
+                    <field id="*/general/enable">1</field>
+                </depends>
+                <field id="length" translate="label" type="text" sortOrder="10" showInDefault="1">
+                    <label>Length of the code</label>
+                </field>
+                <field id="expiration" translate="label" type="text" sortOrder="10" showInDefault="1">
+                    <label>Expires in</label>
+                    <comment>Time in seconds</comment>
+                </field>
+                <field id="allow_letters" translate="label" type="select" sortOrder="1" showInDefault="1">
+                    <label>Allow letters</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Code will also use letters in it, i.e. 3XA45</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

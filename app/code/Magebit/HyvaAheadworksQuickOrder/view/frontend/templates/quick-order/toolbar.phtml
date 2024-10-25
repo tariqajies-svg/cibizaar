@@ -1,0 +1,366 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksQuickOrder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksQuickOrder
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+/* @var $block Template */
+/** @var Escaper $escaper */
+/** @var Config $viewModel */
+
+use Magebit\HyvaAheadworksQuickOrder\ViewModel\Config;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+$viewModel = $block->getData('view_model');
+$config = $viewModel->getConfig();
+$jsonData = json_decode($block->getJsLayout(), true);
+$tabData = $jsonData['components']['aw_quick_order_toolbar']['children'];
+$singleSkuTab = $tabData['individual_sku_tab']['children']['single-sku'];
+$importSkuTab = $tabData['import_sku_tab']['children']['import-sku'];
+$multipleSkuTab = $tabData['multiple_sku_tab']['children']['multiple-sku'];
+$addToListUrl = $jsonData['components']['aw_quick_order_config']['addToListUrl'];
+?>
+<script>
+    function initSingleSkuForm() {
+        return {
+            searchResults: [],
+            showSearch: false,
+            isQtyFieldVisible: <?= $escaper->escapeJs(json_encode($config['isQtyInputDisplayed'])) ?>,
+            isAddToListButtonDisplayed: <?= $escaper->escapeJs(json_encode($config['isAddToListButtonDisplayed'])) ?>,
+            formData: {
+                product_sku: '',
+                product_qty: 1
+            },
+            search(value) {
+                const formKey = hyva.getFormKey();
+                let request_data = 'q=' + value;
+                request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                fetch('<?= $escaper->escapeUrl($singleSkuTab['searchUrl']) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: request_data
+                }).then((response) => response.json())
+                    .then(json => {
+                        this.searchResults = json;
+                        this.showSearch = true;
+                });
+            },
+            addToList() {
+                const formKey = hyva.getFormKey();
+                let request_data = '';
+                for (const key in this.formData) {
+                    if (request_data) {
+                        request_data += '&';
+                    }
+
+                    request_data += key + '=' + encodeURIComponent(this.formData[key]);
+                }
+
+                request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                fetch('<?= $escaper->escapeUrl($singleSkuTab['addToListUrl']) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: request_data
+                }).then((response) => {
+                    window.dispatchEvent(new CustomEvent('qo-get-items'))
+                    return response.json();
+                }).then(json => {
+                    this.formData.product_sku = '';
+                    this.showSearch = false;
+                    if (json.is_editable) {
+                        window.dispatchEvent(new CustomEvent('qo-configure-item', {detail: {
+                                item_key: json.last_added_item_key
+                            }}));
+                    }
+                    if (json.messages && json.messages.length) {
+                        dispatchMessages(json.messages, 2000);
+                    }
+                })
+            },
+            selectSearchResult(sku) {
+                this.formData.product_sku = sku;
+                this.showSearch = false;
+
+                if (!this.isAddToListButtonDisplayed) {
+                    this.addToList();
+                }
+            }
+        }
+    }
+
+    function initMultiSkuForm() {
+        return {
+            formData: {
+                sku_list: ''
+            },
+            addToList() {
+                const formKey = hyva.getFormKey();
+                let request_data = '';
+                for (const key in this.formData) {
+                    if (request_data) {
+                        request_data += '&';
+                    }
+
+                    request_data += key + '=' + encodeURIComponent(this.formData[key]);
+                }
+
+                request_data += '&formKey=' + encodeURIComponent(formKey);
+                fetch('<?= $escaper->escapeUrl($multipleSkuTab['addToListUrl']) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: request_data
+                }).then((response) => {
+                    window.dispatchEvent(new CustomEvent('qo-get-items'));
+                    return response.json();
+                }).then(json => {
+                    this.formData.sku_list = '';
+                    if (json.messages && json.messages.length) {
+                        dispatchMessages(json.messages, 2000);
+                    }
+                })
+            }
+        }
+    }
+
+    function initImportSkuForm() {
+        return {
+            formData: {
+                csvFile: ''
+            },
+            addToList() {
+
+                const formKey = hyva.getFormKey();
+                const formData = new FormData();
+                formData.append('csv-file', this.formData.csvFile[0]);
+                formData.append('formKey', encodeURIComponent(formKey));
+
+                let request_data = 'csv-file=' + encodeURIComponent(this.formData.csvFile[0]);
+                request_data += '&formKey=' + encodeURIComponent(formKey);
+                fetch('<?= $escaper->escapeUrl($importSkuTab['addToListUrl']) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                }).then((response) => {
+                    window.dispatchEvent(new CustomEvent('qo-get-items'));
+                    return response.json();
+                }).then(json => {
+                    this.formData.csvFile = undefined;
+                    if (json.error) {
+                        dispatchMessages([
+                            {
+                                type: 'error',
+                                text: json.error
+                            }
+                        ], 2000);
+                    }
+                    if (json.messages && json.messages.length) {
+                        dispatchMessages(json.messages, 2000);
+                    }
+                })
+            }
+        }
+    }
+</script>
+<div>
+    <div class="flex items-start justify-between md:flex-row flex-col" x-data="{tab: 'single-sku'}">
+        <ul class="toolbar-nav-items md:order-2">
+            <li class="nav-item underline" :class="{'font-bold': tab === 'single-sku'}">
+                <a @click.prevent="tab = 'single-sku'" href="#individual_sku">
+                    <?= $escaper->escapeHtml(__('Enter Individual SKU')) ?>
+                </a>
+            </li>
+            <li class="nav-item underline" :class="{'font-bold': tab === 'multiple-sku'}">
+                <a @click.prevent="tab = 'multiple-sku'" href="#multiple_sku">
+                    <?= $escaper->escapeHtml(__('Enter Multiple SKUs')) ?>
+                </a>
+            </li>
+            <li class="nav-item underline" :class="{'font-bold': tab === 'import-sku'}">
+                <a @click.prevent="tab = 'import-sku'" href="#import_sku">
+                    <?= $escaper->escapeHtml(__('Import SKUs')) ?>
+                </a>
+            </li>
+        </ul>
+        <div class="toolbar-content-items md:order-1 md:w-[65%]">
+            <!-- Tab Contents-->
+            <div x-show="tab === 'single-sku'">
+                <!-- Single SKU-->
+                <form
+                    id="single-sku-form"
+                    class="form flex items-baseline"
+                    x-data="initSingleSkuForm()"
+                    @submit.prevent="addToList()">
+                    <fieldset class="fieldset">
+                        <div class="field text required inline-block single-search relative" :class="isQtyFieldVisible ? 'w-[80%]' : ' w-full'">
+                            <label for="single-search-input" class="label">
+                                <span class="font-bold">
+                                    <?= $escaper->escapeHtml(__('Enter Individual SKU or Product Name')) ?>
+                                </span>
+                            </label>
+                            <div class="control">
+                                <input type="text"
+                                       name="single-product"
+                                       id="single-search-input"
+                                       class="input-text w-full"
+                                       @value="formData.product_sku"
+                                       @input.debounce="search($event.target.value)"
+                                       title="<?= $escaper->escapeHtmlAttr(__('Enter Individual SKU or Product Name')) ?>"
+                                       x-model="formData.product_sku"
+                                       required
+                                />
+                            </div>
+                            <ul x-show="showSearch" class="absolute w-full border border-solid shadow">
+                                <template x-for="searchResult of searchResults">
+                                    <li class="ui-menu-item flex bg-white hover_bg-grey cursor-pointer">
+                                        <button type="button" class="flex bg-white hover_bg-grey" class="menu-item-link" @click="selectSearchResult(searchResult.sku)">
+                                            <div class="column image">
+                                                <img :src="searchResult.url">
+                                            </div>
+                                            <div class="column description">
+                                                <a class="name" x-html="searchResult.name"></a>
+                                                <span class="sku" x-html="searchResult.sku"></span>
+                                            </div>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                        <div class="field number single-qty inline-block w-[10%]" x-show="isQtyFieldVisible">
+                            <label for="single-qty-input" class="label">
+                                <span class="font-bold"><?= $escaper->escapeHtml(__('Qty')) ?></span>
+                            </label>
+                            <div class="control">
+                                <input type="number"
+                                       name="single-qty"
+                                       id="single-qty-input"
+                                       class="input-text w-full"
+                                       title="<?= $escaper->escapeHtmlAttr(__('Qty')) ?>"
+                                       x-model="formData.product_qty"
+                                />
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div x-show="isAddToListButtonDisplayed">
+                        <div class="primary">
+                            <button
+                                id="single-add-to-list"
+                                class="btn btn-primary"
+                                type="submit"
+                            >
+                                <span>
+                                    <?= $escaper->escapeHtml(__('Add to List')) ?>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div x-show="tab === 'multiple-sku'">
+                <form
+                    id="multiple-sku-form" class="form flex items-end gap-4"
+                    x-data="initMultiSkuForm()"
+                    @submit.prevent="addToList()">
+                    <fieldset class="fieldset w-[60%]">
+                        <div class="field text required sku-list-input">
+                            <label for="multiple-sku-input" class="label">
+                            <span class="font-bold">
+                                    <?= $escaper->escapeHtml(__('Enter Multiple SKUs')) ?>
+                            </span>
+                            </label>
+                            <div class="control">
+                                <textarea
+                                    id="multiple-sku-input"
+                                    class="input-text w-full"
+                                    cols="15"
+                                    rows="3"
+                                    x-model="formData.sku_list"></textarea>
+                                <p class="notice text-sm">
+                                    <?= $escaper->escapeHtml(__('Each SKU must be on a new line')) ?>
+                                </p>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div>
+                        <div class="primary">
+                            <button id="multiple-add-to-list"
+                                    class="btn btn-primary"
+                                    type="submit">
+                            <span>
+                                 <?= $escaper->escapeHtml(__('Add to List')) ?>
+                            </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div x-show="tab === 'import-sku'">
+                <form
+                    id="import-sku-form"
+                    class="form flex items-end gap-4"
+                    enctype="multipart/form-data"
+                    method="post"
+                    x-data="initImportSkuForm()"
+                    @submit.prevent="addToList()"
+                >
+                    <fieldset class="fieldset">
+                        <div class="import-notice">
+                            <span class="title font-bold">
+                                <?= $escaper->escapeHtml(__('Import Multiple SKUs from File')) ?>
+                            </span>
+                            <div class="description text-sm">
+                                <?= $escaper->escapeHtml(__('File must be in .csv format and include "SKU" and "QTY" columns')) ?>
+                                <a class="action download-sample underline"
+                                    href="<?= $escaper->escapeHtmlAttr($importSkuTab['downloadSampleFileUrl']) ?>">
+                                    <?= $escaper->escapeHtml(__('Download Sample')) ?>
+                                </a>
+                            </div>
+                        </div>
+                        <input type="file"
+                               required
+                               name="csv-file"
+                               id="file-csv"
+                               accept=".csv"
+                               class="mt-4"
+                               x-on:change="formData.csvFile = Object.values($event.target.files)"
+                        >
+                    </fieldset>
+                    <div>
+                        <div class="primary">
+                            <button id="import-add-to-list"
+                                    class="btn btn-primary"
+                                    type="submit">
+                            <span>
+                                <?= $escaper->escapeHtml(__('Add to List')) ?>
+                            </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>

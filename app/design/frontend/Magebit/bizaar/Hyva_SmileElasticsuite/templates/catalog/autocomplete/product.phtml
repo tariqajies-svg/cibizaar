@@ -1,0 +1,32 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+?>
+<template x-if="searchResult.type == 'product'">
+    <a class="relative w-full block group no-underline text-sm" :href="searchResult.url" :title="searchResult.title">
+        <div class="flex space-x-4 lg:space-x-6">
+            <div class="w-[89px] h-[89px] rounded border border-[#d4d4d4] overflow-hidden p-1.5">
+                <img :src="searchResult.image" class="inline-block" />
+            </div>
+            <div class="flex-1 space-y-1">
+                <span class="link text-gray font-normal
+                        group-active:underline group-hover:text-inherit group-active:text-inherit lg:group-hover:underline mb-5"
+                    x-text="searchResult.title">
+                </span>
+                <!-- <span class="text-sm font-bold search-result-price" x-html="searchResult.price"></span> -->
+            </div>
+        </div>
+    </a>
+</template>

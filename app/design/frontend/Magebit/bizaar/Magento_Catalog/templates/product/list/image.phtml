@@ -1,0 +1,52 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magebit\Catalog\ViewModel\CategoryListImageScr;
+use Magento\Catalog\Block\Product\Image;
+use Magento\Framework\Escaper;
+
+/** @var Image $block */
+/** @var Escaper $escaper */
+$isPreload = $block->getData('is_preload');
+
+/** @var CategoryListImageScr $imageSrc */
+$imageSrc = $block->getImageSrc();
+?>
+<?php if ($imageSrc && count($imageSrc->getSources()) && $isPreload): ?>
+    <link rel="preload" as="image" fetchpriority="high"
+          imagesrcset="<?= /** @noEscape */ $imageSrc->getSrcSet() ?>"
+          imagesizes="<?= /** @noEscape */  $imageSrc->getSizes() ?>"
+    >
+<?php endif; ?>
+<img class="object-contain w-full max-h-[192px] <?= $escaper->escapeHtmlAttr($block->getClass()) ?>"
+     x-data=""
+     @update-gallery-<?= (int)$block->getProductId() ?>.window="$el.src = $event.detail"
+    <?php foreach ($block->getCustomAttributes() as $name => $value): ?>
+        <?= $escaper->escapeHtmlAttr($name) ?>="<?= $escaper->escapeHtmlAttr($value) ?>"
+    <?php endforeach; ?>
+    <?php if (!$isPreload): ?>
+        loading="lazy"
+    <?php endif; ?>
+    width="<?= $escaper->escapeHtmlAttr($block->getWidth()) ?>"
+    height="<?= $escaper->escapeHtmlAttr($block->getHeight()) ?>"
+    alt="<?= $escaper->escapeHtmlAttr($block->getLabel()) ?>"
+    title="<?= $escaper->escapeHtmlAttr($block->getLabel()) ?>"
+    src="<?= $escaper->escapeUrl($block->getImageUrl()) ?>"
+    <?php if ($imageSrc && count($imageSrc->getSources())): ?>
+        srcset="<?= /** @noEscape */ $imageSrc->getSrcSet() ?>"
+        sizes="<?= /** @noEscape */ $imageSrc->getSizes() ?>"
+    <?php endif; ?>
+/>

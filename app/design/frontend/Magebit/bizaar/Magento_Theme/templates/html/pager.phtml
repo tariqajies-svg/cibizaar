@@ -1,0 +1,144 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Theme\Block\Html\Pager;
+use Magebit\HyvaAheadworksCtq\Rewrite\Aheadworks\Ctq\Block\Html\Pager as AheadworksCtqPager;
+
+/** @var Pager|AheadworksCtqPager $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$totalSize = 0;
+if ($block->getCollection()) {
+    $totalSize = $block->getCollection()->getSize();
+} elseif ($block->getSearchResults()) {
+    $totalSize = $block->getSearchResults()->getTotalCount();
+}
+?>
+<?php if ($totalSize): ?>
+
+    <?php if ($block->getUseContainer()): ?>
+        <div class="pager">
+    <?php endif ?>
+
+    <?php if ($block->getShowAmounts()): ?>
+        <p class="toolbar-amount">
+            <span class="toolbar-number">
+            <?php if ($block->getLastPageNum() > 1): ?>
+                <?= /** @noEscape */ __(
+                    'Items %1 to %2 of %3 total',
+                    '<span class="text-navy">' . $block->getFirstNum() . '</span>',
+                    '<span class="text-navy">' . $block->getLastNum() . '</span>',
+                    '<span class="text-navy">' . $block->getTotalNum() . '</span>'
+                ) ?>
+            <?php elseif ($block->getTotalNum() == 1): ?>
+                <?= $escaper->escapeHtml(__('%1 Item', $block->getTotalNum())) ?>
+            <?php else: ?>
+                <?= $escaper->escapeHtml(__('%1 Items', $block->getTotalNum())) ?>
+            <?php endif; ?>
+            </span>
+        </p>
+    <?php endif ?>
+
+    <div class="pages-wrapper">
+        <?php if ($block->getLastPageNum() > 1): ?>
+            <nav class="pages" aria-label="pagination">
+                <ol class="pages-items clear">
+                    <li class="item pages-item-previous">
+                        <?php if (!$block->isFirstPage()): ?>
+                            <a href="<?= $escaper->escapeUrl($block->getPreviousPageUrl()) ?>" class="previous action btn btn-secondary btn-sq text-[#4B40F6]">
+                                <i class="icon-arrow-left" aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>"></i>
+                            </a>
+                        <?php else: ?>
+                            <span class="previous btn btn-secondary btn-sq" aria-disabled="true">
+                                <i class="icon-arrow-left" aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>"></i>
+                            </span>
+                        <?php endif; ?>
+                    </li>
+
+                    <?php foreach ($block->getFramePages() as $page): ?>
+                        <?php if ($block->isPageCurrent($page)): ?>
+                            <li
+                                class="item"
+                                aria-label="<?= $escaper->escapeHtml(__('Page') . ' ' . $page) ?>"
+                            >
+                                <a href="<?= $escaper->escapeUrl($block->getPageUrl($page)) ?>"
+                                    class="page btn btn-primary btn-sq pointer-events-none bg-[#4B40F6]"
+                                    aria-current="page"
+                                >
+                                    <span class="sr-only label">
+                                        <?= $escaper->escapeHtml(
+                                            __('You\'re currently reading page')
+                                        ) ?>
+                                    </span>
+                                    <span><?= $escaper->escapeHtml($page) ?></span>
+                                </a>
+                            </li>
+                        <?php else: ?>
+                            <li
+                                class="item"
+                                aria-label="<?= $escaper->escapeHtml(__('Page') . ' ' . $page) ?>"
+                            >
+                                <a href="<?= $escaper->escapeUrl($block->getPageUrl($page)) ?>"
+                                    class="page btn btn-secondary btn-sq text-[#4B40F6]"
+                                >
+                                    <span class="sr-only label"><?= $escaper->escapeHtml(__('Page')) ?></span>
+                                    <span><?= $escaper->escapeHtml($page) ?></span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+
+                    <li class="item pages-item-next">
+                        <?php if (!$block->isLastPage()): ?>
+                            <a href="<?= $escaper->escapeUrl($block->getNextPageUrl()) ?>" class="next action btn btn-secondary btn-sq text-[#4B40F6]">
+                                    <i class="icon-arrow-right" aria-label="<?= $escaper->escapeHtml(__('Next')) ?>"></i>
+                            </a>
+                        <?php else: ?>
+                            <span class="next btn btn-secondary btn-sq text-gray" aria-disabled="true">
+                                <i class="icon-arrow-right" aria-label="<?= $escaper->escapeHtml(__('Next')) ?>"></i>
+                            </span>
+                        <?php endif; ?>
+                    </li>
+                </ol>
+            </nav>
+        <?php endif; ?>
+    </div>
+
+    <?php if ($block->isShowPerPage()): ?>
+        <div class="field limiter">
+            <label class="inline-label" for="limiter">
+                <span><?= $escaper->escapeHtml(__('Show')) ?>:</span>
+            </label>
+            <select id="limiter" class="form-select form-select-sm limiter-options w-fit" onchange="location.href = this.value">
+                <?php foreach ($block->getAvailableLimit() as $key => $limit): ?>
+                    <option value="<?= $escaper->escapeUrl($block->getLimitUrl($key)) ?>"
+                        <?php if ($block->isLimitCurrent($key)): ?>
+                            selected="selected"
+                        <?php endif ?>>
+                        <?= $escaper->escapeHtml($limit) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <span class="sr-only limiter-text"><?= $escaper->escapeHtml(__('per page')) ?></span>
+        </div>
+    <?php endif ?>
+
+    <?php if ($block->getUseContainer()): ?>
+        </div>
+    <?php endif ?>
+
+<?php endif ?>

@@ -1,0 +1,130 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductStockItem;
+use Magebit\HyvaTheme\Block\Product\Listing\ProductQuantity;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+
+/** @var ProductQuantity $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Product $product */
+$product = $block->getProduct();
+
+if (!$product) {
+    return '';
+}
+
+/** @var ProductStockItem $stockItemViewModel */
+$stockItemViewModel = $viewModels->require(ProductStockItem::class);
+$minSalesQty        = $stockItemViewModel->getMinSaleQty($product);
+$maxSalesQty        = $stockItemViewModel->getMaxSaleQty($product);
+
+$maxSalesQtyLength  = ($maxSalesQty ? strlen((string) $maxSalesQty) : 4)
+    + (/* add one if decimal for separator */
+    (int) $stockItemViewModel->isQtyDecimal($product));
+
+$step = $stockItemViewModel->getQtyIncrements($product) ?: null;
+$defaultQty = $block->getProductDefaultQty() * 1;
+$maxSalesQtyWithStep = $maxSalesQty;
+
+if ($step && $step !== 1) {
+    if (fmod($defaultQty, $step) !== 0.0) {
+        $defaultQtyWithStep = $step;
+        while ($defaultQtyWithStep < $defaultQty) {
+            $defaultQtyWithStep += $step;
+        }
+        $defaultQty = $defaultQtyWithStep;
+    }
+
+    if (fmod($maxSalesQty, $step) !== 0) {
+        $maxSalesQtyWithStep = $step;
+        while ($maxSalesQtyWithStep <= $maxSalesQty) {
+            $maxSalesQtyWithStep += $step;
+        }
+        $maxSalesQtyWithStep = round($maxSalesQtyWithStep, 1);
+        if ($maxSalesQtyWithStep > $maxSalesQty) {
+            // One step less than maximum
+            $maxSalesQtyWithStep -= $step;
+        }
+    }
+}
+?><?php if ($product->isSaleable()): ?>
+<?php if ($block->shouldRenderQuantity()): ?>
+    <div x-data="window.bizaar.initProductListQtyField(
+        {
+            qty: <?=  /** @noEscape */ (int) $defaultQty ?>,
+            productId: <?= /** @noEscape */ (int) $product->getId() ?>,
+            isQtyDecimal: <?= /** @noEscape */ $stockItemViewModel->isQtyDecimal($product) ? 'true' : 'false'?>,
+            maxSalesQtyLength: <?= /** @noEscape */ (int) $maxSalesQtyLength ?>
+        })"
+        class="product-qty flex relative">
+            <label for="qty[<?= (int)$product->getId() ?>]"
+                class="sr-only"
+            >
+                <?= $escaper->escapeHtml(__('Quantity')) ?>
+            </label>
+            <div class="flex flex-1 relative justify-center">
+                <input name="qty"
+                       id="qty[<?= (int)$product->getId() ?>]"
+                       x-ref="qty-<?= (int)$product->getId() ?>"
+                       form="product_addtocart_form<?= (int)$product->getId() ?>"
+                       <?php if ($stockItemViewModel->isQtyDecimal($product)): ?>
+                           type="text"
+                           pattern="[0-9]{0,<?= /** @noEscape */ $maxSalesQtyLength ?>}(\.*[0-9])"
+                           inputmode="decimal"
+                       <?php else: ?>
+                           type="number"
+                           pattern="[0-9]{0,<?= /** @noEscape */ $maxSalesQtyLength ?>}"
+                           inputmode="numeric"
+                       <?php endif; ?>
+                       <?php if ($minSalesQty): ?>min="<?= /** @noEscape */ $defaultQty ?>"<?php endif; ?>
+                       <?php if ($maxSalesQty): ?>max="<?= /** @noEscape */ $maxSalesQtyWithStep ?>"<?php endif; ?>
+                       <?php if ($step): ?>step="<?= /** @noEscape */ $step ?>"<?php endif; ?>
+                       class="form-input form-input-sm px-13 w-full text-center invalid:border-error"
+                       x-model.number="qty"
+                       @change="$dispatch('update-qty-<?= (int)$product->getId() ?>', qty)"
+                />
+            </div>
+            <button type="button"
+                    class="btn btn-secondary btn-sq !border-0 !w-10.5 !h-10.5 rounded-r-none text-gray absolute top-0.25 left-0.25
+                        before:block before:absolute before:w-2.5 before:h-0.5 before:bg-currentColor"
+                    :disabled="qty == <?= /** @noEscape */ $defaultQty ?: 1 ?>"
+                    <?php if ($stockItemViewModel->isQtyDecimal($product)): ?>
+                        @click.prevent="updateQty(parseFloat(qty) - parseFloat(<?= /** @noEscape */ $step ?: 1 ?>), $dispatch)"
+                    <?php else: ?>
+                        @click.prevent="updateQty(qty - <?= /** @noEscape */ $step ?: 1 ?>, $dispatch)"
+                    <?php endif; ?>
+            >
+            </button>
+            <button type="button"
+                    class="btn btn-secondary btn-sq !border-0 !w-10.5 !h-10.5 rounded-l-none text-gray absolute top-0.25 right-0.25
+                        before:block before:absolute before:w-2.5 before:h-0.5 before:bg-currentColor
+                        after:block after:absolute after:w-2.5 after:h-0.5 after:bg-currentColor after:rotate-90"
+                    :disabled="qty == <?= /** @noEscape */ $maxSalesQtyWithStep ?: 1 ?>"
+                    <?php if ($stockItemViewModel->isQtyDecimal($product)): ?>
+                        @click.prevent="updateQty(parseFloat(qty) + parseFloat(<?= /** @noEscape */ $step ?: 1 ?>), $dispatch)"
+                    <?php else: ?>
+                        @click.prevent="updateQty(qty + <?= /** @noEscape */ $step ?: 1 ?>, $dispatch)"
+                    <?php endif; ?>
+            >
+            </button>
+    </div>
+<?php endif; ?>
+<?php endif; ?>

@@ -1,0 +1,83 @@
+<?php
+/**
+ * This file is part of the Magebit_Catalog package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\Catalog\Block\Category\Widget\Menu;
+use Magebit\CategoryImageCache\ViewModel\CategoryImageResizer;
+use CtiDigital\Configurator\ViewModel\Cms;
+use Magento\Framework\Escaper;
+
+/** @var Menu $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$categoryImageResizer = $viewModels->require(CategoryImageResizer::class);
+$categoryHelper = $viewModels->require(Cms::class);
+
+$categories = $block->getCategoryList();
+$block->setData('cache_tags', $block->getIdentities());
+$iterator = 0;
+?>
+<div class="category-menu widget">
+    <?php if ($heading = $block->getHeading()): ?>
+        <h2><?= $escaper->escapeHtml($heading) ?></h2>
+    <?php endif; ?>
+    <?php if ($description = $block->getDescription()): ?>
+        <p class="mt-1"><?= $escaper->escapeHtml($description) ?></p>
+    <?php endif; ?>
+    <div class="menu-items grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 mt-5 gap-px lg:mt-8">
+    <?php foreach ($categories as $category): ?>
+        <?php $iterator++ ?>
+        <div x-data=""
+             class="menu-item brand"
+             @mouseenter="hyva.addHover($el)"
+             @mouseleave="hyva.removeHover($el)">
+            <a href="<?= $escaper->escapeUrl($category->getUrl()) ?>"
+               class="no-underline flex justify-center items-center p-2.75 lg:p-5.75 pb-3 lg:pb-6">
+                <?php if ($category->getImage()): ?>
+                    <picture>
+                        <source media="(min-width: 1024px)"
+                                srcset="<?= $escaper->escapeUrl($categoryImageResizer->resize($category, null, '36')) ?> 1x,
+                                    <?= $escaper->escapeUrl($categoryImageResizer->resize($category, null, '72')) ?> 2x">
+                        <source media="(max-width: 1023px)"
+                                srcset="<?= $escaper->escapeUrl($categoryImageResizer->resize($category, null, '32')) ?> 1x,
+                                    <?= $escaper->escapeUrl($categoryImageResizer->resize($category, null, '64')) ?> 2x">
+                        <img class="h-8 lg:h-9 w-auto"
+                             src="<?= $escaper->escapeUrl($categoryImageResizer->resize($category, null, '36')) ?>"
+                             alt="<?= $escaper->escapeHtmlAttr($category->getName()) ?>"
+                             loading="lazy"
+                             height="36"
+                             width="163">
+                    </picture>
+                <?php endif; ?>
+            </a>
+        </div>
+    <?php endforeach; ?>
+    <?php if ($mainCategory = $categoryHelper->getCategory('brands')): ?>
+        <div x-data=""
+             class="menu-item brand bg-gray-f2
+                <?= $iterator % 2 == 0 ? 'col-span-2 rounded-bl sm:rounded-bl-none sm:col-span-1' : '' ?>"
+             @mouseenter="hyva.addHover($el)"
+             @mouseleave="hyva.removeHover($el)">
+            <a href="<?= $escaper->escapeUrl($mainCategory->getUrl()) ?>"
+               class="no-underline flex items-center justify-center items-center p-2.75 lg:p-5.75 pb-3 lg:pb-6">
+                <span class="text-center leading-6">
+                    <span><?= $escaper->escapeHtml(__('View all brands')) ?></span>
+                    <i class="align-text-bottom icon-arrow-right text-blue mb-0.5"></i>
+                </span>
+            </a>
+        </div>
+    <?php endif; ?>
+    </div>
+</div>

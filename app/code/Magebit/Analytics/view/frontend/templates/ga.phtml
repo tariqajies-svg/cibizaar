@@ -1,0 +1,150 @@
+<?php
+/**
+ * This file is part of the Magebit_Analytics package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Dunkin
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+
+/** @var $block \Magebit\Analytics\Block\Ga */
+
+/** @var \Magento\Framework\Escaper $escaper */
+
+$analyticsData = $block->getAnalyticsData();
+?>
+
+<?php
+if ($analyticsData): ?>
+    <script>
+        window.analyticsData = <?= /* @noEscape */ $analyticsData ?>;
+        let config = window.analyticsData;
+
+        function loadScript(scriptUrl) {
+            let script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.async = true;
+            script.src = scriptUrl;
+            document.head.appendChild(script);
+
+            return new Promise((res, rej) => {
+                script.onload = () => {
+                    res();
+                }
+                script.onerror = () => {
+                    rej();
+                }
+            })
+        }
+
+        const measurementId = config.pageTrackingData.measurementId;
+        const scriptUrl = 'https://www.googletagmanager.com/gtag/js?id=' + measurementId;
+
+        (events => {
+            const loadMyLibrary = () => {
+                events.forEach(type => window.removeEventListener(type, loadMyLibrary))
+                initialize();
+            };
+            events.forEach(type => window.addEventListener(type, loadMyLibrary, {once: true, passive: true}))
+        })(['touchstart', 'mouseover', 'wheel', 'scroll', 'keydown'])
+
+        const initialize = () =>
+        {
+            loadScript(scriptUrl)
+                .then(() => {
+                    window.dataLayer = window.dataLayer || [];
+
+                    function gtag() {
+                        dataLayer.push(arguments);
+                    }
+
+                    window.gtag = gtag;
+                    gtag('js', new Date());
+                    gtag('set', 'developer_id.dYjhlMD', true);
+                    gtag('config', measurementId, {'anonymize_ip': true});
+
+                    // Purchase Event
+                    if (config.ordersTrackingData.hasOwnProperty('currency')) {
+                        var purchaseObject = config.ordersTrackingData.orders[0];
+                        purchaseObject['items'] = config.ordersTrackingData.products;
+                        gtag('event', 'purchase', purchaseObject);
+                    }
+
+                    // Page-view Event
+                    gtag('event', 'page_view', {
+                        page_title: document.title,
+                        page_location: window.location.href,
+                        send_page_view: true
+                    });
+
+                    // PDP events goes here
+                    let isPDPView = document.querySelector('body').classList.contains('catalog-product-view');
+
+                    if (isPDPView) {
+                        let isLuma = config.is_luma;
+
+                        if (isLuma) {
+                            // Page-view Event
+                            gtag('event', 'view_item', {
+                                currency: config.current_currency,
+                                value: parseFloat(document.querySelector('meta[itemprop="price"]').content),
+                                items: [
+                                    {
+                                        item_id: document.querySelector('div[itemprop="sku"]').innerHTML,
+                                        item_name: document.querySelector('.page-title').innerText,
+                                    }
+                                ]
+                            });
+
+                            // Add to cart event
+                            document.querySelector('button.tocart').addEventListener('click', () => {
+                                gtag('event', 'add_to_cart', {
+                                    currency: config.current_currency,
+                                    value: parseFloat(document.querySelector('meta[itemprop="price"]').content),
+                                    items: [
+                                        {
+                                            item_id: document.querySelector('div[itemprop="sku"]').innerHTML,
+                                            item_name: document.querySelector('.page-title').innerText,
+                                        }
+                                    ]
+                                });
+                            })
+                        } else {
+                            // Page-view Event
+                            gtag('event', 'view_item', {
+                                currency: config.current_currency,
+                                value: parseFloat(document.querySelector('meta[property="product:price:amount"]').content),
+                                items: [
+                                    {
+                                        item_id: document.querySelector('#product-details .product-detail-value').innerText,
+                                        item_name: document.title,
+                                    }
+                                ]
+                            });
+
+                            document.querySelector('#product-addtocart-button').addEventListener('click', () => {
+                                gtag('event', 'add_to_cart', {
+                                    currency: config.current_currency,
+                                    value: parseFloat(document.querySelector('meta[property="product:price:amount"]').content),
+                                    items: [
+                                        {
+                                            item_id: document.querySelector('#product-details .product-detail-value').innerText,
+                                            item_name: document.title,
+                                        }
+                                    ]
+                                });
+                            })
+                        }
+                    }
+                })
+                .catch((e) => {
+                    console.log(e);
+                    console.log('Cannot load analytics');
+                })
+        }
+    </script>
+<?php endif; ?>

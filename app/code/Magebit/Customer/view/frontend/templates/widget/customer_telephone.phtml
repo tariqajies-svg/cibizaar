@@ -1,0 +1,79 @@
+<?php
+/**
+ * This file is part of the Magebit_Customer package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\Customer\Block\Widget\CustomerTelephone;
+use Magebit\Customer\ViewModel\Customer;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var CustomerTelephone $block */
+/** @var ViewModelRegistry $viewModels */
+
+$viewModel = $viewModels->require(Customer::class);
+$value = $block->getData(CustomerTelephone::ATTRIBUTE_CODE);
+if (!$value) {
+    $customer = $viewModel->getCurrentCustomer();
+    $value = $customer ? $customer->getExtensionAttributes()->getCustomerTelephone() : null;
+}
+$phoneRequired = $block->isRequired();
+
+?>
+<div x-data="window.bizaar.telephone({fullNumber: '<?= $escaper->escapeJs($value) ?>'})"
+     x-init="init()"
+     class="field field-reserved w-full field-phone !mb-5 lg:!mb-7 <?= $phoneRequired ? 'required' : '' ?>">
+    <label for="<?= /** @noEscape */ CustomerTelephone::ATTRIBUTE_CODE ?>" class="label">
+        <span>
+            <?= $escaper->escapeHtml(__('Phone Number')) ?>
+        </span>
+    </label>
+    <div class="control flex gap-2 relative">
+        <div>
+            <input
+                <?php if ($phoneRequired): ?>
+                    required
+                <?php endif; ?>
+                type="text"
+                autocomplete="off"
+                name="code"
+                @input="dropdownOpened = true"
+                x-model="phoneCode"
+                @click="dropdownOpened = true"
+                class="form-input w-[106px] phone-code-selector"
+                @click.away="dropdownOpened = false; validateCode()">
+            <template x-if="dropdownOpened">
+                <div class="absolute bg-white border overflow-y-auto max-h-[200px] z-10 mt-1 w-full shadow-lg">
+                    <template x-for="item of filteredOptions()">
+                        <div
+                            class="cursor-pointer py-0.25 px-2.75"
+                            @click="phoneCode = item.data.dial_code; dropdownOpened = false; generateFullNumber()"
+                            x-text="item.data.flag + ' ' + item.data.dial_code + ' ' + item.data.name"></div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <input type="tel"
+               name="phone"
+               id="<?= /** @noEscape */ CustomerTelephone::ATTRIBUTE_CODE ?>"
+            <?php if ($phoneRequired): ?>
+                required
+            <?php endif ?>
+               @input="generateFullNumber"
+               x-model="phoneNumber"
+               title="<?= $escaper->escapeHtmlAttr(__('Phone Number')) ?>"
+               class="form-input <?= $escaper->escapeHtmlAttr(
+                   $block->getAttributeValidationClass(CustomerTelephone::ATTRIBUTE_CODE)
+               ) ?>"
+        >
+        <input type="hidden" :value="fullNumber" name="<?= /** @noEscape */ CustomerTelephone::ATTRIBUTE_CODE ?>">
+    </div>
+</div>

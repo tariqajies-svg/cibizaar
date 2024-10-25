@@ -1,0 +1,81 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Checkout\Block\Onepage\Success;
+use Magento\Framework\Escaper;
+
+/** @var Success $block */
+/** @var Escaper $escaper */
+?>
+<div class="checkout-success">
+   
+
+    <?= $block->getAdditionalInfoHtml() ?>
+
+ 
+    <div class="flex items-center flex-col  justify-center mt-12"> 
+        <div class="text-center max-w-lg">
+            <div class="flex justify-center">
+            <svg width="179" height="159" viewBox="0 0 179 159" fill="none" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="89.5" cy="139" rx="89.5" ry="20" fill="#D9D9D9" fill-opacity="0.2"/>
+<path d="M143.047 83.6076V41.0623C143.048 40.6603 142.944 40.265 142.744 39.9165C142.543 39.568 142.254 39.2786 141.906 39.0776L86.586 7.1401C86.2392 6.93988 85.8458 6.83447 85.4453 6.83447C85.0449 6.83447 84.6515 6.93988 84.3047 7.1401L28.9844 39.0776C28.6363 39.2786 28.3474 39.568 28.1471 39.9165C27.9468 40.265 27.8422 40.6603 27.8438 41.0623V104.937C27.8422 105.339 27.9468 105.735 28.1471 106.083C28.3474 106.432 28.6363 106.721 28.9844 106.922L84.3047 138.859C84.6515 139.06 85.0449 139.165 85.4453 139.165C85.8458 139.165 86.2392 139.06 86.586 138.859L107.368 126.86C109.959 130.489 113.349 133.474 117.278 135.583C121.207 137.692 125.568 138.869 130.024 139.022C134.48 139.175 138.912 138.301 142.977 136.467C147.041 134.634 150.629 131.889 153.463 128.447C156.296 125.004 158.3 120.956 159.319 116.615C160.337 112.274 160.343 107.756 159.336 103.413C158.329 99.0689 156.336 95.0151 153.512 91.565C150.687 88.1149 147.106 85.361 143.047 83.5164V83.6076ZM85.4453 11.7482L136.203 41.0623L110.744 55.7535L63.6138 24.3635L85.4453 11.7482ZM85.4453 70.3764L34.6875 41.0623L59.211 26.8957L106.319 58.3085L85.4453 70.3764ZM101.984 110.07C101.99 114.535 103.028 118.939 105.018 122.936L87.7266 132.928V74.3229L108.258 62.392V80.1629C108.258 80.7679 108.498 81.3482 108.926 81.776C109.354 82.2038 109.934 82.4442 110.539 82.4442C111.144 82.4442 111.724 82.2038 112.152 81.776C112.58 81.3482 112.82 80.7679 112.82 80.1629V59.7685L138.37 45.0089V81.9879C135.954 81.3276 133.461 80.9901 130.956 80.9842C123.264 81.0203 115.898 84.1 110.47 89.5501C105.041 95.0002 101.99 102.378 101.984 110.07ZM145.328 100.945L129.588 121.91C129.382 122.184 129.117 122.409 128.813 122.566C128.509 122.724 128.173 122.812 127.831 122.822C127.501 122.822 127.176 122.751 126.877 122.613C126.577 122.475 126.311 122.274 126.097 122.024L116.813 111.119C116.422 110.657 116.232 110.058 116.283 109.455C116.335 108.851 116.623 108.293 117.086 107.903C117.549 107.513 118.148 107.322 118.751 107.374C119.354 107.425 119.913 107.714 120.303 108.177L127.717 116.891L141.906 98.2304C142.082 97.9773 142.307 97.7623 142.568 97.5985C142.829 97.4347 143.12 97.3254 143.424 97.2772C143.729 97.2291 144.039 97.243 144.338 97.3183C144.637 97.3935 144.917 97.5285 145.162 97.715C145.408 97.9016 145.612 98.1359 145.764 98.4038C145.917 98.6716 146.013 98.9675 146.048 99.2736C146.082 99.5797 146.055 99.8897 145.966 100.185C145.878 100.48 145.731 100.754 145.533 100.991L145.328 100.945Z" fill="#0165FF"/>
+</svg>
+
+            </div>
+            <div class="text-xl text-[#062B48] mb-2 mt-5"> Thank You FOR YOUR PURCHASE!</div>
+            <div class="text-sm text-black mb-8 text-black">Your order has been successfully placed.<br>We'll email you order confirmation with details.</div>
+
+            <!-- <div class="text-sm text-black mb-2 bg-slate-200">Your Order # IS: <b>015245161</b> -->
+        
+            <?php if ($block->getOrderId()): ?>
+        <?php if ($block->getCanViewOrder()): ?>
+            <div class="text-sm text-black mb-4">
+                    <span class="bg-slate-200 py-2.5 px-8 rounded set-id-bg">
+                        <?= $escaper->escapeHtml(
+                            __(
+                                'Your order # is: %1.',
+                                sprintf(
+                                    '<a href="%s" class="order-number"><strong class="text-black">%s</strong></a>', 
+                                    $escaper->escapeUrl($block->getViewOrderUrl()),
+                                    $block->getOrderId()
+                                )
+                            ),
+                            ['a', 'strong']
+                        ) ?>
+                    </span>
+                </div>
+        <?php  else: ?>
+            <p><?= $escaper->escapeHtml(__('Your order # is: <span class="text-black font-bold">%1</span>.', $block->getOrderId()), ['span']) ?></p>
+        <?php endif;?>
+        
+    <?php endif; ?> 
+        </div> 
+            <div class="text-sm text-black mb-8"> <?= $escaper->escapeHtml(__('Order Date:'))?>
+    <?= $escaper->escapeHtml(Date('d-m-Y')) ?></span></div>
+                    <div class="flex flex-col md:flex-row justify-center gap-x-5 mb-4">
+                        <div class="">
+                         
+                            <?= $block->getChildHtml('checkout.success.print.button'); ?>
+                        </div>
+
+
+                             
+        <a class="btn bg-[#4A40F6] text-base text-white font-bold  rounded-md  mb-4  hover:bg-[#0073ED]" href="<?= $escaper->escapeUrl($block->getContinueUrl()) ?>">
+            <span><?= $escaper->escapeHtml(__('Continue Shopping')) ?></span>
+        </a>             </div>
+         </div> 
+ </div>
+</div>

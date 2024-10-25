@@ -1,0 +1,73 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magefan\Blog\Block\Sidebar\Categories;
+use Magento\Framework\Escaper;
+
+/**
+ * Blog sidebar categories template
+ *
+ * @var Categories $block
+ * @var Escaper $escaper
+ */
+
+$items = $block->getGroupedChilds();
+
+if (count($items)): ?>
+    <div class="widget block block-categories relative p-5 bg-gray-f2 lg:px-8">
+        <div class="block-title mb-5 uppercase">
+            <h5><?= $escaper->escapeHtml(__('Categories')) ?></h5>
+        </div>
+
+        <ul class="accordion" id="accordion-2">
+        <?php
+            $level = 0;
+            $first = true;
+        foreach ($items as $item):
+            $newLevel = $item->getLevel();
+            if ($level == $newLevel && !$first):
+                echo '</li>';
+                endif;
+
+            if ($level < $newLevel):
+                echo '<ul>';
+                endif;
+
+            if ($level > $newLevel):
+                for ($i = $level; $i > $newLevel; $i--) {
+                    echo '</ul></li>';
+                }
+                endif;
+            ?>
+                <li class="category m-0 pt-2">
+                    <a class="clear flex items-center leading-6 lg:leading-7 lg:hover:text-navy"
+                        title="<?= $escaper->escapeHtml($item->getTitle()) ?>"
+                        href="<?= $escaper->escapeUrl($item->getCategoryUrl()) ?>">
+                    <?= $escaper->escapeHtml($item->getTitle()) ?>
+                        <?php if ($block->showPostsCount()): ?>
+                            <span class="count inline-block text-xs text-gray font-extrabold leading-5 bg-gray-e6 rounded px-2 ml-2">
+                                <?= $escaper->escapeHtml($item->getPostsCount()) ?>
+                            </span>
+                        <?php endif; ?>
+                    </a>
+                <?php
+                    $level = $newLevel;
+                    $first = false;
+            endforeach;
+        ?>
+        </ul>
+    </div>
+<?php endif; ?>

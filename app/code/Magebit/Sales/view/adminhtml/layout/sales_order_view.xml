@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Sales package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Sales
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="order_additional_info">
+            <block
+                class="Magebit\Sales\Block\CreditLimit\Adminhtml\Order\View\View\CreditLimit"
+                name="credit_limit"
+                template="order/view/view/order_credit_limit.phtml"
+            />
+        </referenceBlock>
+        <referenceContainer name="order_additional_info">
+            <block class="Magebit\Sales\Block\Adminhtml\Order\View\PoNumber"
+                   name="payment_po_number"
+                   template="Magebit_Sales::order/view/po_number.phtml"
+                   before="-"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,59 @@
+form,
+fieldset {
+
+    /* Reserve space for single line form validation messages */
+    .field.field-reserved,
+    .field.field-preserved {
+        @apply mb-6 lg:mb-7;
+    }
+
+    .field.field-reserved ul:last-of-type,
+    .field.field-preserved ul:last-of-type {
+
+        /* The sum has to match the value set above for field.field-reserved */
+        @apply -mb-6 lg:-mb-7 py-1;
+    }
+
+    .field.field-reserved ul,
+    .field.field-preserved ul {
+        @apply text-sm;
+    }
+
+    label {
+        @apply mb-2 block text-secondary-darker;
+    }
+
+    .field.choice {
+        @apply flex items-center;
+    }
+
+    .field.choice input {
+        @apply mr-4;
+    }
+
+    .field.choice label {
+        @apply mb-0;
+    }
+
+    .field.field-error {
+        [data-validate] {
+            @apply border-error;
+        }
+
+        .messages {
+            @apply text-error;
+        }
+    }
+
+    legend {
+        @apply text-primary text-xl mb-7 lg:mb-8;
+    }
+
+    legend + br {
+        @apply hidden;
+    }
+}
+
+fieldset ~ fieldset {
+    @apply mt-8;
+}

@@ -1,0 +1,31 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magebit\MagefanBlog\Block\Post\PostList\Toolbar;
+use Magento\Framework\Escaper;
+
+/** @var Toolbar $block */
+/** @var Escaper $escaper */
+
+if ($block->getCollection()->getSize()):
+    $pagerHtml = trim($block->getPagerHtml());
+    if ($pagerHtml): ?>
+        <div class="pager grid gap-3.25 items-center grid-cols-4 grid-flow-row mb-5 sm:grid-cols-8 md:grid-cols-4 lg:mb-0 lg:grid-cols-8">
+            <?= /* @noEscape */ $block->fetchView($block->getTemplateFile('Magebit_MagefanBlog::post/list/toolbar/amount.phtml')) ?>
+            <?= /* @noEscape */ $pagerHtml ?>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>

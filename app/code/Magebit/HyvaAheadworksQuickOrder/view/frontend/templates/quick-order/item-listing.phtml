@@ -1,0 +1,200 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksQuickOrder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksQuickOrder
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+/** @var $block Wrapper*/
+/** @var Escaper $escaper */
+/** @var Config $viewModel */
+/** @var ViewModelRegistry $viewModels */
+/** @var HeroiconsOutline $heroicons */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magebit\HyvaAheadworksQuickOrder\ViewModel\Config;
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+
+$viewModel = $block->getData('view_model');
+$config =  $viewModel->getConfig();
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<div>
+    <div class="admin__data-grid-wrap">
+        <?= $block->getChildHtml('loading') ?>
+        <table class="data-grid data-grid-draggable table w-full mt-4" id="credit_limit_table">
+            <thead>
+                <tr class="table-row">
+                    <th class="cursor-pointer table-cell data-grid-th text-left border-container border-b pb-2 pt-2">
+                        <span><?= $escaper->escapeHtml(__('Product Image')) ?></span>
+                    </th>
+                    <th class="cursor-pointer table-cell data-grid-th text-left border-container border-b pb-2 pt-2" x-on:click="changeSorting('product_name')">
+                        <span class="inline-block"><?= $escaper->escapeHtml(__('Product Name')) ?></span>
+                        <?= $heroicons->chevronDownHtml(
+                            'inline-block transition-transform duration-300 ease-in-out transform rotate-180',
+                            16,
+                            16,
+                            [
+                                ":class" => "{ 'rotate-180': sorting.dir === 'DESC', 'rotate-0': sorting.dir === 'ASC' }",
+                                "x-show" => "sorting.field === 'product_name'"
+                            ]
+                        ); ?>
+                    </th>
+                    <th class="cursor-pointer table-cell data-grid-th text-left border-container border-b pb-2 pt-2" x-on:click="changeSorting('product_sku')">
+                        <span class="inline-block"><?= $escaper->escapeHtml(__('SKU')) ?></span>
+                        <?= $heroicons->chevronDownHtml(
+                            'inline-block transition-transform duration-300 ease-in-out transform rotate-180',
+                            16,
+                            16,
+                            [
+                                ":class" => "{ 'rotate-180': sorting.dir === 'DESC', 'rotate-0': sorting.dir === 'ASC' }",
+                                "x-show" => "sorting.field === 'product_sku'"
+                            ]
+                        ); ?>
+                    </th>
+                    <th class="cursor-pointer table-cell data-grid-th text-left border-container border-b pb-2 pt-2" x-on:click="changeSorting('product_qty')">
+                        <span class="inline-block"><?= $escaper->escapeHtml(__('Quantity')) ?></span>
+                        <?= $heroicons->chevronDownHtml(
+                            'inline-block transition-transform duration-300 ease-in-out transform rotate-180',
+                            16,
+                            16,
+                            [
+                                ":class" => "{ 'rotate-180': sorting.dir === 'DESC', 'rotate-0': sorting.dir === 'ASC' }",
+                                "x-show" => "sorting.field === 'product_qty'"
+                            ]
+                        ); ?>
+                    </th>
+                    <th  class="cursor-pointer table-cell data-grid-th text-left border-container border-b pb-2 pt-2" x-on:click="changeSorting('price')">
+                        <span class="inline-block"><?= $escaper->escapeHtml(__('Price')) ?></span>
+                        <?= $heroicons->chevronDownHtml(
+                            'inline-block transition-transform duration-300 ease-in-out transform rotate-180',
+                            16,
+                            16,
+                            [
+                                ":class" => "{ 'rotate-180': sorting.dir === 'DESC', 'rotate-0': sorting.dir === 'ASC' }",
+                                "x-show" => "sorting.field === 'price'"
+                            ]
+                        ); ?>
+                    </th>
+                    <th class="cursor-pointer table-cell data-grid-th text-left border-container border-b pb-2 pt-2">
+                        <span><?= $escaper->escapeHtml(__('Action')) ?></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="[key, item] of Object.entries(items)">
+                    <tr>
+                        <td class="border-t py-2"><img :src="item.product_image_url" :alt="item.product_image_label" /></td>
+                        <td class="border-t py-2">
+                            <span class="block mb-2" x-html="item.product_name"></span>
+                            <p x-html="item.preparation_error" type="button" x-show="!!item.preparation_error"></p>
+                            <template x-for="productOption of item.product_attributes.product_options">
+                                <p class="text-sm">
+                                    <strong x-text="productOption.label"></strong>:<span x-text="productOption.value"></span>
+                                </p>
+                            </template>
+                            <template x-for="customOption of item.product_attributes.custom_options">
+                                <p class="text-sm">
+                                    <span x-text="customOption.label"></span>:<span x-text="customOption.value"></span>
+                                </p>
+                            </template>
+                            <p>
+                                <button @click="configureItem(item)" class="text-sm underline cursor-pointer" x-show="!!item.is_editable">
+                                    <?= $escaper->escapeHtml(__('Configure')) ?>
+                                </button>
+                            </p>
+                        </td>
+                        <td class="border-t py-2" x-html="item.product_sku"></td>
+                        <td class="border-t py-2">
+                            <?php if ($config['isQtyInputDisplayed']): ?>
+                            <input
+                                 type="number"
+                                 min="1"
+                                 step="1"
+                                 name="single-qty"
+                                 class="input-text"
+                                 x-model="item.product_qty"
+                                 title="<?= $escaper->escapeHtmlAttr(__('Quantity')) ?>"
+                                 @change.debounce="updateQty(item, $event.target.value)"
+                            />
+                            <?php else: ?>
+                                <span x-html="item.product_qty"></span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="border-t py-2" x-html="item.price"></td>
+                        <td class="border-t py-2"><a class="underline cursor-pointer" @click="deleteItem(item)"><?= $escaper->escapeHtml(__('Remove')) ?></a></td>
+                    </tr>
+                </template>
+                <tr x-show="Object.entries(items).length === 0">
+                    <td>
+                        <span><?= $escaper->escapeHtml(__("We couldn't find any records.")) ?></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <nav class="inline-flex items-center pages my-4 w-full justify-center" aria-label="pagination" x-show="pagination.totalRecords > 20">
+            <ol class="relative z-0 inline-flex shadow-sm items pages-items">
+                <li class="item pages-item-previous" x-on:click="changePage(pagination.currentPage - 1)">
+                    <strong
+                        class="action relative inline-flex bg-gray-100 items-center text-sm font-medium leading-5 bg-white border border-gray-300 transition duration-150
+                        ease-in-out focus:z-10 focus:outline-none focus:border-primary-lighter focus:shadow-outline-blue rounded-l-md px-3 py-2"
+                        aria-disabled="true"
+                        :class="{
+                            ['cursor-pointer bg-white hover:text-gray-400']: pagination.currentPage > 1,
+                            ['bg-gray-100 text-gray-500']: pagination.currentPage === 1
+                        }"
+                    >
+                        <span aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>">
+                            <?= $heroicons->chevronLeftHtml('', 20, 20); ?>
+                        </span>
+                    </strong>
+                </li>
+                <template x-for="page of Array.from({length: pagination.totalPages}, (_, i) => i + 1)">
+                    <li class="item -ml-px">
+                        <a class="relative inline-flex items-center text-sm font-medium leading-5 bg-white border border-gray-300 focus:outline-none
+                        focus:border-primary-lighter focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 px-4 py-2 text-gray-700"
+                           :class="{
+                            ['text-gray-700 bg-gray-100 border-primary z-10']: pagination.currentPage === page,
+                            ['cursor-pointer transition duration-150 ease-in-out hover:text-gray-400']: pagination.currentPage !== page
+                           }"
+                           x-on:click="changePage(page)"
+                        >
+                            <span x-html="page"></span>
+                        </a>
+                    </li>
+                </template>
+                <li class="item pages-item-next" x-on:click="changePage(pagination.currentPage + 1)">
+                    <strong
+                        class="action next relative bg-gray-100 inline-flex items-center text-sm font-medium leading-5 bg-white border border-gray-300 transition duration-150
+                        ease-in-out focus:z-10 focus:outline-none focus:border-primary-lighter focus:shadow-outline-blue rounded-r-md px-3 py-2 text-gray-500"
+                        aria-disabled="true"
+                        :class="{
+                            ['cursor-pointer bg-white hover:text-gray-400']: pagination.currentPage < pagination.totalPages,
+                            ['bg-gray-100 text-gray-500']: pagination.currentPage === pagination.totalPages
+                        }"
+                    >
+                        <span aria-label="<?= $escaper->escapeHtml(__('Next')) ?>">
+                            <?= $heroicons->chevronRightHtml('', 20, 20); ?>
+                        </span>
+                    </strong>
+                </li>
+            </ol>
+        </nav>
+        <div class="flex justify-between" x-show="Object.entries(items).length > 0">
+            <button class="btn btn-primary" @click="addToCart"><?= $escaper->escapeHtml('Add to Cart') ?></button>
+            <button class="btn btn-secondary" @click="resetList"><?= $escaper->escapeHtml('Reset List') ?></button>
+        </div>
+    </div>
+</div>

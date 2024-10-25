@@ -1,0 +1,160 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksQuickOrder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksQuickOrder
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+?>
+
+<div>
+    <div class="p-6">
+        <h1 class="base" x-html="configureData.title"></h1>
+        <img class="hover:shadow-sm object-contain h-[300px] w-auto"
+             x-data=""
+             @update-gallery.window="{
+                 if ($event.detail) {
+                     $el.src = $event.detail[0].img;
+                     $el.style = 'display: block';
+                 } else {
+                    $el.src = null
+                     $el.style = 'display: none';
+                 }
+             }"
+             width="auto"
+             height="300px"
+             loading="lazy"
+        />
+        <form id="quick-order-configuration-form" @submit.prevent="updateConfiguration()">
+            <template x-for="attribute of configureData.attributes" :key="attribute.id">
+                <div>
+                    <template x-if="attribute.isSwatch">
+                        <div class="swatch-attribute border-t last:border-b border-container min-h-14">
+
+                            <div class="flex flex-col sm:flex-row items-center py-4 sm:py-1 w-full border-gray-300">
+
+                                <label class="w-full sm:w-1/2 text-left text-gray-700 label product-option-label"
+                                       :for="'attribute'+attribute.productAttribute.code"
+                                >
+                                    <span x-text="attribute.productAttribute.label">
+                                    </span>
+                                </label>
+                                <div class="w-full sm:ml-2 sm:w-1/2 text-left text-gray-900 product-option-values">
+                                    <div
+                                        class="flex items-center -mx-4 space-x-4 swatch-attribute-options"
+                                        role="radiogroup"
+                                    >
+                                        <template
+                                            x-for="(item, index) in configureData.optionConfig.attributes[attribute.id].options"
+                                            :key="item.id"
+                                        >
+                                            <div>
+                                                <template x-if="configureData.optionIsEnabled(attribute.id, item.id) && configureData.optionIsActive(attribute.id, item.id)">
+                                                    <label
+                                                        :for="'attribute-option-'+ configureData.productId +'-'+item.id"
+                                                        class="swatch-option relative border-2 shadow-sm cursor-pointer select-none bg-container-lighter product-option-value-label"
+                                                        :class="{
+                                                            'border-container-lighter ring ring-primary ring-opacity-50':
+                                                                (configureData.selectedValues[attribute.id] === item.id),
+                                                            'border-container-darker':
+                                                                (configureData.selectedValues[attribute.id] !== item.id),
+                                                            'w-6 h-6' : !configureData.isTextSwatch(attribute.id, item.id),
+                                                            'border-container-lighter ring ring-primary ring-opacity-75' : configureData.focusedLabel === item.id
+                                                        }"
+                                                        :style="configureData.getSwatchBackgroundStyle(attribute.id,item.id)"
+                                                    >
+                                                        <input
+                                                            :id="'attribute-option-' + configureData.productId + '-'+item.id"
+                                                            :value="item.id"
+                                                            :name="'super_attribute[' + attribute.id + ']'"
+                                                            type="radio"
+                                                            class="inline-block absolute p-0 border-0 focus:border-0 focus:ring-0 product-option-value-input"
+                                                            style="z-index:-1"
+                                                            x-on:focus="configureData.focusLabel(item.id)"
+                                                            x-on:blur="configureData.blurLabel()"
+                                                            x-on:change="configureData.changeOption(attribute.id, $event.target.value)"
+                                                            x-model="configureData.selectedValues[attribute.id]"
+                                                            :required="configureData.getAllowedAttributeOptions(attribute.id).filter(
+                                                                                                                attributeOption => configureData.selectedValues[attributeOption]
+                                                                                                            ).length === 0"
+                                                        >
+                                                        <div x-html="configureData.getSwatchText(attribute.id, item.id)"
+                                                             class="whitespace-nowrap"
+                                                             :class="{ 'sr-only' : !configureData.isTextSwatch(attribute.id, item.id) }"
+                                                        ></div>
+                                                    </label>
+                                                </template>
+
+                                                <template x-if="configureData.optionIsEnabled(attribute.id, item.id) && !configureData.optionIsActive(attribute.id, item.id)">
+                                                    <div
+                                                        class="relative border-2 shadow-sm opacity-50 cursor-pointer select-none border-container-darker swatch-option bg-container-lighter"
+                                                        :class="{
+                                                            'w-6 h-6' : !configureData.isTextSwatch(attribute.id, item.id),
+                                                        }"
+                                                        :style="configureData.getSwatchBackgroundStyle(attribute.id,item.id)"
+                                                    >
+                                                        <div x-html="configureData.getSwatchText(attribute.id, item.id)"
+                                                             class="whitespace-nowrap"
+                                                             :class="{ 'sr-only' : !configureData.isTextSwatch(attribute.id, item.id) }"
+                                                        ></div>
+                                                        <svg class="absolute inset-0 w-full h-full text-gray-500 bg-white bg-opacity-25">
+                                                            <line x1="0" y1="100%" x2="100%" y2="0" class="stroke-current stroke-1"></line>
+                                                        </svg>
+                                                    </div>
+                                                </template>
+                                            </div>
+
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="!attribute.isSwatch">
+                        <div class="flex items-center py-2 w-full border-t border-gray-300 last:border-b">
+                            <label class="w-1/2 text-left text-gray-700 label"
+                                   :for="'attribute'+attribute.productAttribute.code">
+                                    <span x-text="attribute.productAttribute.label">
+                                    </span>
+                            </label>
+                            <div class="ml-2 w-1/2 text-left text-gray-900">
+                                <select :name="'super_attribute['+ attribute.id + ']'"
+                                        :id="'attribute' + attribute.id"
+                                        class="form-select super-attribute-select"
+                                        x-on:change="configureData.changeOption(attribute.id, event.target.value)"
+                                        required="required">
+                                    <option value="">
+                                        <?= $escaper->escapeHtml(__('Choose an Option...')) ?>
+                                    </option>
+                                    <template
+                                        x-for="(item, index) in configureData.getAllowedAttributeOptions(attribute.id)"
+                                        :key="item.id"
+                                    >
+                                        <option
+                                            :value="item.id"
+                                            x-html="item.label"
+                                            :selected="configureData.selectedValues[attribute.id] === item.id">
+                                        </option>
+                                    </template>
+                                </select>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            <button type="submit" class="btn btn-primary">
+                <span>
+                    <?= $escaper->escapeHtml(__('Confirm')) ?>
+                </span>
+            </button>
+        </form>
+    </div>
+</div>

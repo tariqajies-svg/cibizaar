@@ -1,0 +1,61 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magebit\MagefanBlog\Block\Index;
+use Magento\Framework\Escaper;
+
+/**
+ * Blog post list template
+ *
+ * @var Index $block
+ * @var Escaper $escaper
+ */
+
+$_postCollection = $block->getPostCollection();
+$_highlightPost = $block->getHighlightPost();
+
+if (!$_postCollection->count() && !$_highlightPost): ?>
+    <div class="message info empty">
+        <div>
+            <?= $escaper->escapeHtml(__('We can\'t find posts matching the selection.')) ?>
+        </div>
+    </div>
+<?php else: ?>
+    <?= $block->getAdditionalHtml() ?>
+    <?php if ($block->getCurrentPage() === 1 && $_highlightPost): ?>
+        <div class="highlight-post mb-5 lg:mb-6">
+            <?= $this->getChildBlock('blog.posts.list.item')
+                ->setLazyLoad(false)
+                ->setPost($_highlightPost)
+                ->setIsHighLighted(true)
+                ->toHtml() ?>
+        </div>
+    <?php endif; ?>
+    <?php if ($_postCollection->count()): ?>
+    <div class="post-list-wrapper homepage-blogpost">
+        <?php $iterator = 1; ?>
+        <div class="post-list mb-5 grid grid-cols-1 gap-5 lg:mb-12 lg:grid-cols-2 lg:gap-6">
+            <?php foreach ($_postCollection as $_post): ?>
+                <?= $this->getChildBlock('blog.posts.list.item')
+                    ->setLazyLoad($iterator++ !== 1)
+                    ->setPost($_post)
+                    ->setIsHighLighted(false)
+                    ->toHtml() ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+<?php endif; ?>

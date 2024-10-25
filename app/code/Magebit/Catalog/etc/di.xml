@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_Catalog package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Catalog
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Catalog\Block\Product\ListProduct" type="Magebit\Catalog\Block\Product\ListProduct" />
+    <preference for="Magento\CatalogSearch\Block\SearchResult\ListProduct" type="Magebit\Catalog\Block\Product\ListProduct" />
+    <type name="Magento\Catalog\Block\Category\View">
+        <plugin name="Magebit_Catalog_Plugin_Magento_Catalog_Block_Category_View"
+                type="Magebit\Catalog\Plugin\Magento\Catalog\Block\Category\View"/>
+    </type>
+    <preference for="Magento\InventoryCatalog\Plugin\Catalog\Block\ProductList\UpdateToolbarCount"
+                type="Magebit\Catalog\Plugin\Magento\Catalog\Block\ProductList\UpdateToolbarCount" />
+    <preference for="Hyva\Theme\ViewModel\ProductList" type="Magebit\Catalog\Block\Product\ProductList" />
+    <preference for="Hyva\Theme\ViewModel\ProductListItem" type="Magebit\Catalog\ViewModel\ProductListItem"/>
+    <preference for="Magento\Wishlist\Controller\Index\Add" type="Magebit\Catalog\Controller\Index\WishlistAdd"/>
+    <preference for="Magento\Catalog\Controller\Product\Compare\Add"
+                type="Magebit\Catalog\Override\Magento_Catalog\Catalog\Controller\Product\Compare\AddToCompare"/>
+
+    <type name="Magento\Checkout\Controller\Cart\Add">
+        <plugin name="before_add_to_cart_shipping_rates"
+                type="Magebit\Catalog\Plugin\BeforeAddToCart"/>
+    </type>
+    <type name="Magento\Shipping\Model\Shipping">
+        <plugin name="magebit_catalog_around_collect_rates" type="Magebit\Catalog\Plugin\AroundCollectRates" />
+    </type>
+    <type name="Magento\Catalog\Helper\Output">
+        <plugin name="magebit_catalog_output_helper_after_product_attribute" type="Magebit\Catalog\Plugin\AfterGetAttribute" />
+    </type>
+</config>

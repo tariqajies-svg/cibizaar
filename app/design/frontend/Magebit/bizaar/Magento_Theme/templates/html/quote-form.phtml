@@ -1,0 +1,1758 @@
+<?php // echo "<pre>"; print_r(get_class_methods($block)); die('sdfsdf'); ?>
+<form id="inq-form" class="inq-form" @submit.prevent="validateQuoteForm" x-data="{open : false}">
+    <div class="user-icon mb-3">
+        <img class="border-round-30" src="<?php echo $block->getBaseUrl() . 'media/wysiwyg/home/quote/user.webp'; ?>" alt="User">
+    </div>
+    <h5 class="label small mb-4"><?php echo __('Buy IT Right with B2B Prices') ?></h5>
+    <h3 class="label mb-4"><?php echo __('Have a Project or RFQ? Quick Quotes Delivered in 60 Minutes!') ?></h3>
+    <div x-show.important="!open" id="home-get-a-quote-customer-message">
+        <textarea rows="2" id="searchbox" class="textarea p-4 text-black"
+            placeholder="We need 18 pcs of Ubiquiti U7-Pro and a 24-port PoE Switch for a project..." required></textarea>
+        <button type="submit" class="btn" x-on:click="validateQuoteMessage()">Request a quote</button>
+    </div>
+    <div id="home-get-a-quote-customer-details">
+
+    </div>
+</form>
+<script type="text/javascript">
+
+    function validateQuoteMessage() { //open=true;
+        let eFound = false;
+        let defaultEMessage = "*This field is required!";
+        let elem = document.querySelector('#searchbox');
+        //let Eelem = document.querySelector('#searchboxError');
+        if (elem.value.trim().length == 0) {
+            eFound = true;
+            //Eelem.innerHTML = defaultEMessage;
+        } else {
+            document.querySelector('#home-get-a-quote-customer-message').style.display = "none";
+            document.querySelector('#home-get-a-quote-customer-details').innerHTML = "<input class='form-input h-[50px] mb-2 font-normal p-4 text-black' type='text' placeholder='Name' id='customQuoteName' required/><div class='telphone flex gap-3'><select name='customQuoteTelPrefix' id='customQuoteTelPrefix' required class='form-select w-[120px] h-[50px] px-4'></select><input class='form-input h-[50px] mb-2 font-normal p-4 text-black' type='number' placeholder='Mobile Number' id='customQuoteMobile' required></div><input class='form-input h-[50px] mb-2 font-normal p-4 text-black' type='email' placeholder='Email' id='customQuoteEmail' required><button type='submit' class='btn' id='submit_quote_button'>Submit a quote</button>";
+            bindQuoteTelephoneInput();
+            bindQuoteNameInput();
+        }
+    }
+
+    function bindQuoteNameInput() {
+        const nameInput = document.getElementById('customQuoteName');
+
+        nameInput.addEventListener('keypress', function (e) {
+            if (/\d/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    function sendQuoteMessage() {
+
+        let data = prepareQuoteFormData();
+        fetch(window.BASE_URL + 'ktpl_quote/contact/quoteIndex', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: data
+        }).then((response) => response.json()).then((data) => {
+            if (!data.errors) {
+                dispatchMessages([{
+                    type: "success",
+                    text: data.message
+                }], 6000);
+                document.getElementById('customQuoteName').value = '';
+                document.getElementById('customQuoteEmail').value = '';
+                document.getElementById('customQuoteMobile').value = '';
+                document.getElementById('searchbox').value = '';
+                document.querySelector('#home-get-a-quote-customer-details').innerHTML = '';
+                document.querySelector('#home-get-a-quote-customer-message').style.display = "block";
+            } else {
+                dispatchMessages([{
+                    type: "error",
+                    text: data.message
+                }], 6000);
+            }
+        }).catch((error) => {
+            dispatchMessages([{
+                type: "error",
+                text: "Error Occured! Contact us at : hello@bizaar.ai"
+            }], 6000);
+        });
+
+    }
+    function validateQuoteForm() {
+        let error = true;
+        let defaultEMessage = "*This field is required!";
+        let elem = document.querySelector('#searchbox');
+
+        if (!document.getElementById('customQuoteName').value.trim()) {
+            error = false;
+        } else if (!document.getElementById('customQuoteEmail').value.trim()) {
+            error = false;
+        } else if (!document.getElementById('customQuoteTelPrefix').selectedIndex) {
+            error = false;
+        } else if (!document.getElementById('customQuoteMobile').value.trim()) {
+            error = false;
+        } else if (!document.getElementById('searchbox').value.trim()) {
+            error = false;
+        }
+
+        if (error) {
+        document.getElementById('submit_quote_button').disabled = true;
+            sendQuoteMessage();
+        }
+
+        return error;
+    }
+
+    function prepareQuoteFormData() {
+        return JSON.stringify({
+            name: document.getElementById('customQuoteName').value.trim(),
+            email: document.getElementById('customQuoteEmail').value.trim(),
+            phone: document.getElementById('customQuoteTelPrefix').options[document.getElementById('customQuoteTelPrefix').selectedIndex].innerHTML.slice(5) + " - " + document.getElementById('customQuoteMobile').value,
+            comment: document.getElementById('searchbox').value.trim(),
+            form_key: window.hyva.getFormKey(),
+        });
+    }
+
+</script>
+<script>
+    window.addEventListener('scroll', function (e) {
+
+        var ele = document.querySelector('.inq-form-main');
+        // console.log("sad",ele)
+        ele.classList.remove("active")
+        // console.log($e)
+
+        var scrolledDist = this.scrollY;
+        // console.log('scrolledDist',scrolledDist);
+
+
+        var trainPosition = Math.round(window.pageYOffset / window.innerHeight * 100);
+        //   console.log('trainPosition',trainPosition)
+        var docViewBottom = scrolledDist + 20 + window.innerHeight;
+        // console.log('docViewBottom',docViewBottom)
+        var elemTop = ele.offsetTop - 500;  // top thi div element nu distance
+        // console.log('elemTop',elemTop); 
+
+        var elemBottom = elemTop + ele.offsetHeight; // height of div
+        // console.log('elemBottom',elemBottom);
+        /* 	var trainPosition = Math.round($(window).scrollTop() / $(window).height() * 100); */
+        // var trainPosition = Math.round(window.pageYOffset / window.innerHeight * 100);
+        //window.scrollTo(xCoord, yCoord);
+        // console.log(trainPosition);
+        //document.querySelector('.img-fluid').style.transform = 'translateX('+(trainPosition-50)+'%)';
+        // if (elemTop > scrolledDist && elemBottom < docViewBottom){
+        // 	  alert('dsadasdas');
+        // 	ele.classList.add("active");
+        // 	}
+
+
+        if (scrolledDist > elemTop && scrolledDist < elemBottom) {
+            // alert('dsadasdas');
+            document.querySelector('.img-one').style.transform = 'translateX(' + (trainPosition - 80) + '%)';
+            document.querySelector('.img-two').style.transform = 'translateX(' + (trainPosition - 80) + '%)';
+            document.querySelector('.img-three').style.transform = 'translateX(' + (trainPosition - 80) + '%)';
+            document.querySelector('.img-four').style.transform = 'translateX(' + (trainPosition - 80) + '%)';
+            document.querySelector('.ri-one').style.transform = 'translateX(' + (-trainPosition + 80) + '%)';
+            document.querySelector('.ri-two').style.transform = 'translateX(' + (-trainPosition + 80) + '%)';
+            document.querySelector('.ri-three').style.transform = 'translateX(' + (-trainPosition + 80) + '%)';
+            document.querySelector('.ri-four').style.transform = 'translateX(' + (-trainPosition + 100) + '%)';
+        }
+
+        // if ( scrolledDist > elemTop ){
+        // 	  alert('dsadasdas');
+        // 	ele.classList.add("active");
+        // 	}
+        // });
+
+    });
+
+    const texts = ['We need 18 pcs of Ubiquiti U7-Pro and a 24-port PoE Switch for a project...', 'We need 18 pcs of Ubiquiti U7-Pro and a 24-port PoE Switch for a project...'];
+    const input = document.querySelector('#searchbox');
+    const animationWorker = function (input, texts) {
+        this.input = input;
+        this.defaultPlaceholder = this.input.getAttribute('placeholder');
+        this.texts = texts;
+        this.curTextNum = 0;
+        this.curPlaceholder = '';
+        this.blinkCounter = 0;
+        this.animationFrameId = 0;
+        this.animationActive = false;
+        this.input.setAttribute('placeholder', this.curPlaceholder);
+
+        this.switch = timeout => {
+            this.input.classList.add('imitatefocus');
+            setTimeout(
+                () => {
+                    this.input.classList.remove('imitatefocus');
+                    if (this.curTextNum == 0)
+                        this.input.setAttribute('placeholder', this.defaultPlaceholder); else
+
+                        this.input.setAttribute('placeholder', this.curPlaceholder);
+
+                    setTimeout(
+                        () => {
+                            this.input.setAttribute('placeholder', this.curPlaceholder);
+                            if (this.animationActive)
+                                this.animationFrameId = window.requestAnimationFrame(this.animate);
+                        },
+                        timeout);
+                },
+                timeout);
+        };
+
+        this.animate = () => {
+            if (!this.animationActive) return;
+            let curPlaceholderFullText = this.texts[this.curTextNum];
+            let timeout = 100;
+            if (this.curPlaceholder == curPlaceholderFullText + '|' && this.blinkCounter == 3) {
+                this.blinkCounter = 0;
+                this.curTextNum = this.curTextNum >= this.texts.length - 1 ? 0 : this.curTextNum + 1;
+                this.curPlaceholder = '|';
+                this.switch(3000);
+                return;
+            } else
+                if (this.curPlaceholder == curPlaceholderFullText + '|' && this.blinkCounter < 3) {
+                    this.curPlaceholder = curPlaceholderFullText;
+                    this.blinkCounter++;
+                } else
+                    if (this.curPlaceholder == curPlaceholderFullText && this.blinkCounter < 3) {
+                        this.curPlaceholder = this.curPlaceholder + '|';
+                    } else {
+                        this.curPlaceholder = curPlaceholderFullText.
+                            split('').
+                            slice(0, this.curPlaceholder.length + 1).
+                            join('') + '|';
+                        timeout = 150;
+                    }
+            this.input.setAttribute('placeholder', this.curPlaceholder);
+            setTimeout(
+                () => { if (this.animationActive) this.animationFrameId = window.requestAnimationFrame(this.animate); },
+                timeout);
+        };
+
+        this.stop = () => {
+            this.animationActive = false;
+            window.cancelAnimationFrame(this.animationFrameId);
+        };
+
+        this.start = () => {
+            this.animationActive = true;
+            this.animationFrameId = window.requestAnimationFrame(this.animate);
+            return this;
+        };
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        let aw = new animationWorker(input, texts).start();
+        input.addEventListener("focus", e => aw.stop());
+        input.addEventListener("blur", e => {
+            aw = new animationWorker(input, texts);
+            if (e.target.value == '') setTimeout(aw.start, 2000);
+        });
+    });
+
+    function bindQuoteTelephoneInput() {
+        let TelData = [{
+            "code": "AD",
+            "flag": "🇦🇩",
+            "name": "Andorra",
+            "tel": "+376"
+        },
+        {
+            "code": "AE",
+            "flag": "🇦🇪",
+            "name": "United Arab Emirates",
+            "tel": "+971"
+        },
+        {
+            "code": "AF",
+            "flag": "🇦🇫",
+            "name": "Afghanistan",
+            "tel": "+93"
+        },
+        {
+            "code": "AG",
+            "flag": "🇦🇬",
+            "name": "Antigua and Barbuda",
+            "tel": "+1-268"
+        },
+        {
+            "code": "AI",
+            "flag": "🇦🇮",
+            "name": "Anguilla",
+            "tel": "+1-264"
+        },
+        {
+            "code": "AL",
+            "flag": "🇦🇱",
+            "name": "Albania",
+            "tel": "+355"
+        },
+        {
+            "code": "AM",
+            "flag": "🇦🇲",
+            "name": "Armenia",
+            "tel": "+374"
+        },
+        {
+            "code": "AO",
+            "flag": "🇦🇴",
+            "name": "Angola",
+            "tel": "+244"
+        },
+        {
+            "code": "AQ",
+            "flag": "🇦🇶",
+            "name": "Antarctica",
+            "tel": "+672"
+        },
+        {
+            "code": "AR",
+            "flag": "🇦🇷",
+            "name": "Argentina",
+            "tel": "+54"
+        },
+        {
+            "code": "AS",
+            "flag": "🇦🇸",
+            "name": "American Samoa",
+            "tel": "+1-684"
+        },
+        {
+            "code": "AT",
+            "flag": "🇦🇹",
+            "name": "Austria",
+            "tel": "+43"
+        },
+        {
+            "code": "AU",
+            "flag": "🇦🇺",
+            "name": "Australia",
+            "tel": "+61"
+        },
+        {
+            "code": "AW",
+            "flag": "🇦🇼",
+            "name": "Aruba",
+            "tel": "+297"
+        },
+        {
+            "code": "AX",
+            "flag": "🇦🇽",
+            "name": "Aland Islands",
+            "tel": "+358-18"
+        },
+        {
+            "code": "AZ",
+            "flag": "🇦🇿",
+            "name": "Azerbaijan",
+            "tel": "+994"
+        },
+        {
+            "code": "BA",
+            "flag": "🇧🇦",
+            "name": "Bosnia and Herzegovina",
+            "tel": "+387"
+        },
+        {
+            "code": "BB",
+            "flag": "🇧🇧",
+            "name": "Barbados",
+            "tel": "+1-246"
+        },
+        {
+            "code": "BD",
+            "flag": "🇧🇩",
+            "name": "Bangladesh",
+            "tel": "+880"
+        },
+        {
+            "code": "BE",
+            "flag": "🇧🇪",
+            "name": "Belgium",
+            "tel": "+32"
+        },
+        {
+            "code": "BF",
+            "flag": "🇧🇫",
+            "name": "Burkina Faso",
+            "tel": "+226"
+        },
+        {
+            "code": "BG",
+            "flag": "🇧🇬",
+            "name": "Bulgaria",
+            "tel": "+359"
+        },
+        {
+            "code": "BH",
+            "flag": "🇧🇭",
+            "name": "Bahrain",
+            "tel": "+973"
+        },
+        {
+            "code": "BI",
+            "flag": "🇧🇮",
+            "name": "Burundi",
+            "tel": "+257"
+        },
+        {
+            "code": "BJ",
+            "flag": "🇧🇯",
+            "name": "Benin",
+            "tel": "+229"
+        },
+        {
+            "code": "BL",
+            "flag": "🇧🇱",
+            "name": "Saint Barthelemy",
+            "tel": "+590"
+        },
+        {
+            "code": "BM",
+            "flag": "🇧🇲",
+            "name": "Bermuda",
+            "tel": "+1-441"
+        },
+        {
+            "code": "BN",
+            "flag": "🇧🇳",
+            "name": "Brunei",
+            "tel": "+673"
+        },
+        {
+            "code": "BO",
+            "flag": "🇧🇴",
+            "name": "Bolivia",
+            "tel": "+591"
+        },
+        {
+            "code": "BQ",
+            "flag": "🇧🇶",
+            "name": "Bonaire, Saint Eustatius and Saba ",
+            "tel": "+599"
+        },
+        {
+            "code": "BR",
+            "flag": "🇧🇷",
+            "name": "Brazil",
+            "tel": "+55"
+        },
+        {
+            "code": "BS",
+            "flag": "🇧🇸",
+            "name": "Bahamas",
+            "tel": "+1-242"
+        },
+        {
+            "code": "BT",
+            "flag": "🇧🇹",
+            "name": "Bhutan",
+            "tel": "+975"
+        },
+        {
+            "code": "BV",
+            "flag": "🇧🇻",
+            "name": "Bouvet Island",
+            "tel": "+47"
+        },
+        {
+            "code": "BW",
+            "flag": "🇧🇼",
+            "name": "Botswana",
+            "tel": "+267"
+        },
+        {
+            "code": "BY",
+            "flag": "🇧🇾",
+            "name": "Belarus",
+            "tel": "+375"
+        },
+        {
+            "code": "BZ",
+            "flag": "🇧🇿",
+            "name": "Belize",
+            "tel": "+501"
+        },
+        {
+            "code": "CA",
+            "flag": "🇨🇦",
+            "name": "Canada",
+            "tel": "+1"
+        },
+        {
+            "code": "CC",
+            "flag": "🇨🇨",
+            "name": "Cocos Islands",
+            "tel": "+61"
+        },
+        {
+            "code": "CD",
+            "flag": "🇨🇩",
+            "name": "Democratic Republic of the Congo",
+            "tel": "+243"
+        },
+        {
+            "code": "CF",
+            "flag": "🇨🇫",
+            "name": "Central African Republic",
+            "tel": "+236"
+        },
+        {
+            "code": "CG",
+            "flag": "🇨🇬",
+            "name": "Republic of the Congo",
+            "tel": "+242"
+        },
+        {
+            "code": "CH",
+            "flag": "🇨🇭",
+            "name": "Switzerland",
+            "tel": "+41"
+        },
+        {
+            "code": "CI",
+            "flag": "🇨🇮",
+            "name": "Ivory Coast",
+            "tel": "+225"
+        },
+        {
+            "code": "CK",
+            "flag": "🇨🇰",
+            "name": "Cook Islands",
+            "tel": "+682"
+        },
+        {
+            "code": "CL",
+            "flag": "🇨🇱",
+            "name": "Chile",
+            "tel": "+56"
+        },
+        {
+            "code": "CM",
+            "flag": "🇨🇲",
+            "name": "Cameroon",
+            "tel": "+237"
+        },
+        {
+            "code": "CN",
+            "flag": "🇨🇳",
+            "name": "China",
+            "tel": "+86"
+        },
+        {
+            "code": "CO",
+            "flag": "🇨🇴",
+            "name": "Colombia",
+            "tel": "+57"
+        },
+        {
+            "code": "CR",
+            "flag": "🇨🇷",
+            "name": "Costa Rica",
+            "tel": "+506"
+        },
+        {
+            "code": "CU",
+            "flag": "🇨🇺",
+            "name": "Cuba",
+            "tel": "+53"
+        },
+        {
+            "code": "CV",
+            "flag": "🇨🇻",
+            "name": "Cape Verde",
+            "tel": "+238"
+        },
+        {
+            "code": "CW",
+            "flag": "🇨🇼",
+            "name": "Curacao",
+            "tel": "+599"
+        },
+        {
+            "code": "CX",
+            "flag": "🇨🇽",
+            "name": "Christmas Island",
+            "tel": "+61"
+        },
+        {
+            "code": "CY",
+            "flag": "🇨🇾",
+            "name": "Cyprus",
+            "tel": "+357"
+        },
+        {
+            "code": "CZ",
+            "flag": "🇨🇿",
+            "name": "Czech Republic",
+            "tel": "+420"
+        },
+        {
+            "code": "DE",
+            "flag": "🇩🇪",
+            "name": "Germany",
+            "tel": "+49"
+        },
+        {
+            "code": "DJ",
+            "flag": "🇩🇯",
+            "name": "Djibouti",
+            "tel": "+253"
+        },
+        {
+            "code": "DK",
+            "flag": "🇩🇰",
+            "name": "Denmark",
+            "tel": "+45"
+        },
+        {
+            "code": "DM",
+            "flag": "🇩🇲",
+            "name": "Dominica",
+            "tel": "+1-767"
+        },
+        {
+            "code": "DO",
+            "flag": "🇩🇴",
+            "name": "Dominican Republic",
+            "tel": "+1-809 and 1-829"
+        },
+        {
+            "code": "DZ",
+            "flag": "🇩🇿",
+            "name": "Algeria",
+            "tel": "+213"
+        },
+        {
+            "code": "EC",
+            "flag": "🇪🇨",
+            "name": "Ecuador",
+            "tel": "+593"
+        },
+        {
+            "code": "EE",
+            "flag": "🇪🇪",
+            "name": "Estonia",
+            "tel": "+372"
+        },
+        {
+            "code": "EG",
+            "flag": "🇪🇬",
+            "name": "Egypt",
+            "tel": "+20"
+        },
+        {
+            "code": "EH",
+            "flag": "🇪🇭",
+            "name": "Western Sahara",
+            "tel": "+212"
+        },
+        {
+            "code": "ER",
+            "flag": "🇪🇷",
+            "name": "Eritrea",
+            "tel": "+291"
+        },
+        {
+            "code": "ES",
+            "flag": "🇪🇸",
+            "name": "Spain",
+            "tel": "+34"
+        },
+        {
+            "code": "ET",
+            "flag": "🇪🇹",
+            "name": "Ethiopia",
+            "tel": "+251"
+        },
+        {
+            "code": "FI",
+            "flag": "🇫🇮",
+            "name": "Finland",
+            "tel": "+358"
+        },
+        {
+            "code": "FJ",
+            "flag": "🇫🇯",
+            "name": "Fiji",
+            "tel": "+679"
+        },
+        {
+            "code": "FK",
+            "flag": "🇫🇰",
+            "name": "Falkland Islands",
+            "tel": "+500"
+        },
+        {
+            "code": "FM",
+            "flag": "🇫🇲",
+            "name": "Micronesia",
+            "tel": "+691"
+        },
+        {
+            "code": "FO",
+            "flag": "🇫🇴",
+            "name": "Faroe Islands",
+            "tel": "+298"
+        },
+        {
+            "code": "FR",
+            "flag": "🇫🇷",
+            "name": "France",
+            "tel": "+33"
+        },
+        {
+            "code": "GA",
+            "flag": "🇬🇦",
+            "name": "Gabon",
+            "tel": "+241"
+        },
+        {
+            "code": "GB",
+            "flag": "🇬🇧",
+            "name": "United Kingdom",
+            "tel": "+44"
+        },
+        {
+            "code": "GD",
+            "flag": "🇬🇩",
+            "name": "Grenada",
+            "tel": "+1-473"
+        },
+        {
+            "code": "GE",
+            "flag": "🇬🇪",
+            "name": "Georgia",
+            "tel": "+995"
+        },
+        {
+            "code": "GF",
+            "flag": "🇬🇫",
+            "name": "French Guiana",
+            "tel": "+594"
+        },
+        {
+            "code": "GG",
+            "flag": "🇬🇬",
+            "name": "Guernsey",
+            "tel": "+44-1481"
+        },
+        {
+            "code": "GH",
+            "flag": "🇬🇭",
+            "name": "Ghana",
+            "tel": "+233"
+        },
+        {
+            "code": "GI",
+            "flag": "🇬🇮",
+            "name": "Gibraltar",
+            "tel": "+350"
+        },
+        {
+            "code": "GL",
+            "flag": "🇬🇱",
+            "name": "Greenland",
+            "tel": "+299"
+        },
+        {
+            "code": "GM",
+            "flag": "🇬🇲",
+            "name": "Gambia",
+            "tel": "+220"
+        },
+        {
+            "code": "GN",
+            "flag": "🇬🇳",
+            "name": "Guinea",
+            "tel": "+224"
+        },
+        {
+            "code": "GP",
+            "flag": "🇬🇵",
+            "name": "Guadeloupe",
+            "tel": "+590"
+        },
+        {
+            "code": "GQ",
+            "flag": "🇬🇶",
+            "name": "Equatorial Guinea",
+            "tel": "+240"
+        },
+        {
+            "code": "GR",
+            "flag": "🇬🇷",
+            "name": "Greece",
+            "tel": "+30"
+        },
+        {
+            "code": "GS",
+            "flag": "🇬🇸",
+            "name": "South Georgia and the South Sandwich Islands",
+            "tel": "+500"
+        },
+        {
+            "code": "GT",
+            "flag": "🇬🇹",
+            "name": "Guatemala",
+            "tel": "+502"
+        },
+        {
+            "code": "GU",
+            "flag": "🇬🇺",
+            "name": "Guam",
+            "tel": "+1-671"
+        },
+        {
+            "code": "GW",
+            "flag": "🇬🇼",
+            "name": "Guinea-Bissau",
+            "tel": "+245"
+        },
+        {
+            "code": "GY",
+            "flag": "🇬🇾",
+            "name": "Guyana",
+            "tel": "+592"
+        },
+        {
+            "code": "HK",
+            "flag": "🇭🇰",
+            "name": "Hong Kong",
+            "tel": "+852"
+        },
+        {
+            "code": "HM",
+            "flag": "🇭🇲",
+            "name": "Heard Island and McDonald Islands",
+            "tel": "+672"
+        },
+        {
+            "code": "HN",
+            "flag": "🇭🇳",
+            "name": "Honduras",
+            "tel": "+504"
+        },
+        {
+            "code": "HR",
+            "flag": "🇭🇷",
+            "name": "Croatia",
+            "tel": "+385"
+        },
+        {
+            "code": "HT",
+            "flag": "🇭🇹",
+            "name": "Haiti",
+            "tel": "+509"
+        },
+        {
+            "code": "HU",
+            "flag": "🇭🇺",
+            "name": "Hungary",
+            "tel": "+36"
+        },
+        {
+            "code": "ID",
+            "flag": "🇮🇩",
+            "name": "Indonesia",
+            "tel": "+62"
+        },
+        {
+            "code": "IE",
+            "flag": "🇮🇪",
+            "name": "Ireland",
+            "tel": "+353"
+        },
+        {
+            "code": "IL",
+            "flag": "🇮🇱",
+            "name": "Israel",
+            "tel": "+972"
+        },
+        {
+            "code": "IM",
+            "flag": "🇮🇲",
+            "name": "Isle of Man",
+            "tel": "+44-1624"
+        },
+        {
+            "code": "IN",
+            "flag": "🇮🇳",
+            "name": "India",
+            "tel": "+91"
+        },
+        {
+            "code": "IO",
+            "flag": "🇮🇴",
+            "name": "British Indian Ocean Territory",
+            "tel": "+246"
+        },
+        {
+            "code": "IQ",
+            "flag": "🇮🇶",
+            "name": "Iraq",
+            "tel": "+964"
+        },
+        {
+            "code": "IR",
+            "flag": "🇮🇷",
+            "name": "Iran",
+            "tel": "+98"
+        },
+        {
+            "code": "IS",
+            "flag": "🇮🇸",
+            "name": "Iceland",
+            "tel": "+354"
+        },
+        {
+            "code": "IT",
+            "flag": "🇮🇹",
+            "name": "Italy",
+            "tel": "+39"
+        },
+        {
+            "code": "JE",
+            "flag": "🇯🇪",
+            "name": "Jersey",
+            "tel": "+44-1534"
+        },
+        {
+            "code": "JM",
+            "flag": "🇯🇲",
+            "name": "Jamaica",
+            "tel": "+1-876"
+        },
+        {
+            "code": "JO",
+            "flag": "🇯🇴",
+            "name": "Jordan",
+            "tel": "+962"
+        },
+        {
+            "code": "JP",
+            "flag": "🇯🇵",
+            "name": "Japan",
+            "tel": "+81"
+        },
+        {
+            "code": "KE",
+            "flag": "🇰🇪",
+            "name": "Kenya",
+            "tel": "+254"
+        },
+        {
+            "code": "KG",
+            "flag": "🇰🇬",
+            "name": "Kyrgyzstan",
+            "tel": "+996"
+        },
+        {
+            "code": "KH",
+            "flag": "🇰🇭",
+            "name": "Cambodia",
+            "tel": "+855"
+        },
+        {
+            "code": "KI",
+            "flag": "🇰🇮",
+            "name": "Kiribati",
+            "tel": "+686"
+        },
+        {
+            "code": "KM",
+            "flag": "🇰🇲",
+            "name": "Comoros",
+            "tel": "+269"
+        },
+        {
+            "code": "KN",
+            "flag": "🇰🇳",
+            "name": "Saint Kitts and Nevis",
+            "tel": "+1-869"
+        },
+        {
+            "code": "KP",
+            "flag": "🇰🇵",
+            "name": "North Korea",
+            "tel": "+850"
+        },
+        {
+            "code": "KR",
+            "flag": "🇰🇷",
+            "name": "South Korea",
+            "tel": "+82"
+        },
+        {
+            "code": "KW",
+            "flag": "🇰🇼",
+            "name": "Kuwait",
+            "tel": "+965"
+        },
+        {
+            "code": "KY",
+            "flag": "🇰🇾",
+            "name": "Cayman Islands",
+            "tel": "+1-345"
+        },
+        {
+            "code": "KZ",
+            "flag": "🇰🇿",
+            "name": "Kazakhstan",
+            "tel": "+7"
+        },
+        {
+            "code": "LA",
+            "flag": "🇱🇦",
+            "name": "Laos",
+            "tel": "+856"
+        },
+        {
+            "code": "LB",
+            "flag": "🇱🇧",
+            "name": "Lebanon",
+            "tel": "+961"
+        },
+        {
+            "code": "LC",
+            "flag": "🇱🇨",
+            "name": "Saint Lucia",
+            "tel": "+1-758"
+        },
+        {
+            "code": "LI",
+            "flag": "🇱🇮",
+            "name": "Liechtenstein",
+            "tel": "+423"
+        },
+        {
+            "code": "LK",
+            "flag": "🇱🇰",
+            "name": "Sri Lanka",
+            "tel": "+94"
+        },
+        {
+            "code": "LR",
+            "flag": "🇱🇷",
+            "name": "Liberia",
+            "tel": "+231"
+        },
+        {
+            "code": "LS",
+            "flag": "🇱🇸",
+            "name": "Lesotho",
+            "tel": "+266"
+        },
+        {
+            "code": "LT",
+            "flag": "🇱🇹",
+            "name": "Lithuania",
+            "tel": "+370"
+        },
+        {
+            "code": "LU",
+            "flag": "🇱🇺",
+            "name": "Luxembourg",
+            "tel": "+352"
+        },
+        {
+            "code": "LV",
+            "flag": "🇱🇻",
+            "name": "Latvia",
+            "tel": "+371"
+        },
+        {
+            "code": "LY",
+            "flag": "🇱🇾",
+            "name": "Libya",
+            "tel": "+218"
+        },
+        {
+            "code": "MA",
+            "flag": "🇲🇦",
+            "name": "Morocco",
+            "tel": "+212"
+        },
+        {
+            "code": "MC",
+            "flag": "🇲🇨",
+            "name": "Monaco",
+            "tel": "+377"
+        },
+        {
+            "code": "MD",
+            "flag": "🇲🇩",
+            "name": "Moldova",
+            "tel": "+373"
+        },
+        {
+            "code": "ME",
+            "flag": "🇲🇪",
+            "name": "Montenegro",
+            "tel": "+382"
+        },
+        {
+            "code": "MF",
+            "flag": "🇲🇫",
+            "name": "Saint Martin",
+            "tel": "+590"
+        },
+        {
+            "code": "MG",
+            "flag": "🇲🇬",
+            "name": "Madagascar",
+            "tel": "+261"
+        },
+        {
+            "code": "MH",
+            "flag": "🇲🇭",
+            "name": "Marshall Islands",
+            "tel": "+692"
+        },
+        {
+            "code": "MK",
+            "flag": "🇲🇰",
+            "name": "Macedonia",
+            "tel": "+389"
+        },
+        {
+            "code": "ML",
+            "flag": "🇲🇱",
+            "name": "Mali",
+            "tel": "+223"
+        },
+        {
+            "code": "MM",
+            "flag": "🇲🇲",
+            "name": "Myanmar",
+            "tel": "+95"
+        },
+        {
+            "code": "MN",
+            "flag": "🇲🇳",
+            "name": "Mongolia",
+            "tel": "+976"
+        },
+        {
+            "code": "MO",
+            "flag": "🇲🇴",
+            "name": "Macao",
+            "tel": "+853"
+        },
+        {
+            "code": "MP",
+            "flag": "🇲🇵",
+            "name": "Northern Mariana Islands",
+            "tel": "+1-670"
+        },
+        {
+            "code": "MQ",
+            "flag": "🇲🇶",
+            "name": "Martinique",
+            "tel": "+596"
+        },
+        {
+            "code": "MR",
+            "flag": "🇲🇷",
+            "name": "Mauritania",
+            "tel": "+222"
+        },
+        {
+            "code": "MS",
+            "flag": "🇲🇸",
+            "name": "Montserrat",
+            "tel": "+1-664"
+        },
+        {
+            "code": "MT",
+            "flag": "🇲🇹",
+            "name": "Malta",
+            "tel": "+356"
+        },
+        {
+            "code": "MU",
+            "flag": "🇲🇺",
+            "name": "Mauritius",
+            "tel": "+230"
+        },
+        {
+            "code": "MV",
+            "flag": "🇲🇻",
+            "name": "Maldives",
+            "tel": "+960"
+        },
+        {
+            "code": "MW",
+            "flag": "🇲🇼",
+            "name": "Malawi",
+            "tel": "+265"
+        },
+        {
+            "code": "MX",
+            "flag": "🇲🇽",
+            "name": "Mexico",
+            "tel": "+52"
+        },
+        {
+            "code": "MY",
+            "flag": "🇲🇾",
+            "name": "Malaysia",
+            "tel": "+60"
+        },
+        {
+            "code": "MZ",
+            "flag": "🇲🇿",
+            "name": "Mozambique",
+            "tel": "+258"
+        },
+        {
+            "code": "NA",
+            "flag": "🇳🇦",
+            "name": "Namibia",
+            "tel": "+264"
+        },
+        {
+            "code": "NC",
+            "flag": "🇳🇨",
+            "name": "New Caledonia",
+            "tel": "+687"
+        },
+        {
+            "code": "NE",
+            "flag": "🇳🇪",
+            "name": "Niger",
+            "tel": "+227"
+        },
+        {
+            "code": "NF",
+            "flag": "🇳🇫",
+            "name": "Norfolk Island",
+            "tel": "+672"
+        },
+        {
+            "code": "NG",
+            "flag": "🇳🇬",
+            "name": "Nigeria",
+            "tel": "+234"
+        },
+        {
+            "code": "NI",
+            "flag": "🇳🇮",
+            "name": "Nicaragua",
+            "tel": "+505"
+        },
+        {
+            "code": "NL",
+            "flag": "🇳🇱",
+            "name": "Netherlands",
+            "tel": "+31"
+        },
+        {
+            "code": "NO",
+            "flag": "🇳🇴",
+            "name": "Norway",
+            "tel": "+47"
+        },
+        {
+            "code": "NP",
+            "flag": "🇳🇵",
+            "name": "Nepal",
+            "tel": "+977"
+        },
+        {
+            "code": "NR",
+            "flag": "🇳🇷",
+            "name": "Nauru",
+            "tel": "+674"
+        },
+        {
+            "code": "NU",
+            "flag": "🇳🇺",
+            "name": "Niue",
+            "tel": "+683"
+        },
+        {
+            "code": "NZ",
+            "flag": "🇳🇿",
+            "name": "New Zealand",
+            "tel": "+64"
+        },
+        {
+            "code": "OM",
+            "flag": "🇴🇲",
+            "name": "Oman",
+            "tel": "+968"
+        },
+        {
+            "code": "PA",
+            "flag": "🇵🇦",
+            "name": "Panama",
+            "tel": "+507"
+        },
+        {
+            "code": "PE",
+            "flag": "🇵🇪",
+            "name": "Peru",
+            "tel": "+51"
+        },
+        {
+            "code": "PF",
+            "flag": "🇵🇫",
+            "name": "French Polynesia",
+            "tel": "+689"
+        },
+        {
+            "code": "PG",
+            "flag": "🇵🇬",
+            "name": "Papua New Guinea",
+            "tel": "+675"
+        },
+        {
+            "code": "PH",
+            "flag": "🇵🇭",
+            "name": "Philippines",
+            "tel": "+63"
+        },
+        {
+            "code": "PK",
+            "flag": "🇵🇰",
+            "name": "Pakistan",
+            "tel": "+92"
+        },
+        {
+            "code": "PL",
+            "flag": "🇵🇱",
+            "name": "Poland",
+            "tel": "+48"
+        },
+        {
+            "code": "PM",
+            "flag": "🇵🇲",
+            "name": "Saint Pierre and Miquelon",
+            "tel": "+508"
+        },
+        {
+            "code": "PN",
+            "flag": "🇵🇳",
+            "name": "Pitcairn",
+            "tel": "+870"
+        },
+        {
+            "code": "PR",
+            "flag": "🇵🇷",
+            "name": "Puerto Rico",
+            "tel": "+1-787 and 1-939"
+        },
+        {
+            "code": "PS",
+            "flag": "🇵🇸",
+            "name": "Palestinian Territory",
+            "tel": "+970"
+        },
+        {
+            "code": "PT",
+            "flag": "🇵🇹",
+            "name": "Portugal",
+            "tel": "+351"
+        },
+        {
+            "code": "PW",
+            "flag": "🇵🇼",
+            "name": "Palau",
+            "tel": "+680"
+        },
+        {
+            "code": "PY",
+            "flag": "🇵🇾",
+            "name": "Paraguay",
+            "tel": "+595"
+        },
+        {
+            "code": "QA",
+            "flag": "🇶🇦",
+            "name": "Qatar",
+            "tel": "+974"
+        },
+        {
+            "code": "RE",
+            "flag": "🇷🇪",
+            "name": "Reunion",
+            "tel": "+262"
+        },
+        {
+            "code": "RO",
+            "flag": "🇷🇴",
+            "name": "Romania",
+            "tel": "+40"
+        },
+        {
+            "code": "RS",
+            "flag": "🇷🇸",
+            "name": "Serbia",
+            "tel": "+381"
+        },
+        {
+            "code": "RU",
+            "flag": "🇷🇺",
+            "name": "Russia",
+            "tel": "+7"
+        },
+        {
+            "code": "RW",
+            "flag": "🇷🇼",
+            "name": "Rwanda",
+            "tel": "+250"
+        },
+        {
+            "code": "SA",
+            "flag": "🇸🇦",
+            "name": "Saudi Arabia",
+            "tel": "+966"
+        },
+        {
+            "code": "SB",
+            "flag": "🇸🇧",
+            "name": "Solomon Islands",
+            "tel": "+677"
+        },
+        {
+            "code": "SC",
+            "flag": "🇸🇨",
+            "name": "Seychelles",
+            "tel": "+248"
+        },
+        {
+            "code": "SD",
+            "flag": "🇸🇩",
+            "name": "Sudan",
+            "tel": "+249"
+        },
+        {
+            "code": "SE",
+            "flag": "🇸🇪",
+            "name": "Sweden",
+            "tel": "+46"
+        },
+        {
+            "code": "SG",
+            "flag": "🇸🇬",
+            "name": "Singapore",
+            "tel": "+65"
+        },
+        {
+            "code": "SH",
+            "flag": "🇸🇭",
+            "name": "Saint Helena",
+            "tel": "+290"
+        },
+        {
+            "code": "SI",
+            "flag": "🇸🇮",
+            "name": "Slovenia",
+            "tel": "+386"
+        },
+        {
+            "code": "SJ",
+            "flag": "🇸🇯",
+            "name": "Svalbard and Jan Mayen",
+            "tel": "+47"
+        },
+        {
+            "code": "SK",
+            "flag": "🇸🇰",
+            "name": "Slovakia",
+            "tel": "+421"
+        },
+        {
+            "code": "SL",
+            "flag": "🇸🇱",
+            "name": "Sierra Leone",
+            "tel": "+232"
+        },
+        {
+            "code": "SM",
+            "flag": "🇸🇲",
+            "name": "San Marino",
+            "tel": "+378"
+        },
+        {
+            "code": "SN",
+            "flag": "🇸🇳",
+            "name": "Senegal",
+            "tel": "+221"
+        },
+        {
+            "code": "SO",
+            "flag": "🇸🇴",
+            "name": "Somalia",
+            "tel": "+252"
+        },
+        {
+            "code": "SR",
+            "flag": "🇸🇷",
+            "name": "Suriname",
+            "tel": "+597"
+        },
+        {
+            "code": "SS",
+            "flag": "🇸🇸",
+            "name": "South Sudan",
+            "tel": "+211"
+        },
+        {
+            "code": "ST",
+            "flag": "🇸🇹",
+            "name": "Sao Tome and Principe",
+            "tel": "+239"
+        },
+        {
+            "code": "SV",
+            "flag": "🇸🇻",
+            "name": "El Salvador",
+            "tel": "+503"
+        },
+        {
+            "code": "SX",
+            "flag": "🇸🇽",
+            "name": "Sint Maarten",
+            "tel": "+599"
+        },
+        {
+            "code": "SY",
+            "flag": "🇸🇾",
+            "name": "Syria",
+            "tel": "+963"
+        },
+        {
+            "code": "SZ",
+            "flag": "🇸🇿",
+            "name": "Swaziland",
+            "tel": "+268"
+        },
+        {
+            "code": "TC",
+            "flag": "🇹🇨",
+            "name": "Turks and Caicos Islands",
+            "tel": "+1-649"
+        },
+        {
+            "code": "TD",
+            "flag": "🇹🇩",
+            "name": "Chad",
+            "tel": "+235"
+        },
+        {
+            "code": "TF",
+            "flag": "🇹🇫",
+            "name": "French Southern Territories",
+            "tel": "+262"
+        },
+        {
+            "code": "TG",
+            "flag": "🇹🇬",
+            "name": "Togo",
+            "tel": "+228"
+        },
+        {
+            "code": "TH",
+            "flag": "🇹🇭",
+            "name": "Thailand",
+            "tel": "+66"
+        },
+        {
+            "code": "TJ",
+            "flag": "🇹🇯",
+            "name": "Tajikistan",
+            "tel": "+992"
+        },
+        {
+            "code": "TK",
+            "flag": "🇹🇰",
+            "name": "Tokelau",
+            "tel": "+690"
+        },
+        {
+            "code": "TL",
+            "flag": "🇹🇱",
+            "name": "East Timor",
+            "tel": "+670"
+        },
+        {
+            "code": "TM",
+            "flag": "🇹🇲",
+            "name": "Turkmenistan",
+            "tel": "+993"
+        },
+        {
+            "code": "TN",
+            "flag": "🇹🇳",
+            "name": "Tunisia",
+            "tel": "+216"
+        },
+        {
+            "code": "TO",
+            "flag": "🇹🇴",
+            "name": "Tonga",
+            "tel": "+676"
+        },
+        {
+            "code": "TR",
+            "flag": "🇹🇷",
+            "name": "Turkey",
+            "tel": "+90"
+        },
+        {
+            "code": "TT",
+            "flag": "🇹🇹",
+            "name": "Trinidad and Tobago",
+            "tel": "+1-868"
+        },
+        {
+            "code": "TV",
+            "flag": "🇹🇻",
+            "name": "Tuvalu",
+            "tel": "+688"
+        },
+        {
+            "code": "TW",
+            "flag": "🇹🇼",
+            "name": "Taiwan",
+            "tel": "+886"
+        },
+        {
+            "code": "TZ",
+            "flag": "🇹🇿",
+            "name": "Tanzania",
+            "tel": "+255"
+        },
+        {
+            "code": "UA",
+            "flag": "🇺🇦",
+            "name": "Ukraine",
+            "tel": "+380"
+        },
+        {
+            "code": "UG",
+            "flag": "🇺🇬",
+            "name": "Uganda",
+            "tel": "+256"
+        },
+        {
+            "code": "UM",
+            "flag": "🇺🇲",
+            "name": "United States Minor Outlying Islands",
+            "tel": "+1"
+        },
+        {
+            "code": "US",
+            "flag": "🇺🇸",
+            "name": "United States",
+            "tel": "+1"
+        },
+        {
+            "code": "UY",
+            "flag": "🇺🇾",
+            "name": "Uruguay",
+            "tel": "+598"
+        },
+        {
+            "code": "UZ",
+            "flag": "🇺🇿",
+            "name": "Uzbekistan",
+            "tel": "+998"
+        },
+        {
+            "code": "VA",
+            "flag": "🇻🇦",
+            "name": "Vatican",
+            "tel": "+379"
+        },
+        {
+            "code": "VC",
+            "flag": "🇻🇨",
+            "name": "Saint Vincent and the Grenadines",
+            "tel": "+1-784"
+        },
+        {
+            "code": "VE",
+            "flag": "🇻🇪",
+            "name": "Venezuela",
+            "tel": "+58"
+        },
+        {
+            "code": "VG",
+            "flag": "🇻🇬",
+            "name": "British Virgin Islands",
+            "tel": "+1-284"
+        },
+        {
+            "code": "VI",
+            "flag": "🇻🇮",
+            "name": "U.S. Virgin Islands",
+            "tel": "+1-340"
+        },
+        {
+            "code": "VN",
+            "flag": "🇻🇳",
+            "name": "Vietnam",
+            "tel": "+84"
+        },
+        {
+            "code": "VU",
+            "flag": "🇻🇺",
+            "name": "Vanuatu",
+            "tel": "+678"
+        },
+        {
+            "code": "WF",
+            "flag": "🇼🇫",
+            "name": "Wallis and Futuna",
+            "tel": "+681"
+        },
+        {
+            "code": "WS",
+            "flag": "🇼🇸",
+            "name": "Samoa",
+            "tel": "+685"
+        },
+        {
+            "code": "YE",
+            "flag": "🇾🇪",
+            "name": "Yemen",
+            "tel": "+967"
+        },
+        {
+            "code": "YT",
+            "flag": "🇾🇹",
+            "name": "Mayotte",
+            "tel": "+262"
+        },
+        {
+            "code": "ZA",
+            "flag": "🇿🇦",
+            "name": "South Africa",
+            "tel": "+27"
+        },
+        {
+            "code": "ZM",
+            "flag": "🇿🇲",
+            "name": "Zambia",
+            "tel": "+260"
+        },
+        {
+            "code": "ZW",
+            "flag": "🇿🇼",
+            "name": "Zimbabwe",
+            "tel": "+263"
+        }
+        ]
+        let telPrefixes = ``;
+        let countryOptions = ``;
+        TelData.forEach(item => {
+            telPrefixes += `<option value="${item.code}" ${item.code === 'AE' ? 'selected' : ''} >${item.flag} ${item.tel}</option>`;
+            countryOptions += `<option value="${item.code}">${item.flag} ${item.name}</option>`;
+        })
+        document.getElementById('customQuoteTelPrefix').innerHTML = telPrefixes;
+    }
+</script>

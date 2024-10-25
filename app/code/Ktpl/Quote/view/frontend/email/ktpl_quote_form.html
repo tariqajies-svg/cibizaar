@@ -1,0 +1,21 @@
+<!--@subject {{trans "Request a Quote"}} @-->
+{{template config_path="design/email/header_template"}}
+<table class="message-details">
+    <tr>
+        <td><strong>{{trans "Name"}}</strong></td>
+        <td>{{var data.name}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Email"}}</strong></td>
+        <td>{{var data.email}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Phone Number"}}</strong></td>
+        <td>{{var data.phone}}</td>
+    </tr>    
+    <tr>
+        <td><strong>{{trans "Comment"}}</strong></td>
+        <td>{{var data.comment}}</td>
+    </tr>
+</table>
+{{template config_path="design/email/footer_template"}}

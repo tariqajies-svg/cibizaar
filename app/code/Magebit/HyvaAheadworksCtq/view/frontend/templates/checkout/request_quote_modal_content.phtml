@@ -1,0 +1,74 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\Checkout\RequestQuoteLink;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var RequestQuoteLink $block */
+
+$blockNameInLayout = $block->getNameInLayout();
+?>
+<script>
+    function initRequestForm() {
+        return {
+            isLoading: false,
+            submitForm(event) {
+                this.isLoading = true;
+                this.validate().then(() => {
+                    event.target.submit();
+                }).catch((invalid) => {
+                    this.isLoading = false;
+                    if (invalid.length > 0) {
+                        invalid[0].focus();
+                    }
+                });
+            },
+        };
+    }
+</script>
+<div>
+    <div class="pop-up-header">
+        <h3><?= $escaper->escapeHtml(__('New quote')) ?></h3>
+    </div>
+    <form x-data="{...initRequestForm(), ...hyva.formValidation($el)}"
+          action="<?= $escaper->escapeUrl($block->getUrl('aw_ctq/requestQuote/submit')) ?>"
+          method="post"
+          @submit.prevent="submitForm"
+    >
+        <div class="field field-reserved required">
+            <label class="label" for="quote_name_<?= $escaper->escapeHtmlAttr($blockNameInLayout) ?>"><?= $escaper->escapeHtml(__('Quote Name')) ?></label>
+            <input placeholder="<?= $escaper->escapeHtmlAttr(__('Quote Name')) ?>" class="form-input"
+                   data-validate='{"required": true}'
+                   name="quote_name"
+                   id="quote_name_<?= $escaper->escapeHtmlAttr($blockNameInLayout) ?>" type="text"/>
+        </div>
+        <div class="field field-reserved required">
+            <label class="label" for="quote-comment-field_<?= $escaper->escapeHtmlAttr($blockNameInLayout) ?>"><?= $escaper->escapeHtml(__('Comment')) ?></label>
+            <textarea placeholder="<?= $escaper->escapeHtmlAttr(__('Comment')) ?>" class="form-textarea"
+                      name="comment[comment]"
+                      data-validate='{"required": true}'
+                      id="quote-comment-field_<?= $escaper->escapeHtmlAttr($blockNameInLayout) ?>" type="text"></textarea>
+        </div>
+        <div class="field field-reserved">
+            <?= $block->getChildBlock('aw.ctq.create.request.modal.file_uploader')
+                ->setIsModal(true)
+                ->toHtml() ?>
+        </div>
+        <p class="text-xs mb-2"><?= $escaper->escapeHtml(__('Note, any discounts applied will be discarded')) ?></p>
+        <input name="form_key" type="hidden" value="<?= $escaper->escapeUrl($block->getFormKey()) ?>"/>
+        <button class="btn btn-primary w-full" type="submit"><?= $escaper->escapeHtml(__('Send')) ?></button>
+        <?= $block->getChildHtml('aw.ctq.create.request.modal.loading') ?>
+    </form>
+</div>

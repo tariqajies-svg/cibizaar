@@ -1,0 +1,53 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Quote\Link;
+use Magento\Framework\Escaper;
+
+/** @var Link $block */
+/** @var Escaper $escaper */
+?>
+
+<button x-data="initAmQuoteSubmitButton()"
+        @click.prevent="processSubmitQuote($el)"
+        type="button"
+        title="<?= $escaper->escapeHtmlAttr(__(__('Request A Quote'))) ?>"
+        class="amquote-addto-button amasty-quote-link w-full btn btn-primary checkout flex gap-2 px-3">
+        <i class="icon-quote text-lg"></i><?= $escaper->escapeHtml(__('Request A Quote')) ?>
+</button>
+
+<script>
+    function initAmQuoteSubmitButton() {
+        return {
+            selectors: {
+                updateForm: '#amasty-quote-update',
+                loginForm: '.amquote-cart-form .form.form-login',
+            },
+            processSubmitQuote: function ($el) {
+                window.dispatchEvent(new CustomEvent('validateRequestQuoteForm'));
+
+                const updateFormNode = document.querySelector(this.selectors.updateForm);
+                const loginFormNode = document.querySelector(this.selectors.loginForm);
+                if (!updateFormNode.reportValidity() || !loginFormNode.reportValidity()) {
+                    return;
+                }
+
+                Array.from(loginFormNode.elements).forEach((element) => {
+                    const clonedElement = element.cloneNode();
+                    clonedElement.hidden = true;
+                    updateFormNode.appendChild(clonedElement);
+                });
+
+                updateFormNode.querySelector('input[name="update_cart_action"]').value = 'submit';
+
+                $el.setAttribute('disabled', '');
+
+                updateFormNode.submit();
+            }
+        };
+    }
+</script>

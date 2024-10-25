@@ -1,0 +1,80 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\ConfigurableProduct\Block\Product\View\Type\Configurable;
+use Magento\Framework\Escaper;
+
+/** @var Configurable $block */
+/** @var Escaper $escaper */
+
+$product = $block->getProduct();
+$productId = $product->getId();
+$attributes = $block->decorateArray($block->getAllowAttributes());
+?>
+<?php if ($product->isSaleable() && count($attributes)): ?>
+    <script>
+        function initConfigurableDropdownOptions_<?= (int) $productId ?>() {
+            return initConfigurableOptions(
+                '<?= (int) $productId ?>',
+                <?= /* @noEscape */ $block->getJsonConfig() ?>
+            );
+        }
+    </script>
+    <div x-data="initConfigurableDropdownOptions_<?= (int) $productId ?>()"
+         x-init="init();"
+         @private-content-loaded.window="onGetCartData($event.detail.data)"
+         class="relative mb-7 lg:my-3"
+    >
+        <div>
+            <?php foreach ($attributes as $attribute): ?>
+                <?php $attributeId = $attribute->getAttributeId(); ?>
+                <?php $productAttribute = $attribute->getProductAttribute();  ?>
+                <div class="dropdown-attribute">
+                    <label class="block"
+                            for="attribute<?= $escaper->escapeHtmlAttr($attributeId) ?>"
+                    >
+                        <?= $escaper->escapeHtml(__('Select')) ?>
+                        <span class="lowercase">
+                            <?= $escaper->escapeHtml($productAttribute->getStoreLabel()) ?>
+                        </span>
+                    </label>
+                    <div class="w-full my-2">
+                        <select name="super_attribute[<?= $escaper->escapeHtmlAttr($attributeId) ?>]"
+                                id="attribute<?= $escaper->escapeHtmlAttr($attributeId) ?>"
+                                class="form-select super-attribute-select"
+                                x-on:change="changeOption(<?= (int) $attributeId ?>, event.target.value)"
+                                required="required">
+                            <option value="">
+                                <?= $escaper->escapeHtml(__('Choose an Option...')) ?>
+                            </option>
+                            <template
+                                x-for="(item, index) in getAllowedAttributeOptions(<?= (int) $attributeId ?>)"
+                                :key="item.id"
+                            >
+                                <option
+                                    :value="item.id"
+                                    x-html="getAttributeOptionLabel(item)"
+                                    :selected="selectedValues[<?= $escaper->escapeHtmlAttr($attributeId) ?>] ===
+                                        item.id">
+                                </option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+<?php endif;?>

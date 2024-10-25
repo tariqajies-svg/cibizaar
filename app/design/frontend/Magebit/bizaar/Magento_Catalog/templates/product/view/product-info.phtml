@@ -1,0 +1,263 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Customer;
+use Hyva\Theme\ViewModel\ProductAttributes;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magebit\Brands\ViewModel\Brand;
+use Magebit\Catalog\ViewModel\ProductListAttributes;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$productViewModel = $viewModels->require(ProductPage::class);
+$brandViewModel = $viewModels->require(Brand::class);
+$attributesViewModel = $viewModels->require(ProductAttributes::class);
+$listAttributesViewModel = $viewModels->require(ProductListAttributes::class);
+$customer = $viewModels->require(Customer::class);
+
+/** @var Product $product */
+$product = $productViewModel->getProduct();
+$productAttributeList = $listAttributesViewModel->getProductAttributes($product);
+$hasBrandUrl = $brandViewModel->hasBrandUrl($product);
+
+$productQtyBlock = $block->getChildHtml("product.info.quantity");
+?>
+<?php /* Left section */ ?>
+<div class="pro-middle order-last flex flex-col md:order-2 w-full lg:col-span-5">
+    <?php if($product->getNew()):?>
+        <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #FD4331;">
+            <span class="text-white text-xs uppercase font-semibold uppercase">New</span>
+        </div>
+    <?php endif; ?>
+
+    <?php if($product->getTopSeller()):?>
+        <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #F63972;">
+            <span class="text-white text-xs uppercase font-semibold uppercase">Top Seller</span>
+        </div>
+    <?php endif; ?>
+
+    <?php if($product->getLimitedStock()):?>
+        <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #F4CA3D;">
+            <span class="text-white text-xs uppercase font-semibold uppercase">Limited Stock</span>
+        </div>
+    <?php endif; ?>
+
+    <?php if($product->getBizaarChoice()):?>
+        <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #0165ff;">
+            <span class="text-white text-xs uppercase font-semibold uppercase">Bizaar's Choice</span>
+        </div>
+    <?php endif; ?>
+    <?php if($product->getLowestPrice()):?>
+        <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #545454;">
+            <span class="text-white text-xs uppercase font-semibold uppercase">Lowest Price</span>
+        </div>
+    <?php endif; ?>
+    <div class="pdp-raview-container flex justify-between">
+        <div class="pdp-brand-logo">
+            <?php 
+                $brandLogo = $this->getLayout()->createBlock("Magebit\Brands\Block\BrandSwatch")->getBrandLogoPDP($product);
+                if($brandLogo){ ?>
+                    <img src="<?php echo $brandLogo['image_url']; ?>" alt="<?php echo $brandLogo['brand']; ?>" class="max-w-32">
+                <?php } ?>
+        </div>
+        <?php if ($productInfoReview = $block->getChildHtml('product.info.review')): ?>
+            <div class="my-2 cursor-pointer"
+                onclick="(
+                    document.getElementById('customer-review-list') ||
+                    document.getElementById('customer-reviews')).scrollIntoView({behavior: 'smooth'}
+                )">
+                <?= /* @noEscape */ $productInfoReview ?>
+            </div>
+        <?php endif; ?>
+    </div>
+    <div class="pdp-sku-container mt-2 text-base font-normal">
+        <span class="product-detail-label pr-1">
+            <?= $escaper->escapeHtml(__('SKU')) ?>:
+        </span>
+        <span class="product-detail-value">
+            <?= $escaper->escapeHtml($product->getSku()) ?>
+        </span>
+    </div>
+    <div class="pdp-pro-name">
+        <h1 class="hidden md:block mt-3 w-full text-base xl:text-[22px] font-medium text-black">
+            <?= $escaper->escapeHtml($product->getName()) ?>
+        </h1>
+        <?php /* Product actions */ ?>
+        <div class="product-info-actions flex gap-2 w-full mb-4 lg:mb-0 text-right lg:w-unset">
+            <?php /* $block->getChildHtml('product.info.addtocompare'); */ ?>
+            <?php /* $block->getChildHtml('product.info.addtowishlist'); */ ?>
+            <?= $block->getChildHtml('product.info.emailtofriend'); ?>
+            <?php if ($addToRequisitionList = $block->getChildBlock('product.info.addToRequisitionlist')): ?>
+                <?= $addToRequisitionList->setProduct($product)->toHtml() ?>
+            <?php endif; ?>
+        </div>
+    </div>
+
+
+    <?php if ($shortDescription = $productViewModel->getShortDescription()): ?>
+        <div class="product-description mb-2 mt-3 text-sm lg:text-base leading-6"><?= /* @noEscape */ $shortDescription ?></div>
+    <?php endif; ?>
+        <?php
+$hidePriceHelper = $this->helper('\Amasty\HidePrice\Helper\Data');
+         if ($hidePriceHelper->isNeedHideProduct($block->getProduct())) { 
+?>
+<div class="amasty-hide-price-pdp">
+                <?= $hidePriceHelper->getNewPriceHtmlBox($block->getProduct()) ?>
+                </div>                
+            <?php } ?>
+    <?php /* Price */ ?>
+    <?php if ($product->isSaleable()): ?>
+        <div class="pdp-price-container">
+            <div class="border-b pb-4 mb-4">
+                <?= $block->getChildHtml("product.info.stockstatus") ?>
+                <?= $block->getChildHtml("product.info.back_in_stock") ?>
+            </div>
+            <?php if(!$hidePriceHelper->isNeedHideProduct($block->getProduct())) { ?>
+            <?= $block->getChildHtml("product.info.price") ?>
+        <?php } ?>
+        </div>
+    <?php endif; ?>
+
+    <?php /* Quantity and Add to cart */ ?>
+    <?php if ($product->isSaleable()): ?>
+        <script>
+            function initMobileAddToCart() {
+                return {
+                    hideScroller() {
+                        const scrollTo = this.$refs.scrollTo;
+                        const scroller = this.$refs.scroller;
+                        const scrollerQtyInput = scroller.querySelector('input[name="qty"]');
+                        const scrollToOffset = scrollTo.getBoundingClientRect().top;
+                        const scrollerOffset = scroller.getBoundingClientRect().top;
+                        const headerHeight = document.getElementById('header').offsetHeight;
+
+                        if (scrollToOffset > scrollerOffset
+                            || scrollToOffset + scrollTo.offsetHeight - headerHeight < 0 ) {
+                            scroller.style.visibility = 'visible';
+                            scrollerQtyInput.disabled = false;
+                        } else {
+                            scroller.style.visibility = 'hidden';
+                            scrollerQtyInput.disabled = true;
+                        }
+                    }
+                }
+            }
+        </script>
+        <div x-data="initMobileAddToCart()"
+             x-init="hideScroller()"
+             class="my-2 lg:my-3">
+            <div class="gap-2 lg:gap-4 my-4 sm:mt-0 flex flex-wrap"
+                 x-ref="scrollTo">
+                <?= $block->getChildHtml("product.info.quantity") ?>
+                <?= $block->getChildHtml("product.info.addtocart") ?>
+            </div>
+            <div class="product-atc-mobile"
+                 x-ref="scroller"
+                 x-cloak
+                 @scroll.window="hideScroller()">
+                    <?php if ($qtyBlock = $block->getChildBlock("product.info.quantity")): ?>
+                        <?php $qtyBlock->setData('is_mobile', true); ?>
+                        <?= $qtyBlock->toHtml(); ?>
+                    <?php endif; ?>
+                    <?php if ($addToCartBlock = $block->getChildBlock("product.info.addtocart")): ?>
+                        <?php $addToCartBlock->setData('is_mobile', true); ?>
+                        <?= $addToCartBlock->toHtml(); ?>
+                    <?php endif; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+    
+    
+
+    <?php if ($product->isSaleable()): ?>
+        <?= $block->getChildHtml('addtocart.shortcut.buttons') ?>
+    <?php endif; ?>
+    
+<?= $block->getChildHtml("product.info.additional") ?>
+
+    <!-- <div class="flex flex-wrap 2xl:flex-nowrap items-center gap-5 lg:gap-6 mb-5 lg:mb-6 w-full">
+        <?php /* Stock status */ ?>
+        <div class="flex flex-col sm:flex-row justify-between w-full">
+            <?/*= $block->getChildHtml("alert.urls") */?>
+        </div>
+    </div> -->
+
+    <div class="mb-5 w-full lg:hidden">
+        <?= $block->getChildHtml("product.info.back_in_stock") ?>
+    </div>
+    
+    <div class="flex items-center mb-1">
+        <div class="">
+            <img src="<?php echo $block->getBaseUrl().'media/wysiwyg/pdp/limited-stock-1.svg' ?>" alt="">
+        </div>
+        <span class="ml-2 text-gray-700 font-normal"><?php echo __('limited stock - more arriving soon') ?></span>
+    </div>
+    <div class="flex items-center mb-1">
+        <div class="">
+            <img src="<?php echo $block->getBaseUrl().'media/wysiwyg/pdp/limited-stock-2.svg' ?>" alt="">
+        </div>
+        <span class="ml-2 text-gray-700 font-light"><?php echo __('your price: ') ?>
+        <?php
+    $customerGroup = $this->helper('Ktpl\Catalog\Helper\Data')->getGroupId();
+    if($customerGroup) {
+    ?>
+        <strong class="font-semibold"><?php echo __($product->getResource()->getAttribute('manufacturer')->getFrontend()->getValue($product).' '. $customerGroup) ?></strong>
+    <?php } else {
+        echo '<strong class="font-semibold"><a href="'.$block->getBaseUrl().'/customer/account/login">Login</a> for your B2B price</strong>';
+    } ?>   
+    </span>
+    </div>
+    <?php /* Product attributes */ ?>
+    
+    <div class="product-info-form">
+        <?= $block->getChildHtml('product.info.form') ?>
+    </div>
+
+    <div class="lg:flex justify-between border-t mt-4 pt-4">
+        <?php if ((int)$product->getData('dispatch_messag')) { ?>
+        <div class="flex lg:w-2/3 text-base text-black">
+            <span class="font-normal clear pr-2 text-[#737373]"><?= $escaper->escapeHtml(__('Shipping')) ?>:</span>
+             <span class="font-semibold"><?= $escaper->escapeHtml(Date('D, d M', strtotime('+'.(int)$product->getData('dispatch_messag').'day'))) ?></span>
+        </div>
+    <?php } ?>
+        <div class="mt-3 lg:mt-0 ml-auto">
+            <?php if($manufacturer_warranty = $product->getResource()->getAttribute('manufacturer_warranty')->getFrontend()->getValue($product)) {
+                $manufacturer_warranty = str_replace(' ', '_', $manufacturer_warranty);
+                 $manufacturer_warranty_url = $block->getBaseUrl().'media/wysiwyg/pdp/'.$manufacturer_warranty.'.svg';
+                ?>
+            <div class="flex items-center border-b pb-2 mb-2">
+                <img src="<?php echo $manufacturer_warranty_url; ?>" alt="<?php echo $manufacturer_warranty ?> Icon">
+            </div>
+            <?php } ?>
+            <div class="flex items-center">
+                <img src="<?php echo $block->getBaseUrl().'media/wysiwyg/pdp/genuine.svg' ?>" alt="Genuine Icon" class="mr-2">
+                <div class="text-xs font-semibold"><?php echo __('100% Genuine') ?></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+</style>

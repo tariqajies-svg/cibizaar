@@ -1,0 +1,42 @@
+<?php
+/**
+ * This file is part of the Magebit_AdditionalCharge package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_AdditionalCharge
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+/**
+ * Adds is_charge checkbox handling as it's not saving it's value by default
+ */
+?>
+<script>
+    require([
+        "jquery",
+        "mage/adminhtml/form"
+    ], function(jQuery){
+        (function ($) {
+            $(document).ready(function () {
+                'use strict';
+
+                var isCharge = $('#is_charge')
+                    .on('change.isCharge', function(){
+                        const isChargeChecked = $(this).is(':checked');
+                        $(this).val(isChargeChecked ? 1 : 0);
+                    });
+                if (parseInt(isCharge.val(), 10)) {
+                    isCharge.attr({checked: 'checked'})
+                }
+                isCharge.trigger('change');
+            });
+        })(jQuery);
+    });
+</script>

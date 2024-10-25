@@ -1,0 +1,52 @@
+@import 'theme/components/page.css';
+@import 'theme/components/customer.css';
+@import 'theme/components/recaptcha.css';
+@import 'theme/components/sales.css';
+@import 'theme/components/style/forms.css';
+@import 'theme/components/filters.css';
+@import 'theme/components/header.css';
+@import 'theme/components/footer.css';
+@import 'theme/components/tooltip.css';
+@import 'theme/components/product-slider.css';
+@import 'theme/components/search.css';
+@import 'theme/components/menu-mobile.css';
+@import 'theme/components/price.css';
+@import 'theme/components/get-a-quote.css';
+
+/* Blocks */
+@import 'theme/blocks/seo-description.css';
+@import 'theme/blocks/checkout/cart-summary.css';
+@import 'theme/blocks/checkout/item-list.css';
+@import 'theme/blocks/category-menu.css';
+@import 'theme/blocks/block-account-information.css';
+@import 'theme/blocks/quote/aw_ctq-quote-links.css';
+@import 'theme/blocks/add-to-rl.css';
+@import 'theme/blocks/blogs/sidebar.css';
+@import 'theme/blocks/blogs/list-item.css';
+
+/* Pages */
+@import 'theme/pages/my-account.css';
+@import 'theme/pages/checkout-onepage-success.css';
+@import 'theme/pages/customer-account.css';
+@import 'theme/pages/home.css';
+@import 'theme/pages/checkout-cart-index.css';
+@import 'theme/pages/account/requisition-list.css';
+@import 'theme/pages/aw_ca-company-edit.css';
+@import 'theme/pages/no-route.css';
+@import 'theme/pages/catalog-product-view.css';
+@import 'theme/pages/quick-order.css';
+@import 'theme/pages/ca-roles-permissions.css';
+@import 'theme/pages/customer-order-view.css';
+@import 'theme/pages/aw_ctq-quote-edit.css';
+@import 'theme/pages/contact.css';
+@import 'theme/pages/product-compare-index.css';
+@import 'theme/pages/cms-page-view.css';
+@import 'theme/pages/wishlist.css';
+@import 'theme/pages/blogs/listing.css';
+@import 'theme/pages/blogs/view.css';
+@import 'theme/pages/about-us.css';
+@import 'theme/pages/pdp.css';
+
+/* BSS */
+@import 'theme/pages/bss-sitemap.css';
+@import 'theme/components/screen-resolution-xl-xxl.css';

@@ -1,0 +1,52 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Data\Helper\PostHelper;
+use Magento\Framework\Escaper;
+use Magento\Sales\Block\Order\Info\Buttons;
+use Magento\Sales\Helper\Reorder;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var Escaper $escaper */
+/** @var Buttons $block */
+?>
+<div class="order-buttons flex gap-y-4.75 gap-x-6.5 flex-wrap lg:gap-x-6">
+    <?php $order = $block->getOrder() ?>
+    <div class="flex flex-grow gap-2 lg:gap-6 items-start flex-wrap">
+        <?php if ($this->helper(Reorder::class)->canReorder($order->getEntityId())): ?>
+            <?php $formData = json_decode($this->helper(PostHelper::class)->getPostData(
+                $block->getReorderUrl($order)
+            ), true) ?>
+            <form action="<?= $escaper->escapeUrl($formData['action']) ?>" method="post" class="flex flex-grow items-center">
+                <?= $block->getBlockHtml('formkey'); ?>
+                <input type="hidden" name="data" value='<?= /** @noEscape */ json_encode($formData['data']) ?>'/>
+                <button type="submit" class="btn btn-primary flex-grow btn-sm btn btn-primary btn-light">
+                    <i class="icon-reload inline-block mr-1"></i>
+                    <span><?= $escaper->escapeHtml(__('Reorder')) ?></span>
+                </button>
+            </form>
+        <?php endif ?>
+        <a href="<?= $escaper->escapeUrl($block->getPrintUrl($order)) ?>"
+           class="btn btn-primary btn-sm flex-grow btn btn-primary btn-light"
+           target="_blank"
+           rel="noopener">
+            <i class="icon-printer inline-block mr-1"></i>
+            <span><?= $escaper->escapeHtml(__('Print Order')) ?></span>
+        </a>
+    </div>
+    <?= $block->getChildHtml() ?>
+</div>

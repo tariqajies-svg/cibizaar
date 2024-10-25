@@ -1,0 +1,53 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Slider;
+use Magento\Catalog\Block\Product\View\Gallery;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Gallery $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Slider $sliderViewModel */
+
+$images = $block->getGalleryImages()->getItems();
+$mainImage = current(array_filter($images, function ($img) use ($block) {
+    return $block->isMainImage($img);
+}));
+
+if (!empty($images) && empty($mainImage)) {
+    $mainImage = $block->getGalleryImages()->getFirstItem();
+}
+
+if (!$mainImage || !$mainImage->getData('medium_image_url')) {
+    return;
+}
+?>
+<link rel="preload" as="image" fetchpriority="high"
+      imagesrcset="<?= $escaper->escapeUrl($mainImage->getData('small_mobile_image_url')) ?> 318w,
+                   <?= $escaper->escapeUrl($mainImage->getData('mobile_image_url')) ?> 370w,
+                   <?= $escaper->escapeUrl($mainImage->getData('tablet_image_url')) ?> 340w,
+                   <?= $escaper->escapeUrl($mainImage->getData('large_tablet_image_url')) ?> 466w,
+                   <?= $escaper->escapeUrl($mainImage->getData('small_desktop_image_url')) ?> 391w,
+                   <?= $escaper->escapeUrl($mainImage->getData('medium_image_url')) ?> 473w"
+      imagesizes="(max-width: 411px) 318px,
+                  (max-width: 767px) 370px,
+                  (max-width: 1023px) 340px,
+                  (max-width: 1279px) 466px,
+                  (max-width: 1535px) 391px,
+                  (min-width: 1536px) 473px"
+>

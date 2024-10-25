@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="aw_ca_company_extend" resource="default" engine="innodb" comment="AW Company Table">
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="AW_CA_COMPANY_EXTEND_ID" indexType="btree">
+            <column name="id"/>
+        </index>
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="row Id"/>
+        <column xsi:type="int" name="company_id" padding="10" unsigned="true" nullable="false" identity="false"
+                comment="Company ID"/>
+        <column xsi:type="varchar" name="description" nullable="true" length="100" comment="Company Description"/>
+        <column xsi:type="varchar" name="website" nullable="true" length="100" comment="Company Website"/>
+        <column xsi:type="varchar" name="tln" nullable="true" length="50" comment="Trade License Number"/>
+    </table>
+</schema>

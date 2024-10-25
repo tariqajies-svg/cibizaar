@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Amasty\Xnotif\Model\UrlHash" type="Magebit\Bizaar\Rewrite\Amasty\Xnotif\Model\UrlHash"/>
+    <type name="Magento\Quote\Model\Quote\Address\Rate">
+        <plugin name="Magebit_Bizaar_Plugin_Magento_Quote_Model_Quote_Address_Rate"
+                type="Magebit\Bizaar\Plugin\Magento\Quote\Model\Quote\Address\Rate"
+                sortOrder="10" disabled="false"/>
+    </type>
+    <preference for="Amasty\Shiprestriction\Model\RestrictRatesPerCarrier"
+                type="Magebit\Bizaar\Rewrite\Amasty\Shiprestriction\Model\RestrictRatesPerCarrier"/>
+    <type name="Infibeam\Ccavenue\Model\Ccavenue">
+        <plugin name="Magebit_Bizaar_Plugin_Infibeam_Ccavenue_Model_Ccavenue"
+                type="Magebit\Bizaar\Plugin\Infibeam\Ccavenue\Model\Ccavenue"
+                sortOrder="10" disabled="false"/>
+    </type>
+</config>

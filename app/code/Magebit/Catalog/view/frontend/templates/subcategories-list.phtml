@@ -1,0 +1,83 @@
+<?php
+/**
+ * This file is part of the Magebit_Catalog package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\Catalog\Block\Category\SubcategoriesList;
+use Magebit\Catalog\ViewModel\SubcategoryTree;
+use Magebit\CategoryImageCache\ViewModel\CategoryImageResizer;
+use Magento\Framework\Escaper;
+
+/**
+ * @var SubcategoriesList $block
+ * @var ViewModelRegistry $viewModels
+ * @var Escaper $escaper
+ */
+
+// Do nothing if category is not loaded
+if (!$category = $block->getCategory()) {
+    return;
+}
+/** @var SubcategoryTree $subcategoryTreeViewModel */
+$subcategoryTreeViewModel = $viewModels->require(SubcategoryTree::class);
+/** @var CategoryImageResizer $categoryImageResizer */
+$categoryImageResizer = $viewModels->require(CategoryImageResizer::class);
+
+// Order is important here: 1. build the menu data, 2. then set the cache tags from the view model identities
+$categoriesTree = $subcategoryTreeViewModel->getDescendantsTree($category);
+$block->setData('cache_tags', $subcategoryTreeViewModel->getIdentities());
+
+if (!count($categoriesTree)) {
+    return;
+}
+$isBrand = $category->getUrlPath() === 'brands';
+?>
+<div class="category-list grid grid-cols-1 gap-px mt:0.5  md:mt-6.75 md:mb-7
+            xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+    <?php foreach ($categoriesTree as $category): ?>
+        <div class="category-list-item relative after:absolute p-3.75 pb-2.75 md:p-7.75 md:pb-7">
+            <a class="!text-navy lg:hover:!text-blue-darker lg:active:!text-navy"
+               href="<?= $escaper->escapeUrl($category->getUrl()) ?>">
+                <?php if ($category->getImage()): ?>
+                    <div class="mb-4 md:mb-7.75 flex items-center w-20 lg:w-[120px]
+                        <?= $escaper->escapeHtmlAttr($isBrand ? 'h-10 lg:h-15' : 'h-20 lg:h-[120px]') ?>">
+                        <picture>
+                            <source media="(min-width: 1024px)"
+                                    srcset="<?= $escaper->escapeUrl($categoryImageResizer->resize($category, $isBrand ? null : '120', $isBrand ? '60' : '120')) ?> 1x,
+                                        <?= $escaper->escapeUrl($categoryImageResizer->resize($category, $isBrand ? null : '240', $isBrand ? '120' : '240')) ?> 2x">
+                            <source media="(max-width: 1023px)"
+                                    srcset="<?= $escaper->escapeUrl($categoryImageResizer->resize($category, $isBrand ? null : '80', $isBrand ? '40' : '80')) ?> 1x,
+                                        <?= $escaper->escapeUrl($categoryImageResizer->resize($category, $isBrand ? null : '160', $isBrand ? '80' : '160')) ?> 2x">
+                            <img src="<?= $escaper->escapeUrl($categoryImageResizer->resize($category, $isBrand ? null : '120', $isBrand ? '60' : '120')) ?>"
+                                 alt="<?= $escaper->escapeHtmlAttr($category->getName()) ?>"
+                                 height="<?= $escaper->escapeHtmlAttr($isBrand ? '60' : '120') ?>"
+                                 loading="lazy"
+                                 <?= $isBrand ? '' : 'width="120"' ?>>
+                        </picture>
+                    </div>
+                <?php endif; ?>
+                <h4 class="mb-0 !text-inherit !font-bold text-sm leading-5 lg:text-md"><?= $escaper->escapeHtml($category->getName()) ?></h4>
+            </a>
+            <?php if ($childTree = $category->getChildrenTree()): ?>
+                <ul class="clear mt-3 md:mt-5">
+                    <?php foreach ($category->getChildrenTree() as $category2): ?>
+                        <li class="mb-1">
+                            <a class="!text-gray block lg:hover:!text-blue-darker lg:active:!text-navy font-semibold"
+                               href="<?= $escaper->escapeUrl($category2->getUrl()) ?>"><?= $escaper->escapeHtml($category2->getName()) ?></a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
+</div>

@@ -1,0 +1,28 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+/**
+ * The AlpineJS scope of this file is the method `initCartTotals()` in Magento_Checkout::php-cart/totals.phtml
+ */
+?>
+<template x-if="segment.code === 'discount'">
+    <div class="flex pb-1.25 text-sm lg:text-base md:grid md:grid-cols-2 md:w-full border-container">
+        <div class="w-7/12 text-left md:w-auto"
+             x-html="segment.title"
+        ></div>
+        <div class="w-5/12 text-right md:w-auto text-navy font-bold"
+             x-text="hyva.formatPrice(segment.value)"
+        ></div>
+    </div>
+</template>

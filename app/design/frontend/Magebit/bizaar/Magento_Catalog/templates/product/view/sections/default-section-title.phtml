@@ -1,0 +1,51 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\AbstractBlock;
+
+/** @var AbstractBlock $sectionBlock */
+/** @var Escaper $escaper */
+
+$product = $sectionBlock->getProduct();
+?>
+<div id="specification" class="">
+    <h3 class="text-md xl:text-xl font-semibold xl:font-bold leading-7 flex justify-between items-center cursor-pointer">
+        <span><?= $sectionBlock->getTitle() ? $escaper->escapeHtml($sectionBlock->getTitle()) : '&nbsp;' ?></span>
+        <span>
+            <svg x-show="!open" class="md-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 9l-7 7-7-7"></path>
+            </svg>
+            <svg x-show="open" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 15l7-7 7 7"></path>
+            </svg>
+        </span>
+    </h3>
+    <?php if ($sectionBlock->getNameInLayout() === 'product.attributes' && $product && ($product->getData('attachment_1_label') || $product->getData('attachment_2_label'))): ?>
+        <div class="flex flex-col flex-grow items-end mt-0">
+            <?php if (($label = $product->getData('attachment_1_label')) && ($url = $product->getData('attachment_1_url'))): ?>
+                <a href="<?= $escaper->escapeUrl($url) ?>" target="_blank">
+                    <?= $escaper->escapeHtml((string) $label) ?>
+                </a>
+            <?php endif; ?>
+            <?php if (($label = $product->getData('attachment_2_label')) && ($url = $product->getData('attachment_2_url'))): ?>
+                <a href="<?= $escaper->escapeUrl($url) ?>" target="_blank">
+                    <?= $escaper->escapeHtml((string) $label) ?>
+                </a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+</div>

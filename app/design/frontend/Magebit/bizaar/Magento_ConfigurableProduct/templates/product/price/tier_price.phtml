@@ -1,0 +1,100 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magebit\Catalog\ViewModel\TierPrices;
+use Magento\Catalog\Block\Product\View;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+
+/** @var View $block */
+/** @var Escaper $escaper */
+/** @var Product $product */
+
+/** @var ViewModelRegistry $viewModels */
+$currentProduct = $viewModels->require(CurrentProduct::class);
+$product = $currentProduct->get();
+
+if (!$product) {
+    return '';
+}
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+$tierPricesViewModel = $viewModels->require(TierPrices::class);
+$showTierPrice = $tierPricesViewModel->isTierPriceAllowed();
+?>
+<script>
+    function initTierPrices<?= (int) $product->getId() ?>() {
+        return {
+            activeProductsPriceData: false,
+            getConfiguredTierPrices() {
+                if (this.activeProductsPriceData && this.activeProductsPriceData.tierPrices) {
+                    return this.activeProductsPriceData.tierPrices.map((tierPrice) => {
+                        return {
+                            qty: tierPrice.qty,
+                            price: tierPrice.price,
+                            percentage: tierPrice.percentage
+                        }
+                    })
+                }
+                return false;
+            },
+            getItemPrice(item) {
+                return hyva.formatPrice(item.price)
+            },
+            eventListeners: {
+                ['@update-prices-<?= (int) $product->getId() ?>.window'](event) {
+                    this.activeProductsPriceData = event.detail;
+                }
+            }
+        }
+    }
+</script>
+<div
+     x-data="initTierPrices<?= (int)$product->getId() ?>()"
+     x-spread="eventListeners"
+>
+    <template x-if="getConfiguredTierPrices() && getConfiguredTierPrices().length">
+        <div class="pt-3 lg:pt-6">
+            <?php if (!$showTierPrice): ?>
+                <div class="text-sm font-semibold text-black text-center mb-2"><?= /** @noEscape  */ $tierPricesViewModel->getBulkPriceMessage() ?></div>
+            <?php endif; ?>
+            <div class="flex flex-col font-bold"
+                 :class="{'opacity-50': <?= /** @noEscape */ $showTierPrice ? 0 : 1 ?>}">
+                <div class="flex justify-between font-extrabold uppercase text-2xs lg:text-xs pb-1">
+                    <span><?= $escaper->escapeHtml(__('Quantity')) ?></span>
+                    <span><?= $escaper->escapeHtml(__('Price')) ?></span>
+                </div>
+                <div class="space-y-1 text-xs lg:text-sm">
+                    <template x-for="(tierPrice, index) in getConfiguredTierPrices()" :key="index">
+                        <div class="flex">
+                            <span class="text-navy" x-text="tierPrice.qty + '+'"></span>
+                            <span class="flex-grow border-b mb-1.5 lg:mb-2 mx-2"></span>
+                            <?php if ($showTierPrice): ?>
+                                <span class="text-blue" x-text="getItemPrice(tierPrice)"></span>
+                            <?php else: ?>
+                                <span class="text-blue blurred">123.40</span>
+                            <?php endif; ?>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>

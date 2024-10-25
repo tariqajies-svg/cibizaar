@@ -1,0 +1,80 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ca\Api\Data\CompanyInterface;
+use Aheadworks\Ca\ViewModel\Company\Company;
+use Aheadworks\Ca\ViewModel\Company\Customer;
+use Aheadworks\Ca\ViewModel\Company\Formatter;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\ImageResizer\ViewModel\ImageResizer;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Company $companyViewModel */
+
+$companyViewModel = $viewModels->require(Company::class);
+$customerViewModel = $viewModels->require(Customer::class);
+$formatter = $viewModels->require(Formatter::class);
+$imageResizer = $viewModels->require(ImageResizer::class);
+
+if ($companyUser = $customerViewModel->getCurrentCompanyUser()) {
+    /** @var CompanyInterface $company */
+    $company = $companyViewModel->getCompanyByCustomer($companyUser);
+} else {
+    return '';
+}
+
+$email = $formatter->getSalesRepresentativeEmail($company);
+$telephone = $formatter->getSalesRepresentativeTelephone($company);
+$image = $formatter->getSalesRepresentativeImage($company);
+?>
+<div class="w-full lg:w-1/2">
+    <div class="card flex flex-col lg:flex-row lg:gap-8">
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-[48px] h-[48px] mb-5.25 lg:mb-4.5
+            rounded-full text-secondary <?= $escaper->escapeHtmlAttr($image ? 'bg-white' : 'bg-blue') ?>">
+            <?php if ($image): ?>
+                <picture>
+                    <img class="rounded-full w-[48px] h-[48px]"
+                         srcset="<?= $escaper->escapeUrl($imageResizer->resize($image, 96)) ?> 2x"
+                         src="<?= $escaper->escapeUrl($imageResizer->resize($image, 48)) ?>"
+                         alt="<?= $escaper->escapeHtmlAttr(__('Your manager\'s profile picture')) ?>"
+                         loading="lazy" />
+                </picture>
+            <?php else: ?>
+                <i class="icon icon-support text-white"></i>
+            <?php endif; ?>
+        </div>
+        <div class="flex-grow">
+            <h5 class="mb-3.25 lg:mb-4.75">
+                <span><?= $escaper->escapeHtml(__('Your Client Manager')) ?></span>
+            </h5>
+            <div class="grid gap-2">
+                <p><?= $escaper->escapeHtml($formatter->formatSalesRepresentativeName($company)) ?></p>
+
+                <?php if ($telephone): ?>
+                    <a href="tel:<?= $escaper->escapeHtmlAttr($telephone) ?>">
+                        <?= $escaper->escapeHtml($telephone) ?>
+                    </a>
+                <?php endif; ?>
+
+                <a href="mailto:<?= $escaper->escapeHtmlAttr($email) ?>">
+                    <?= $escaper->escapeHtml($email) ?>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

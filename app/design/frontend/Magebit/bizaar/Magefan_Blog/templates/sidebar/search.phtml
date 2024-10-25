@@ -1,0 +1,79 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magefan\Blog\Block\Sidebar\Search;
+use Magento\Framework\Escaper;
+
+/**
+ * Blog sidebar search form template
+ *
+ * @var Search $block
+ * @var Escaper $escaper
+ */
+?>
+
+<div class="widget block blog-search relative p-5 bg-gray-f2 lg:px-8">
+    <div class="block-content">
+        <form class="form"
+              x-data="initBlogSearchComponent()"
+              x-ref="blog_search_form"
+              id="blog_search_mini_form"
+              action="<?= $escaper->escapeUrl($block->getFormUrl()) ?>"
+              method="get">
+            <div class="field search relative flex-1">
+                <label class="label sr-only" for="blog_search">
+                    <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </label>
+                <div class="control">
+                    <input id="blog_search"
+                           type="text"
+                           x-ref="blog_search_input"
+                           name="q"
+                           value="<?= $escaper->escapeHtml($block->getQuery()) ?>"
+                           placeholder="<?= $escaper->escapeHtml(__('Search posts here...')) ?>"
+                           class="form-input text-[16px] leading-6 py-2.25"
+                           maxlength="128" role="combobox"
+                           aria-haspopup="false"
+                           aria-autocomplete="both"
+                           autocomplete="off">
+                </div>
+                <button class="absolute flex items-center h-full top-0 right-0 py-3 px-5 lg:px-6 text-gray w-14 lg:w-16"
+                        aria-label="Search"
+                        type="submit"
+                        @click="getBlogSearch()"
+                        title="<?= $escaper->escapeHtml(__('Search')) ?>">
+                    <i class="icon-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function initBlogSearchComponent() {
+        return {
+            getBlogSearch: function() {
+                const searchValue = this.$refs.blog_search_input.value;
+                const formAction = this.$refs.blog_search_form.action;
+
+                if (searchValue) {
+                    window.location = formAction + ( ('/' != formAction.charAt(formAction.length - 1)) ? '/' : '' ) + encodeURI(searchValue) + '/';
+                }
+
+                return false;
+            }
+        }
+    }
+</script>

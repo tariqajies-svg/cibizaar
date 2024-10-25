@@ -1,0 +1,33 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Sales\Block\Order\Info\Buttons;
+
+/** @var Escaper $escaper */
+/** @var Buttons $block */
+?>
+<div class="flex items-start justify-start md:justify-end">
+    <?php $order = $block->getOrder() ?>
+    <a href="<?= $escaper->escapeUrl($block->getUrl('*/*/printShipment', ['order_id' => $order->getId()])) ?>"
+       class="btn btn-secondary btn-sm"
+       target="_blank"
+       rel="noopener">
+        <i class="icon-printer inline-block mr-1"></i>
+        <span><?= $escaper->escapeHtml(__('Print All Shipments')) ?></span>
+    </a>
+    <?= $block->getChildHtml() ?>
+</div>

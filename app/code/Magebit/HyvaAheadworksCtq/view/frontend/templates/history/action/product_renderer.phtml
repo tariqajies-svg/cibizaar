@@ -1,0 +1,51 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\History\Action\ProductRenderer;
+use Magento\Framework\Escaper;
+
+/** @var ProductRenderer $block */
+/** @var Escaper $escaper */
+
+$action = $block->getAction();
+?>
+<div>
+    <div class="text-xs text-navy font-bold mb-1.75 lg:text-sm">
+        <span>
+            <?= $escaper->escapeHtml($block->getProductViewModel()->getProductName($action->getValue())) ?>
+        </span>
+        <span class="font-normal">
+            (<?= $escaper->escapeHtml($block->getHistoryViewModel()->getActionStatusFormatted($action->getStatus())) ?>)
+        </span>
+    </div>
+    <div class="mb-4.25 lg:mb-5.25">
+        <?php if ($action->getActions()): ?>
+            <?php foreach ($action->getActions() as $productAction): ?>
+                <span class="whitespace-nowrap leading-7 mr-0.75">
+                    <span class="whitespace-nowrap leading-7 mr-0.75">
+                        <?= $escaper->escapeHtml($block->getHistoryViewModel()->getActionTypeFormatted($productAction->getType())) ?>:
+                    </span>
+                    <?php if ($productAction->getOldValue()): ?>
+                        <span class="whitespace-nowrap leading-7 mr-0.75 line-through">
+                            <?= $escaper->escapeHtml($productAction->getOldValue()) ?></span>
+                        <i class="icon-arrow-right align-text-bottom text-blue mr-0.75"></i>
+                    <?php endif; ?>
+                    <span class="whitespace-nowrap leading-7">
+                        <?= $escaper->escapeHtml($productAction->getValue()) ?>
+                    </span>
+                </span>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="Ktpl" translate="label" sortOrder="1000">
+            <label>Ktpl</label>
+        </tab>
+        <section id="custom_form" translate="label" type="text" sortOrder="161803" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Custom Forms</label>
+            <tab>Ktpl</tab>
+            <resource>Ktpl_CustomForms::config</resource>
+            <group id="general" translate="label" type="text" sortOrder="5" showInDefault="1" showInStore="1" showInWebsite="1">
+                <label>Forms Configuration</label>
+
+               <field id="customforms_email_sender" type="select" translate="label" sortOrder="1" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Forms Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+
+                <field id="customforms_admin_mail" translate="label" type="text" sortOrder="2" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Admin mail to recieve cforms related mails</label>
+                </field>
+            </group>       
+            <group id="request_quote" translate="label" type="text" sortOrder="10" showInDefault="1" showInStore="1" showInWebsite="1">
+                <label>Request Quote Email Configuration</label>
+
+                <field id="allow_requotequote_mail" type="select" translate="label" sortOrder="3" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Send Request Quote Email To Admin?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="requestquote_subject" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Request Quote Mail Subject</label>
+                    <depends>
+                        <field id="allow_requotequote_mail">1</field>
+                    </depends>
+                </field>
+
+                <field id="requestquote_template" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Request Quote Mail</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="allow_requotequote_mail">1</field>
+                    </depends>
+                </field>
+
+                <field id="requotequote_copyto" translate="label" type="text" sortOrder="6" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Send Request Quote Email Copy To</label>
+                    <comment><![CDATA[Please write comma separated email address]]></comment>
+                    <backend_model>Ktpl\CustomForms\Model\System\Config\Backend\Emailvalid</backend_model>
+                    <depends>
+                        <field id="allow_requotequote_mail">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

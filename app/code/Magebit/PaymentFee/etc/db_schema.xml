@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_PaymentFee package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="quote" resource="checkout" comment="Sales Flat Quote">
+        <column xsi:type="decimal" name="payment_fee" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Payment Fee"/>
+        <column xsi:type="decimal" name="base_payment_fee" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Base Payment Fee"/>
+    </table>
+    <table name="sales_order" resource="sales" comment="Sales Flat Order">
+        <column xsi:type="decimal" name="payment_fee" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Payment Fee"/>
+        <column xsi:type="decimal" name="base_payment_fee" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Base Payment Fee"/>
+    </table>
+    <table name="sales_creditmemo" resource="sales" comment="Sales Flat Creditmemo">
+        <column xsi:type="decimal" name="payment_fee" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Payment Fee"/>
+        <column xsi:type="decimal" name="base_payment_fee" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Base Payment Fee"/>
+    </table>
+    <table name="sales_invoice" resource="sales" comment="Sales Flat Invoice">
+        <column xsi:type="decimal" name="payment_fee" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Payment Fee"/>
+        <column xsi:type="decimal" name="base_payment_fee" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Base Payment Fee"/>
+    </table>
+</schema>

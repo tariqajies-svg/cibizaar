@@ -1,0 +1,17 @@
+<?php
+/**
+ * The AlpineJS scope of this file is the method `initCartTotals()` in Magento_Checkout::php-cart/totals.phtml
+ */
+
+use Magebit\PaymentFee\Model\Total\Quote\PaymentFee;
+?>
+<template x-if="segment.code === '<?= /** @noEscape */ PaymentFee::TOTAL_CODE ?>' && segment.value > 0">
+    <div class="flex pb-1.25 text-sm lg:text-base md:grid md:grid-cols-2 md:w-full border-container">
+        <div class="w-7/12 text-left md:w-auto"
+             x-html="segment.title"
+        ></div>
+        <div class="w-5/12 text-right md:w-auto text-navy font-bold"
+             x-text="hyva.formatPrice(segment.value)"
+        ></div>
+    </div>
+</template>

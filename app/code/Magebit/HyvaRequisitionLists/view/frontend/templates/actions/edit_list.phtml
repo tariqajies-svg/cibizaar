@@ -1,0 +1,110 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+
+/** @var Wrapper $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Modal $modalViewModel */
+
+$viewModel = $block->getParentBlock()->getData('requisition_list_view_model');
+$modalViewModel = $viewModels->require(Modal::class);
+?>
+
+<script>
+    function initUpdateRequisitionList() {
+        return {
+            isLoading: false,
+            error: false,
+            submitForm (event) {
+                this.$refs.listName.required = true;
+
+                if (!this.$refs.listName.form.checkValidity()) {
+                    this.isLoading = false;
+                    this.error = true;
+                    event.preventDefault();
+                }
+            }
+        }
+    }
+</script>
+<?php $modal = $modalViewModel->createModal()->withContent(<<<END_OF_CONTENT
+                <div class="pl-5 pr-4.75 pt-5.25 pb-4.5 flex flex-row justify-between border-b border-gray lg:py-7 lg:px-8">
+                    <h1>{$escaper->escapeHtml(__('Edit Requisition List'))}</h1>
+                    <button @click="hide" type="button" class="btn lg:!p-0">
+                        <i class="icon text-2xl leading-5 icon-close text-red cursor-pointer lg:text-[24px]"></i>
+                    </button>
+                </div>
+                <div class="px-5 py-7.25 lg:px-8 lg:pt-6.5 lg:pb-8">
+                    <form
+                        x-data="initUpdateRequisitionList()"
+                        action="{$viewModel->getUpdateUrl()}"
+                        @submit="isLoading = true, submitForm(event)"
+                        method="post"
+                        id="list-validate-detail"
+                    >
+                        <div class="required">
+                            <label class="label" for="name">{$escaper->escapeHtml(__('New Requisition List Name'))}</label>
+                            <input
+                                class="form-input invalid:error"
+                                type="text"
+                                id="name"
+                                name="name"
+                                x-ref="listName"
+                                value="{$viewModel->getCurrentRequisitionListName()}"
+                            >
+                            <span x-show="error" class="error">{$escaper->escapeHtml(__('Field is required'))}</span>
+                        </div>
+                        <div class="mt-3.5 lg:mt-3">
+                            <label class="label" for="description">{$escaper->escapeHtml(__('New Description'))}</label>
+                            <input
+                                class="form-input"
+                                type="text"
+                                id="description"
+                                name="description"
+                                value="{$viewModel->getCurrentRequisitionListDescription()}"
+                            >
+                        </div>
+                       {$block->getBlockHtml('formkey')}
+                       {$block->getBlockHtml('loading')}
+                        <button type="submit" class="btn btn-primary lg-max:w-full mt-4 py-3 lg:!px-10 lg:mt-6">
+                            {$escaper->escapeHtml(__('Save'))}
+                        </button>
+                    </form>
+                </div>
+                END_OF_CONTENT
+)->positionBottom()
+    ->addContainerClass('pop-up', 'rounded-none')
+    ->addOverlayClass('backdrop')
+    ->addDialogClass('pop-up-dialog')
+    ->removeOverlayClass('bg-black')
+    ->removeContainerClass('rounded-lg')
+    ->removeDialogClass('rounded-lg', 'shadow-xl')
+?>
+<div x-data="{...hyva.modal() }">
+    <button
+        @click="<?= $escaper->escapeHtmlAttr($modal->getShowJs()) ?>"
+        type="button"
+        class="create-button hover:underline active:underline cursor-pointer text-red font-medium hover:text-red-darker"
+    >
+        <i class="icon icon-edit text-red text-sm cursor-pointer lg:text-[16px]"></i><span>&nbsp;<?= $escaper->escapeHtml(__('Edit')) ?></span>
+    </button>
+    <?= /** @noEscape */ $modal->withAriaLabel('edit-list') ?>
+</div>

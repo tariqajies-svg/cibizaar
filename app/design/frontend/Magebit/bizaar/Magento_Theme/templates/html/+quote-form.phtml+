@@ -1,0 +1,292 @@
+<div class="inq-form-main">
+	<div class="inq-form-inner">
+		<div class="form-left">
+			<div class="img img-one">
+				<img class="bg-move" src="https://bizaar.magentoprojects.net/media/wysiwyg/home/quote/quote-form01.png" /></div>
+			<div class="img img-two"><img class="bg-move" src="https://bizaar.magentoprojects.net/media/wysiwyg/home/quote/quote-form02.png" /></div>
+			<div class="img img-three"><img class="bg-move" src="https://bizaar.magentoprojects.net/media/wysiwyg/home/quote/quote-form03.png" /></div>
+			<div class="img img-four"><img class="bg-move" src="https://bizaar.magentoprojects.net/media/wysiwyg/home/quote/quote-form04.png" /></div>
+		</div>
+		<form id="inq-form" class="inq-form">
+			<div class="user-icon">
+				<img class="user" src="https://bizaar.magentoprojects.net/media/wysiwyg/home/quote/user.png" />
+			</div>
+			<h5 class="label small">Get the best prices within 60 minutes!</h5>
+			<h3 class="label">Have a Project or RFQ? Get a Quote Instantly </h3>
+			<textarea rows="3" id="searchbox" class="textarea" placeholder="E.g. I’m looking for 30 units of Ubiquiti U6-Pro and..."></textarea>
+			<button type="button" class="btn">Get a quote</button>
+		</form>
+		<div class="form-right">
+			<div class="img-one ri-one"><img src="https://bizaar.magentoprojects.net/media/wysiwyg/home/quote/quote-form05.png" /></div>
+			<div class="img-two ri-two"><img src="https://bizaar.magentoprojects.net/media/wysiwyg/home/quote/quote-form06.png" /></div>
+			<div class="img-three ri-three"><img src="https://bizaar.magentoprojects.net/media/wysiwyg/home/quote/quote-form07.png" /></div>
+		</div>
+	</div> 
+</div>
+<style>
+	.inq-form {
+		display: flex;
+		flex-wrap: wrap;
+		text-align: center;
+		max-width: 590px;
+		width: 33.333333%;
+	}
+	.inq-form > * {
+		width: 100%;
+	}
+	.inq-form h3 {
+		font-size: 36px;
+		line-height: 47px;
+	}
+	.inq-form h5 {
+		color: #0147B3;
+		font-size: 16px;
+		line-height: 13px;
+		font-weight: 600;
+	}
+	.user-icon img {
+		margin: auto;
+	}
+	.inq-form-inner {
+		display: flex;
+		justify-content: space-around;
+    	padding: 50px 0 29px 0;
+		overflow: hidden;
+	}
+    .inq-form-inner .textarea {
+        border: 1px solid #ccc;
+        padding: 10px;
+        width: 100%;
+		font-size: 20px;
+		line-height: 28px;
+		font-weight: 300;
+    }
+    .inq-form-inner .btn {
+		margin: auto;
+		width: 100%;
+		font-size: 20px;
+		line-height: 24px;
+		font-weight: 400;
+		color: #fff;
+		background: #0165FF;
+		border-radius: 6px;
+		border: 0;
+	}
+	.inq-form-inner .form-left,
+	.inq-form-inner .form-right {
+		display: flex;
+		flex-wrap: wrap;
+		width: 33.333333%;
+	}
+	.inq-form-inner .form-right {
+		justify-content: flex-end;
+	}
+	.form-left .img {
+		position: relative;
+		display: inline-block;
+		width: 260px;
+	}
+	.form-left .img img {
+		position: absolute;
+	}
+	.img.img-one {
+    transform: translateX(-70%);
+}
+
+/* .img.img-two {
+    transform: translate(-70%, -10%);
+}
+
+.img.img-three {
+    transform: translateX(30%);
+}
+
+.img-one.ri-one {
+    transform: translateX(90%);
+} */
+</style>
+<script>
+	// window.addEventListener('scroll', function(e) {
+ 
+	// var scrolledDist = window.pageYOffset;
+	// /*  var trainPosition = Math.round($(window).scrollTop() / $(window).height() * 100); */
+	// 	var trainPosition = Math.round(window.pageYOffset / window.innerHeight * 100);
+	// //window.scrollTo(xCoord, yCoord);
+	// 	console.log(trainPosition);
+	// document.querySelector('.img-one').style.transform = 'translateX('+(trainPosition-50)+'%)';
+	// document.querySelector('.img-two').style.transform = 'translateX('+(trainPosition-50)+'%)';
+	// document.querySelector('.img-three').style.transform = 'translateX('+(trainPosition-50)+'%)';
+	// document.querySelector('.img-four').style.transform = 'translateX('+(trainPosition-50)+'%)';
+	// document.querySelector('.ri-one').style.transform = 'translateX('+(-trainPosition)+'%)';
+	// document.querySelector('.ri-two').style.transform = 'translateX('+(-trainPosition)+'%)';
+	// document.querySelector('.ri-three').style.transform = 'translateX('+(-trainPosition)+'%)';
+	// });
+
+
+	window.addEventListener('scroll', function(e) {
+
+	var ele = document.querySelector('.inq-form-main'); 
+	console.log("sad",ele)
+	ele.classList.remove("active")
+	// console.log($e)
+
+	var scrolledDist = this.scrollY;
+	console.log('scrolledDist',scrolledDist);
+	
+
+	  	var trainPosition = Math.round(window.pageYOffset / window.innerHeight * 100);
+	var docViewBottom = scrolledDist + 20 + window.innerHeight;
+	console.log('docViewBottom',docViewBottom)
+	var elemTop = ele.offsetTop - 500;  // top thi div element nu distance
+	console.log('elemTop',elemTop); 
+
+	var elemBottom = elemTop + ele.offsetHeight; // height of div
+	console.log('elemBottom',elemBottom);
+	/* 	var trainPosition = Math.round($(window).scrollTop() / $(window).height() * 100); */
+	// var trainPosition = Math.round(window.pageYOffset / window.innerHeight * 100);
+	//window.scrollTo(xCoord, yCoord);
+	// console.log(trainPosition);
+	//document.querySelector('.img-fluid').style.transform = 'translateX('+(trainPosition-50)+'%)';
+	// if (elemTop > scrolledDist && elemBottom < docViewBottom){
+	// 	  alert('dsadasdas');
+	// 	ele.classList.add("active");
+	// 	}
+
+
+		if(scrolledDist > elemTop && scrolledDist < elemBottom ){
+			// alert('dsadasdas');
+			document.querySelector('.img-one').style.transform = 'translateX('+(trainPosition)+'%)';
+	document.querySelector('.img-two').style.transform = 'translateX('+(trainPosition)+'%)';
+	document.querySelector('.img-three').style.transform = 'translateX('+(trainPosition)+'%)';
+	document.querySelector('.img-four').style.transform = 'translateX('+(trainPosition)+'%)';
+	document.querySelector('.ri-one').style.transform = 'translateX('+(-trainPosition)+'%)';
+	document.querySelector('.ri-two').style.transform = 'translateX('+(-trainPosition)+'%)';
+	document.querySelector('.ri-three').style.transform = 'translateX('+(-trainPosition)+'%)';
+		}
+
+	// if ( scrolledDist > elemTop ){
+	// 	  alert('dsadasdas');
+	// 	ele.classList.add("active");
+	// 	}
+	// });
+
+	});
+
+
+// $(window).on('load scroll', function() {
+//     var $e = $('#timeline .section');
+//     $e.removeClass("active")
+//     console.log($e)
+//     $e.each(function(index){
+
+// 		    var $window = $(window);
+
+//     var docViewTop = $window.scrollTop();
+//     var docViewBottom = docViewTop + 20 + $window.height();
+//     var elemTop = $e.eq(index).offset().top;
+//     var elemBottom = elemTop + $e.eq(index).height();
+//     if (elemTop > docViewTop && elemBottom < docViewBottom){
+// 			$e.eq(index).addClass("active");
+//   }
+//   });
+// })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const texts = ['E.g. I’m looking for 30 units of Ubiquiti U6-Pro and...','Lorem Ipsum is simply dummy text of the printing and typesetting industry.'];
+const input = document.querySelector('#searchbox');
+const animationWorker = function (input, texts) {
+  this.input = input;
+  this.defaultPlaceholder = this.input.getAttribute('placeholder');
+  this.texts = texts;
+  this.curTextNum = 0;
+  this.curPlaceholder = '';
+  this.blinkCounter = 0;
+  this.animationFrameId = 0;
+  this.animationActive = false;
+  this.input.setAttribute('placeholder', this.curPlaceholder);
+
+  this.switch = timeout => {
+    this.input.classList.add('imitatefocus');
+    setTimeout(
+    () => {
+      this.input.classList.remove('imitatefocus');
+      if (this.curTextNum == 0)
+      this.input.setAttribute('placeholder', this.defaultPlaceholder);else
+
+      this.input.setAttribute('placeholder', this.curPlaceholder);
+
+      setTimeout(
+      () => {
+        this.input.setAttribute('placeholder', this.curPlaceholder);
+        if (this.animationActive)
+        this.animationFrameId = window.requestAnimationFrame(this.animate);},
+      timeout);
+    },
+    timeout);
+  };
+
+  this.animate = () => {
+    if (!this.animationActive) return;
+    let curPlaceholderFullText = this.texts[this.curTextNum];
+    let timeout = 100;
+    if (this.curPlaceholder == curPlaceholderFullText + '|' && this.blinkCounter == 3) {
+      this.blinkCounter = 0;
+      this.curTextNum = this.curTextNum >= this.texts.length - 1 ? 0 : this.curTextNum + 1;
+      this.curPlaceholder = '|';
+      this.switch(3000);
+      return;
+    } else
+    if (this.curPlaceholder == curPlaceholderFullText + '|' && this.blinkCounter < 3) {
+      this.curPlaceholder = curPlaceholderFullText;
+      this.blinkCounter++;
+    } else
+    if (this.curPlaceholder == curPlaceholderFullText && this.blinkCounter < 3) {
+      this.curPlaceholder = this.curPlaceholder + '|';
+    } else
+    {
+      this.curPlaceholder = curPlaceholderFullText.
+      split('').
+      slice(0, this.curPlaceholder.length + 1).
+      join('') + '|';
+      timeout = 150;
+    }
+    this.input.setAttribute('placeholder', this.curPlaceholder);
+    setTimeout(
+    () => {if (this.animationActive) this.animationFrameId = window.requestAnimationFrame(this.animate);},
+    timeout);
+  };
+
+  this.stop = () => {
+    this.animationActive = false;
+    window.cancelAnimationFrame(this.animationFrameId);
+  };
+
+  this.start = () => {
+    this.animationActive = true;
+    this.animationFrameId = window.requestAnimationFrame(this.animate);
+    return this;
+  };
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  let aw = new animationWorker(input, texts).start();
+  input.addEventListener("focus", e => aw.stop());
+  input.addEventListener("blur", e => {
+    aw = new animationWorker(input, texts);
+    if (e.target.value == '') setTimeout(aw.start, 2000);
+  });
+});
+
+</script>

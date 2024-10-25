@@ -1,0 +1,33 @@
+<!--@subject {{var data.subject}} @-->
+{{template config_path="design/email/header_template"}}
+<table class="message-details">
+    <tr>
+        <td><strong>{{trans "Name"}}</strong></td>
+        <td>{{var data.name}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Company Name"}}</strong></td>
+        <td>{{var data.companyname}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Email"}}</strong></td>
+        <td>{{var data.email}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Phone Number"}}</strong></td>
+        <td>{{var data.phonenumber}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Shipping Address"}}</strong></td>
+        <td>{{var data.shippingaddress}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Product List"}}</strong></td>
+        <td>{{var data.productlist}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Additional Comments"}}</strong></td>
+        <td>{{var data.additional}}</td>
+    </tr>
+</table>
+{{template config_path="design/email/footer_template"}}

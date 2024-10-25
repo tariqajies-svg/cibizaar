@@ -1,0 +1,48 @@
+<!--
+/**
+ * This file is part of the Magebit/bizaar_fallback design package.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+ -->
+
+<tr class="row"
+    click="element.selectShippingMethod"
+    data-bind="css: { rowChecked: element.isSelected() == method.carrier_code + '_' + method.method_code}"
+>
+    <td class="col col-method">
+        <input type="radio"
+               class="radio"
+               ifnot="method.error_message"
+               ko-checked="element.isSelected"
+               ko-value="method.carrier_code + '_' + method.method_code"
+               attr="'aria-labelledby': 'label_method_' + method.method_code + '_' + method.carrier_code + ' ' + 'label_carrier_' + method.method_code + '_' + method.carrier_code,
+                    'checked': element.rates().length == 1 || element.isSelected" />
+    </td>
+    <td class="col col-method-title"
+        attr="'id': 'label_method_' + method.method_code + '_' + method.carrier_code"
+        text="method.carrier_title + ' - ' + method.method_title"></td>
+    <!-- ko ifnot: (method.error_message) -->
+    <td class="col col-price">
+        <each args="element.getRegion('price')" render=""></each>
+    </td>
+    <!-- /ko -->
+    <td class="col col-icon d-none" data-bind="attr: {'id': 'label_method_icon_' + method.carrier_code}"></td>
+</tr>
+<tr class="row row-error"
+    if="method.error_message">
+    <td class="col col-error" colspan="4">
+        <div role="alert" class="message error">
+            <div text="method.error_message"></div>
+        </div>
+        <span class="no-display">
+            <input type="radio"
+                   attr="'value' : method.method_code, 'id': 's_method_' + method.method_code">
+        </span>
+    </td>
+</tr>

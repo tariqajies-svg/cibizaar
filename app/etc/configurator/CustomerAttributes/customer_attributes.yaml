@@ -1,0 +1,46 @@
+customer_attributes:
+  customer_telephone:
+    label: Customer Phone Number
+    input: text
+    type: varchar
+    required: false
+    visible: 1
+    position: 85
+    used_in_forms: customer_account_create,customer_account_edit,adminhtml_customer
+  subscribed_whatsapp:
+    label: Whatsapp Subscription
+    input: select
+    source: Magento\Eav\Model\Entity\Attribute\Source\Boolean
+    type: int
+    required: false
+    visible: 1
+    position: 1
+    used_in_forms: customer_account_create,customer_account_edit,adminhtml_customer
+  disable_2fa:
+    label: Disable 2FA
+    input: select
+    source: Magento\Eav\Model\Entity\Attribute\Source\Boolean
+    type: int
+    required: false
+    visible: 1
+    position: 2
+    system: 0
+    user_defined: 1
+    default: 0
+    used_in_forms: customer_account_create,customer_account_edit,adminhtml_customer
+  twofa_code:
+    label: 2FA Code
+    input: text
+    type: varchar
+    required: false
+    system: 0
+    visible: 0
+    position: 85
+  twofa_code_created_at:
+    label: 2FA Code
+    input: text
+    type: varchar
+    required: false
+    system: 0
+    visible: 0
+    position: 85

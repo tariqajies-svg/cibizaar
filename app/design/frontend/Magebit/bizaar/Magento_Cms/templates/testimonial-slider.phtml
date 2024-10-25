@@ -1,0 +1,59 @@
+<script>
+var galleryTop = new Swiper('.gallery-top', {
+  loop: true,
+  loopedSlides: 1,
+  allowTouchMove: false,
+  thumbs: {
+    swiper: galleryThumbs,
+  },
+  
+});
+ 
+var galleryThumbs = new Swiper('.gallery-thumbs', {
+  // Your gallery-thumbs options here
+  navigation: {
+    nextEl: '.gallerythumb-next',
+    prevEl: '.gallerythumb-prev',
+  },
+  loop: true,
+  centeredSlides: true,
+  loopedSlides: 3,
+  slideToClickedSlide: true,
+  spaceBetween: 10, // Adjust spacing between thumbnails
+  slidesPerView: 3, // Adjust number of thumbnails visible
+  coverflowEffect: {
+        rotate: 50,
+        stretch: 0,
+        depth: 100,
+        modifier: 1,
+        slideShadows: true,
+      },
+  thumbs: {
+    swiper: galleryTop,
+  },
+  breakpoints: {
+    1280: {
+      loopedSlides: 5,
+      slidesPerView: 5,
+    },
+  }
+});
+ 
+// function centerSlide(index) {
+//   console.log(index);
+ 
+//   galleryTop.slideToLoop(index);
+//   galleryThumbs.slideToLoop(index);
+// }
+ 
+// let thumb = document.querySelectorAll('.gallery-thumbs-test > div');
+ 
+// thumb.forEach(function (slide) {
+//     // slide.style.color = 'red';
+//     let index = slide.getAttribute('data-swiper-slide-index');
+//     slide.addEventListener('click', () => {
+//       centerSlide(index);
+//       // console.log(index);
+//     })
+// });
+</script>

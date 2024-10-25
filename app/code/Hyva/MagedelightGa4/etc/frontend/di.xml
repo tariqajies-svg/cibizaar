@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Magedelight
+ * Copyright (C) 2023 Magedelight <info@magedelight.com>
+ *
+ * @category Magedelight
+ * @package Hyva_MagedelightGa4
+ * @copyright Copyright (c) 2023 Mage Delight (http://www.magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@magedelight.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Hyva\CompatModuleFallback\Model\CompatModuleRegistry">
+		<arguments>
+			<argument name="compatModules" xsi:type="array">
+				<item name="magedelight-ga4-compt" xsi:type="array">
+					<item name="original_module" xsi:type="string">Magedelight_Ga4</item>
+					<item name="compat_module" xsi:type="string">Hyva_MagedelightGa4</item>
+				</item>
+			</argument>
+		</arguments>
+	</type>
+</config>

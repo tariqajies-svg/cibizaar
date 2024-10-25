@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+* Ktpl Technolabs
+* http://www.Ktpl.com/
+* @author Ktpl
+* @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="Ktpl" translate="label" sortOrder="300">
+            <label>Ktpl</label>
+        </tab>
+        <section id="ktpl_quote" translate="label" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Quote</label>
+            <tab>Ktpl</tab>
+            <resource>Ktpl_Quote::Ktpl_Quote</resource>
+            <group id="email" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Admin Notification Email Options</label>
+                <field id="recipient_email" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Emails To</label>
+                    <comment><![CDATA[Emails must be separated with a comma (,)]]> </comment>
+                </field>
+                <!-- <field id="sender_email_identity" canRestore="1" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field> -->
+                <field id="template" translate="label comment" canRestore="1" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
+

@@ -1,0 +1,160 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\MagefanBlog\ViewModel\Comment as CommentViewModel;
+use Magefan\Blog\Block\Post\View\Comments\Magefan\Comment;
+use Magento\Framework\Escaper;
+
+/**
+ * Blog post comments template
+ *
+ * @var Comment $block
+ * @var Escaper $escaper
+ * @var ViewModelRegistry $viewModels
+ */
+
+$commentViewModel = $viewModels->require(CommentViewModel::class);
+
+$comment = $block->getComment();
+$numberOfCommentsToDisplay = $block->getNumberOfReplies();
+
+$replies = $block->getRepliesCollection();
+$repliesCount = count($replies);
+
+$uniqueId = '_' . uniqid();
+?>
+<div class="c-comment c-comment-parent-<?= /* @noEscape */ (int)$comment->getParentId() ?>">
+    <div class="c-post c-post">
+        <div x-data="initComment<?= /* @noEscape */ $uniqueId ?>()"
+             x-init="$nextTick(() => { prepareMobileDescription() })"
+             x-ref="comment<?= /* @noEscape */ (int)$comment->getId() ?>">
+            <div class="c-comment content relative p-5 bg-gray-fa mb-3 lg:px-8">
+                <div class="p-info">
+                    <div class="p-name item inline-block after:content-['•'] after:inline-block after:px-2">
+                        <span class="font-bold text-black"><?= $escaper->escapeHtml($comment->getAuthor()->getNickname()) ?></span>
+                        <?php if ((int)$comment->getParentId() !== 0): ?>
+                            <span class="text-gray px-1 text-xs lg:text-sm">
+                            <?= $escaper->escapeHtml(__('replying to')) ?>
+                        </span>
+                            <span class="font-bold text-black">
+                            <?php $parentComment = $commentViewModel->getComment((int)$comment->getParentId());
+                            echo $escaper->escapeHtml($parentComment->getAuthor()->getNickname()); ?>
+                        </span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="publish-date item inline-block text-xs lg:text-sm">
+                        <?= $escaper->escapeHtml($block->getPublishDate()) ?>
+                    </div>
+                </div>
+
+                <div class="p-text py-2 text-black">
+                    <span class="hidden lg:block" x-text="fullDesc"></span>
+                    <div class="block relative lg:hidden"
+                         :class="{ 'pb-5' : showFullDesc }">
+                        <span x-text="mobileDesc"></span>
+                        <template x-if="needShowMore">
+                            <a href="#"
+                               @click.prevent="toggleDescription()"
+                               class="reply-action absolute bottom-0 right-0 link text-secondary bg-gray-fa px-0.25 mb-0.25 font-bold text-xs">
+                                <span x-html="showFullDesc ? 'Show less' : '...Show more'"></span>
+                            </a>
+                        </template>
+                    </div>
+                </div>
+                <div class="p-actions">
+                    <a href="#" class="reply-action link text-secondary font-bold"
+                       @click.prevent="showForm($refs.comment<?= /* @noEscape */ (int)$comment->getId() ?>, <?= /* @noEscape */ $comment->isReply() ?
+                           (int)$comment->getParentId() :
+                           (int)$comment->getId() ?>)"
+                       title="<?= $escaper->escapeHtml(__('Reply')) ?>">
+                        <?= $escaper->escapeHtml(__('Reply')) ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <?php if ($repliesCount): ?>
+            <div x-data="initCommentReplies<?= /* @noEscape */ $uniqueId ?>()"
+                 class="p-replies ml-3 pl-3 border-l lg:ml-6 lg:pl-6">
+                <?php $i = 0;
+                foreach ($replies as $reply):
+                    $i++;?>
+                    <div :class="{ 'hidden': !showMoreReplies && <?= /* @noEscape */ $i ?> > showLimit }">
+                        <?= /* @noEscape */ $block->setComment($reply)->toHtml(); ?>
+                    </div>
+                <?php endforeach; ?>
+                <span x-show="repliesCount > showLimit"
+                      @click="showMoreReplies = !showMoreReplies"
+                      class="c-allcomments more-comments-action link cursor-pointer block py-[11px] mb-3">
+                    <span x-html="showMoreReplies ? 'Show less replies' : '...Show more replies'"></span>
+                </span>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+<script>
+    function initCommentReplies<?= /* @noEscape */  $uniqueId ?>() {
+        return {
+            showLimit: <?= /* @noEscape */ $numberOfCommentsToDisplay ?>,
+            showMoreReplies: false,
+            repliesCount: <?= /* @noEscape */ $repliesCount ?>,
+        }
+    }
+</script>
+<script>
+    function initComment<?= /** @noEscape */  $uniqueId ?>() {
+        return {
+            descLimit: 197,
+            fullDesc: '<?= /* @noEscape */ nl2br($escaper->escapeJs($comment->getText())) ?>',
+            shortDesc: '',
+            mobileDesc: '',
+            showFullDesc: false,
+            needShowMore: false,
+            prepareMobileDescription: function () {
+                if (this.fullDesc.length > this.descLimit) {
+                    this.shortDesc = this.fullDesc.substring(0, this.descLimit) + "...";
+                    this.mobileDesc = this.shortDesc;
+                    this.needShowMore = true;
+
+                } else {
+                    this.mobileDesc = this.fullDesc;
+                }
+            },
+            toggleDescription:function () {
+                if (!this.showFullDesc) {
+                    this.mobileDesc = this.fullDesc;
+                } else {
+                    this.mobileDesc = this.shortDesc;
+                }
+
+                this.showFullDesc = !this.showFullDesc;
+            },
+            showForm: function (commentRef, parentId) {
+                window.dispatchEvent(
+                    new CustomEvent(
+                        "show-reply-form",
+                        {
+                            detail: {
+                                commentRef: commentRef,
+                                parentId: parentId
+                            }
+                        }
+                    )
+                );
+            }
+        }
+    }
+</script>

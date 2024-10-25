@@ -1,0 +1,95 @@
+<?php
+/**
+ * This file is part of the Magebit_MagefanBlog package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_MagefanBlog
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magefan\Blog\Model\Post;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\MagefanBlog\ViewModel\PlaceholderImage;
+
+/**
+ * @var Template $block
+ * @var Escaper $escaper
+ * @var Post $item
+ * @var ViewModelRegistry $viewModels
+ */
+$post = $block->getData('item');
+$placeholderViewModel = $viewModels->require(PlaceholderImage::class);
+?>
+<div class="post-list-wrapper blog-widget-recent">
+    <?php
+    $postUrl = $escaper->escapeUrl($post->getPostUrl());
+    $postName = $escaper->escapeHtml($post->getTitle());
+    ?>
+    <div class="post-image">
+        <?php
+        $featuredImage = $post->getFeaturedImage() ?
+            $post->getFeaturedImage() :
+            $placeholderViewModel->getImage();
+        ?>
+        <?php if ($featuredImage) { ?>
+            <?php
+            $featuredImgAlt = $post->getData('featured_list_img_alt') ?: $post->getData('featured_img_alt');
+            if (!$featuredImgAlt) {
+                $featuredImgAlt = $postName;
+            }
+            ?>
+            <div class="post-ftimg-hld">
+                <a href="<?= /*@noEscape*/ $postUrl ?>" title="<?= /*@noEscape*/ $postName ?>">
+                    <img class="blog-post-image" src="<?= $escaper->escapeHtml($featuredImage) ?>"
+                         alt="<?= $escaper->escapeHtml($featuredImgAlt) ?>" />
+                </a>
+            </div>
+        <?php } ?>
+    </div>
+    <div class="post-header">
+        <div class="post-title-holder clearfix">
+            <div class="post-title">
+                <?php // if ($categoriesCount = $post->getCategoriesCount()) { ?>
+                    <div class="item post-heading">
+                        <?php if ($_tagsCount = $post->getTagsCount()): ?>
+                            <div class="item post-tags inline-block text-xs lg:text-sm">
+                                <?php $n = 0;
+                                foreach ($post->getRelatedTags() as $tag):
+                                    $n++; ?>
+                                    <a title="<?= $escaper->escapeHtml($tag->getTitle()) ?>"
+                                       href="<?= $escaper->escapeUrl($tag->getTagUrl()) ?>"
+                                    ><?= $escaper->escapeHtml($tag->getTitle()) ?></a><?= ($n != $_tagsCount) ? ',' : '' ?>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($post->isPublishDateEnabled()) { ?>
+                            <span class="item post-posed-date">
+                                <span class="value"><?= $escaper->escapeHtml($post->getPublishDate()) ?></span>
+                            </span>
+                        <?php } ?>
+                    </div>
+                <?php // } ?>
+                <a class="post-item-link"
+                   href="<?= /*@noEscape*/ $postUrl ?>">
+                    <?= /*@noEscape*/ $postName ?>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="post-content">
+        <div class="post-description clearfix">
+            <div class="post-text-hld clearfix">
+                <?= /*@noEscape*/ $post->getShortFilteredContent() ?>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Aheadworks\Ca\Block\ButtonWithCheckAcl;
+use Magento\Framework\Escaper;
+
+/** @var ButtonWithCheckAcl $block */
+/** @var Escaper $escaper */
+?>
+<a href="<?= $escaper->escapeUrl($block->getUrl($block->getLink())) ?>"
+   class="w-full lg:w-auto <?= /* @noEscape */
+    $block->getAdditionalClasses() ?>">
+    <?= $escaper->escapeHtml($block->getLabel()) ?>
+</a>

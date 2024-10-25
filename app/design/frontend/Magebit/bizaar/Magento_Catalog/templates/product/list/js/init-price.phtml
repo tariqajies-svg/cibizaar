@@ -1,0 +1,137 @@
+<?php
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+?>
+<script>
+    "use strict";
+
+    (function () {
+        window.bizaar.initPrice = function (options) {
+            return {
+                regularPriceKey: options.regularPriceKey,
+                finalPriceKey: options.finalPriceKey,
+                activeProductsPriceData: false,
+                initialFinalPrice: options.initialFinalPrice,
+                calculatedFinalPrice: false,
+                calculatedFinalPriceWithCustomOptions: false,
+                initialTierPrices: JSON.parse(options.initialTierPrices),
+                showRegularPriceLabel: options.showRegularPriceLabel,
+                customOptionPrices: [],
+                activeCustomOptions: [],
+                qty: 1,
+                isSaleable: options.isSaleable,
+                updateCustomOptionActive(data) {
+                    let activeCustomOptions = this.activeCustomOptions;
+                    const customOptionId = data.customOptionId;
+
+                    if (data.active) {
+                        if (!activeCustomOptions.includes(customOptionId)) {
+                            activeCustomOptions.push(data.customOptionId);
+                        }
+                    } else {
+                        if (customOptionId && activeCustomOptions.includes(customOptionId)) {
+                            let index = activeCustomOptions.indexOf(customOptionId);
+                            activeCustomOptions.splice(index, 1);
+                        }
+                    }
+                    this.calculateFinalPriceWithCustomOptions()
+                },
+                updateCustomOptionPrices(prices) {
+                    if (prices) {
+                        this.customOptionPrices = prices;
+                    }
+
+                    this.calculateFinalPriceWithCustomOptions();
+                },
+                calculateFinalPrice() {
+                    let finalPrice = this.initialFinalPrice;
+
+                    if (this.activeProductsPriceData && this.activeProductsPriceData.tierPrices) {
+                        finalPrice = this.activeProductsPriceData.tierPrices.reduce((finalValue, tierPrice) => {
+                            if (this.qty >= tierPrice.qty) {
+                                return tierPrice.price < finalValue ? tierPrice.price : finalValue;
+                            }
+                            return finalValue;
+                        }, this.activeProductsPriceData[this.finalPriceKey].amount);
+
+                    } else {
+                        finalPrice = Object.values(this.initialTierPrices).reduce((finalValue, tierPrice) => {
+                            if (this.qty >= tierPrice.price_qty) {
+                                return parseFloat(tierPrice.website_price) < finalValue ?
+                                    parseFloat(tierPrice.website_price) :
+                                    finalValue;
+                            }
+                            return finalValue;
+                        }, finalPrice);
+
+                    }
+                    this.calculatedFinalPrice = finalPrice;
+
+                    window.dispatchEvent(
+                        new CustomEvent(
+                            'update-product-final-price',
+                            {detail: this.calculatedFinalPrice}
+                        )
+                    );
+                },
+                calculatePriceLabelVisibility() {
+                    this.showRegularPriceLabel = (
+                        (this.calculatedFinalPrice === this.activeProductsPriceData[this.regularPriceKey].amount) &&
+                        this.activeProductsPriceData.isMinimalPrice
+                    );
+                },
+                calculateFinalPriceWithCustomOptions() {
+                    let finalPrice = this.calculatedFinalPrice ||
+                        this.initialFinalPrice;
+                    this.calculatedFinalPriceWithCustomOptions = finalPrice + this.getCustomOptionPrice();
+                },
+                getCustomOptionPrice() {
+                    return this.activeCustomOptions.reduce((priceAccumulator, activeCustomOptionId) => {
+                        const customOptionPrice = this.customOptionPrices[activeCustomOptionId];
+                        if (customOptionPrice) {
+                            return Number.parseFloat(priceAccumulator) + Number.parseFloat(customOptionPrice);
+                        }
+                        return priceAccumulator;
+                    }, 0);
+                },
+                getFormattedFinalPrice() {
+                    return hyva.formatPrice(
+                        this.calculatedFinalPriceWithCustomOptions ||
+                        this.calculatedFinalPrice ||
+                        this.initialFinalPrice
+                    )
+                },
+                isPriceHidden() {
+                    const finalPrice = this.calculatedFinalPriceWithCustomOptions ||
+                        this.calculatedFinalPrice ||
+                        this.initialFinalPrice;
+                    return !this.isSaleable && finalPrice === 0;
+                },
+                eventListeners: {
+                    ['@update-prices-' + options.productId + '.window'](event) {
+                        this.activeProductsPriceData = event.detail;
+
+                        this.calculateFinalPrice();
+                        this.calculateFinalPriceWithCustomOptions();
+                        this.calculatePriceLabelVisibility();
+                    },
+                    ['@update-qty-' + options.productId + '.window'](event) {
+                        this.qty = event.detail;
+                        this.calculateFinalPrice();
+                        this.calculateFinalPriceWithCustomOptions();
+                    },
+                    ['@update-custom-option-active.window'](event) {
+                        this.updateCustomOptionActive(event.detail);
+                    },
+                    ['@update-custom-option-prices.window'](event) {
+                        this.updateCustomOptionPrices(event.detail);
+                    }
+                }
+            }
+        }
+    })();
+</script>

@@ -1,0 +1,113 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\ReCaptcha;
+use Magento\Framework\Escaper;
+use Magento\Newsletter\Block\Subscribe;
+
+/** @var Subscribe $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var ReCaptcha $recaptcha */
+/** @var HeroiconsOutline $heroicons */
+
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+
+// Do not replace this with $viewModels->require(ReCaptcha::class); that might break the dependency
+// on the Magento_ReCaptchaNewsletter module
+$recaptcha = $block->getData('viewModelRecaptcha');
+?>
+<div class="container">
+    <form class="form subscribe inline-block lg:grid grid-cols-2 items-center gap-x-5"
+          action="<?= $escaper->escapeUrl($block->getFormActionUrl()) ?>"
+          method="post"
+          x-data="{...initNewsletterForm(), ...hyva.formValidation($el)}"
+          @submit.prevent="submitForm()"
+          id="newsletter-validate-detail"
+          novalidate>
+        <div class="section-heading leading-5 text-white mb-5 lg:mb-0">
+            <h2 class="text-2xl text-white mb-3"><?= $escaper->escapeHtml(__('Discover the Next Era of Networking with Us')) ?></h2>
+            <p><?= $escaper->escapeHtml(__('Follow and Subscribe to Us for Exclusive Deals,  Latest Product Updates, and Industry Insights. Subscribe now - we offer new verified B2b accounts a AED 250 discount on their first order above AED 5000.')) ?></p>
+        </div>
+        <div class="field">
+            <label for="newsletter-subscribe" class="sr-only">
+                <?= $escaper->escapeHtml(__('Email Address')) ?>
+            </label>
+            <div class="relative md:flex gap-x-3.5">
+                <div class="field field-reserved !mb-0 w-full">
+                    <input name="email"
+                        type="email"
+                        required
+                        id="newsletter-subscribe"
+                        class="form-input w-full bg-transparent text-white"
+                        placeholder="<?= $escaper->escapeHtmlAttr(__('Enter e-mail address')) ?>"
+                        data-validate='{"email": true}'>
+                </div>
+                <?= $block->getBlockHtml('formkey') ?>
+                <?= $recaptcha ? $recaptcha->getInputHtml('newsletter') : '' ?>
+                <button class="btn btn-primary subscribe-btn"
+                    aria-label="<?= $escaper->escapeHtml(__('Subscribe')) ?>">
+                    <?= $escaper->escapeHtml(__('Subscribe')) ?>
+                </button>
+            </div>
+        </div>
+        <div>
+            <template x-if="displayErrorMessage">
+                <p class="flex items-center text-red">
+                    <span class="inline-block w-8 h-8 mr-3">
+                        <?= $heroicons->exclamationCircleHtml(); ?>
+                    </span>
+                    <template x-for="errorMessage in errorMessages">
+                        <span x-html="errorMessage"></span>
+                    </template>
+                </p>
+            </template>
+        </div>
+    </form>
+    <div class="w-full">
+        <?= $recaptcha ? $recaptcha->getLegalNoticeHtml('newsletter') : '' ?>
+    </div>
+    <script>
+        function initNewsletterForm() {
+            return {
+                errors: 0,
+                hasCaptchaToken: 0,
+                displayErrorMessage: false,
+                errorMessages: [],
+                setErrorMessages(messages) {
+                    this.errorMessages = [messages]
+                    this.displayErrorMessage = this.errorMessages.length
+                },
+                submitForm() {
+                    // Do not rename $form, the variable is expected to be declared in the recaptcha output
+                    const $form = document.querySelector('#newsletter-validate-detail');
+
+                    this.validate()
+                        .then(() => {
+                            <?= $recaptcha ? $recaptcha->getValidationJsHtml('newsletter') : '' ?>
+                            if (this.errors === 0) {
+                                $form.submit();
+                            }
+                        }).catch((invalid) => {
+                            if (invalid.length > 0) {
+                                invalid[0].focus();
+                            }
+                        });
+                }
+            }
+        }
+    </script>
+</div>

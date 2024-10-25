@@ -1,0 +1,111 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\Block\User\UserList;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCa\ViewModel\AuthManagement;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Escaper;
+
+/** @var UserList $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var AuthManagement $authManagement */
+$authManagement = $viewModels->require(AuthManagement::class);
+
+$companyUserList = $block->getUserListViewModel()->getSearchResults()->getItems();
+$companyUserViewModel = $block->getUserViewModel();
+$title = $block->getTitle();
+$allowedEdit = $authManagement->isAllowed('aw_ca/user/edit');
+?>
+<div class="mt-4 mb-5 lg:mt-0 lg:mb-8 lg:flex lg:justify-between lg:items-start">
+    <?php if ($title): ?>
+        <h2 class="mb-4.75 lg:mb-0"><?= $escaper->escapeHtml($block->getTitle()) ?></h2>
+    <?php endif; ?>
+    <?= $block->getChildBlock('aw_ca.customer.user.list.add')->toHtml()?>
+</div>
+
+<?php if ($companyUserList && count($companyUserList)): ?>
+    <div class="table-wrapper aw-ca__customer-subscriptions">
+        <table class="data table mb-5">
+            <thead>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('ID')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Name')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Email')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Phone Number')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Role')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Designation')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Status')) ?></th>
+                    <?php if ($allowedEdit): ?>
+                        <th class="text-right"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+                    <?php endif; ?>
+                </tr>
+            </thead>
+            <tbody>
+            <?php /** @var CustomerInterface $companyUser */  ?>
+            <?php foreach ($companyUserList as $companyUser): ?>
+                <tr>
+                    <td data-th="<?= $escaper->escapeHtml(__('ID')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getId()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Name')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getFirstname() . ' ' . $companyUser->getLastname()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Email')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getEmail()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Phone Number')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getExtensionAttributes()->getAwCaCompanyUser()->getTelephone()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Role')) ?>" class="role">
+                        <?= $escaper->escapeHtml($companyUserViewModel->getRoleName($companyUser->getExtensionAttributes()->getAwCaCompanyUser()->getCompanyRoleId())) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Designation')) ?>">
+                        <?= $escaper->escapeHtml($companyUser->getExtensionAttributes()->getAwCaCompanyUser()->getJobTitle()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Status')) ?>">
+                        <?= $escaper->escapeHtml($companyUserViewModel->getStatusLabel($companyUser->getExtensionAttributes()->getAwCaCompanyUser()->getStatus())) ?>
+                    </td>
+                    <?php if ($allowedEdit): ?>
+                        <td class="table-actions text-right">
+                            <a class="action edit btn btn-secondary btn-sq"
+                               title="<?= $escaper->escapeHtmlAttr(__('Edit')) ?>"
+                               href="<?= $escaper->escapeUrl($companyUserViewModel->getEditUrl($companyUser->getId())) ?>">
+                                <i class="icon-edit"></i>
+                            </a>
+                            <?php $isActivated = $companyUserViewModel->isActivated($companyUser) ?>
+                            <a class="action delete btn btn-secondary btn-sq"
+                               title="<?= $escaper->escapeHtmlAttr(__(!$isActivated ? 'Activate' : 'Deactivate')) ?>"
+                               href="<?= $escaper->escapeUrl($companyUserViewModel->getChangeStatusUrl($companyUser->getId(), !$isActivated)) ?>">
+                                <i class="<?= $isActivated ? 'icon-error' : 'icon-checkmark-ellipse' ?>"></i>
+                            </a>
+                        </td>
+                    <?php endif; ?>
+                </tr>
+            <?php endforeach; ?>
+           </tbody>
+        </table>
+        <?php if ($block->getChildHtml('pager')): ?>
+            <?= $block->getChildHtml('pager') ?>
+        <?php endif; ?>
+    </div>
+<?php else: ?>
+    <div class="message info empty">
+        <span><?= $escaper->escapeHtml(__('You have created no users.')) ?></span>
+    </div>
+<?php endif ?>

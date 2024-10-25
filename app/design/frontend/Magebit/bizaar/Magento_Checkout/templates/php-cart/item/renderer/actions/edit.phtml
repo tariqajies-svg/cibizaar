@@ -1,0 +1,33 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Checkout\Block\Cart\Item\Renderer\Actions\Edit;
+use Magento\Framework\Escaper;
+
+/** @var Edit $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+?>
+<?php if ($block->isProductVisibleInSiteVisibility()): ?>
+    <a class="btn-edit ml-3 no-underline"
+       href="<?= $escaper->escapeUrl($block->getConfigureUrl()) ?>"
+       title="<?= $escaper->escapeHtmlAttr(__('Edit item parameters')) ?>"
+    >
+        <i class="icon icon-edit text-black text-md"></i>
+        <span class="sr-only"><?= $escaper->escapeHtml(__('Edit')) ?></span>
+    </a>
+<?php endif ?>

@@ -1,0 +1,18 @@
+.checkout-cart-index {
+    .columns,
+    .container {
+        max-width: 1600px;
+    }
+}
+.cart-wrapper-summary {
+    @apply bg-[#F7F7F7] rounded-md;
+}
+.cart-summary {
+    @apply flex flex-col-reverse;
+
+    .checkout-methods-items {
+        .item {
+            @apply pb-2;
+        }
+    }
+}

@@ -1,0 +1,240 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\Block\Form;
+
+/** @var Form $block */
+?>
+<script>
+    function initEditForm() {
+        return {
+            placeholder: [],
+            userName: '',
+            compareItems: {},
+            sentData: {},
+            actionTitle: '',
+            fieldsetTitle: '',
+            saveUrl: '',
+            isEdit: true,
+            editTitle: String('<?= $escaper->escapeHtml(__('Edit User')); ?>'),
+            createTitle: String('<?= $escaper->escapeHtml(__('New User')); ?>'),
+            isLoading: false,
+            formData: {},
+            getComponentData: function () {
+                const JsLayout = JSON.parse('<?= $block->getJsLayout() ?>');
+                const general = JsLayout.components.awCaForm.children.general.children;
+                this.saveUrl = JsLayout.components.awCaUserProvider.clientConfig.urls.save;
+                this.actionTitle = JsLayout.components.awCaForm.children.save.title;
+                this.fieldsetTitle = JsLayout.components.awCaForm.children.general.label;
+
+                if (JsLayout.components.awCaUserProvider.data) {
+                    this.sentData = JsLayout.components.awCaUserProvider.data;
+                } else {
+                    this.isEdit = false;
+                }
+                for (let i in general) {
+                    let dataScope = general[i].dataScope.split('.'),
+                    val = '';
+                    if (this.isEdit) {
+                        val = this.sentData;
+                    }
+                    general[i].name = '';
+                    dataScope.forEach((slug, k) => {
+                        general[i].name += k === 0 ? slug : '[' + slug + ']';
+                        if (this.isEdit) {
+                            val = val[slug];
+                        }
+                    });
+
+                    this.formData[dataScope.pop()] = val;
+                    general[i].val = val;
+                }
+                this.userName = general.firstname?.val && general.lastname?.val ? `"${general.firstname.val} ${general.lastname.val}"` : '';
+                this.compareItems = general;
+            },
+            submitForm: function () {
+                this.validate()
+                    .then(() => {
+                        this.isLoading = true;
+                        const formKey = hyva.getFormKey();
+                        const $form = this.$refs.editForm;
+                        const dataForm = new FormData($form);
+                        let request_data = '';
+                        if (this.isEdit) {
+                            for (let i in this.sentData) {
+                                if (typeof this.sentData[i] === 'string' || typeof this.sentData[i] === 'number' || typeof this.sentData[i] === 'boolean') {
+                                    if (request_data) {
+                                        request_data += '&'
+                                    }
+                                    request_data += i + '=' + encodeURIComponent(this.sentData[i]);
+                                }
+                            }
+                        }
+                        for (let [name, value] of dataForm) {
+                            request_data += '&' + name + '=' + encodeURIComponent(value);
+                        }
+                        request_data += '&formKey=' + encodeURIComponent(formKey);
+                        fetch(this.saveUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: request_data
+                            }
+                        ).then(response => {
+                                return response
+                            }
+                        ).then(data => {
+                            if (data.errors) {
+                                this.isLoading = false;
+                                dispatchMessages([{
+                                    type: 'error',
+                                    text: data.message
+                                }], 5000);
+                            } else {
+                                window.location.href = data.url
+                            }
+                        });
+                    }).catch((invalid) => {
+                        if (invalid.length > 0) {
+                            invalid[0].focus();
+                        }
+                    });
+            },
+            getOptionSelected: function (optionValue, fieldDefault, fieldVal) {
+                if (fieldVal) {
+                    if (optionValue === fieldVal) {
+                        return true;
+                    }
+                } else {
+                    if (optionValue === fieldDefault) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            getValidation (field) {
+                const validation = {};
+
+                if (field.hasOwnProperty('validation')) {
+                    for (const [key, value] of Object.entries(field.validation)) {
+                        switch (key) {
+                            case 'required-entry':
+                                if (value !== false) {
+                                    validation.required = value;
+                                }
+                                break;
+                            case 'validate-email':
+                                if (value !== false) {
+                                    validation.email = value;
+                                }
+                                break;
+                            default:
+                                if (value !== false) {
+                                    validation[key] = value;
+                                }
+                        }
+                    }
+                }
+                return JSON.stringify(validation);
+            },
+            isInvalid(fieldName) {
+                return this.$refs[fieldName].lastChild?.classList?.contains('massages') === false;
+            }
+        }
+    }
+</script>
+
+<section>
+    <div class="block form">
+        <form x-data="{...initEditForm(), ...hyva.formValidation($el)}"
+              x-init="getComponentData()"
+              id="editform"
+              x-ref="editForm"
+              method="post"
+              @submit.prevent="submitForm()"
+        >
+            <h2 class="pt-4.25 pb-5 md:pt-0 lg:pb-7.75" x-html="isEdit ? editTitle + ' ' + userName : createTitle"></h2>
+
+                <fieldset class="fieldset border-t pt-8 pb-1">
+                    <template x-if="fieldsetTitle">
+                        <h3 class="mb-6.75 lg:mb-7.75" x-html="fieldsetTitle"></h3>
+                    </template>
+                    <div class="fieldset-wrapper grid grid-cols-1 gap-x-7 md:grid-cols-2">
+                        <template x-for="[key, field] of Object.entries(compareItems)">
+                            <div :x-ref="field.name" class="field field-reserved"
+                                 :class="{ 'field-error': isInvalid(field.name),
+                                            'hidden': field.elementTmpl === 'ui/form/element/hidden' }">
+                                <label x-html="field.label" :for="field.name"></label>
+                                <div class="control relative">
+                                    <template x-if="field.elementTmpl === 'ui/form/element/select'">
+                                        <select class="form-select" :id="field.name" :name="field.name"
+                                                x-model="formData[key]"
+                                                @change="onChange"
+                                                data-validate='{"required": true}'>
+                                            <template x-for="[k, option] of Object.entries(field.options)">
+                                                <option
+                                                    :title="option.label"
+                                                    :key="option.value"
+                                                    x-bind:selected="getOptionSelected(option.value, field.default, field.val)"
+                                                    :value="option.value"
+                                                    x-html="option.label"
+                                                    :placeholder="field.label"
+                                                ></option>
+                                            </template>
+                                        </select>
+                                    </template>
+                                    <template x-if="field.elementTmpl === 'Aheadworks_Ca/form/element/validated-email'">
+                                        <input :placeholder="field.label" class="form-input email"
+                                            :id="field.name" :name="field.name" type="email"
+                                            x-model="formData[key]"
+                                            :data-validate='getValidation(field)'
+                                            @change="onChange"/>
+                                    </template>
+                                    <template x-if="field.elementTmpl === 'ui/form/element/hidden'">
+                                        <input type="hidden"
+                                               :id="field.name" :value="field.val" :name="field.name"/>
+                                    </template>
+                                    <template x-if="!field.elementTmpl">
+                                        <input :placeholder="field.label" class="form-input"
+                                            :id="field.name" :name="field.name" type="text"
+                                            x-model="formData[key]"
+                                            :data-validate='getValidation(field)'
+                                            @change="onChange"/>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </fieldset>
+
+
+            <div class="actions-toolbar sm:flex-row !mt-0">
+                <template x-if="actionTitle">
+                    <button class="btn btn-primary w-full sm:w-auto" type="submit">
+                        <span x-html="actionTitle"></span>
+                    </button>
+                </template>
+                <a class="before-icon-arrow-left flex items-center text-base gap-x-2.25 no-underline justify-end"
+                   href="javascript:history.back()">
+                    <span class="hover:underline"><?= $escaper->escapeHtml(__('Back')) ?></span>
+                </a>
+            </div>
+            <?= $block->getChildHtml() ?>
+        </form>
+    </div>
+</section>

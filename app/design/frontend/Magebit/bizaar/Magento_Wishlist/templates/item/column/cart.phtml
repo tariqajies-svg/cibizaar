@@ -1,0 +1,128 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Wishlist\Block\Customer\Wishlist\Item\Column\Cart;
+use Magento\Wishlist\Model\Item;
+use Magento\Wishlist\ViewModel\AllowedQuantity;
+
+/** @var Cart $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Item $item */
+$item = $block->getItem();
+$product = $item->getProduct();
+/** @var AllowedQuantity $viewModel */
+$viewModel = $viewModels->require(AllowedQuantity::class);
+$allowedQty = $viewModel->setItem($item)->getMinMaxQty();
+
+// The product url contains a hash with selected product options
+// We're going to use that hash
+$productUrl = $block->getProductUrl($item);
+$urlHash = explode('#', $productUrl);
+// it would be nicer if we would one day extend the getItemConfigureUrl instead
+$configureUrl = $block->getItemConfigureUrl($item);
+
+// we add the hash from productUrl to the configureUrl
+$editProductUrl = $configureUrl . (count($urlHash) > 1 ? '#' . $urlHash[1] : '');
+
+?>
+<?php foreach ($block->getChildNames() as $childName): ?>
+    <?= /* @noEscape */ $block->getLayout()->renderElement($childName, false) ?>
+<?php endforeach;?>
+<div class="box-tocart mt-2 lg:mt-3">
+    <fieldset class="fieldset">
+        <div class="flex gap-1 md:flex-wrap lg:flex-nowrap lg:gap-2">
+            <?php if ($product->isVisibleInSiteVisibility()): ?>
+                <?php if ($item->canHaveQty() && $product->isSaleable()): ?>
+                    <div class="field qty">
+                        <label class="!hidden"
+                               for="qty[<?= $escaper->escapeHtmlAttr($item->getId()) ?>]">
+                            <span><?= $escaper->escapeHtml(__('Qty')) ?></span>
+                        </label>
+                        <div x-data="{qty: '<?= /* @noEscape */ $block->getAddToCartQty($item) * 1 ?>'}"
+                             class="control flex border border-gray-e6 rounded h-10 lg:h-13">
+                            <button class="btn btn-secondary px-5.25 w-9.75 lg:w-13
+                                   before:block before:absolute before:w-3 before:h-0.5
+                                   before:bg-gray border-none rounded-r-none"
+                                    type="button"
+                                    @click="qty--"
+                                    :disabled="qty <= 1"
+                            >
+                            </button>
+                            <input type="number"
+                                   x-ref="product-qty-<?= $escaper->escapeHtmlAttr($item->getId()) ?>"
+                                   data-role="qty"
+                                   id="qty[<?= $escaper->escapeHtmlAttr($item->getId()) ?>]"
+                                   class="form-input form-input-qty px-2 py-2 w-full text-center border-none"
+                                   name="qty[<?= $escaper->escapeHtmlAttr($item->getId()) ?>]"
+                                   x-model="qty"
+                                   min="0"
+                            >
+                            <button class="btn btn-secondary px-5.25 w-9.75 lg:w-13 before:block before:absolute
+                                   before:w-3 before:h-0.5 before:bg-gray after:block after:absolute
+                                   after:w-3 after:h-0.5 after:bg-gray after:rotate-90 border-none rounded-l-none"
+                                    @click="++qty"
+                                    type="button">
+                            </button>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <div class="flex gap-1 justify-end lg:gap-2">
+                    <a class="btn btn-secondary btn-sq text-gray lg:!w-13 lg:!h-13"
+                       href="<?= $escaper->escapeUrl($editProductUrl) ?>">
+                        <i class="icon-edit"></i>
+                        <span class="sr-only"><?= $escaper->escapeHtml(__('Edit')) ?></span>
+                    </a>
+                    <a href="#"
+                       data-role="remove"
+                       @click.prevent='hyva.postForm(<?= /* @noEscape */ $block->getItemRemoveParams($block->getItem()) ?>)'
+                       title="<?= $escaper->escapeHtmlAttr(__('Remove Item')) ?>"
+                       class="btn btn-secondary btn-sq text-gray lg:!w-13 lg:!h-13">
+                        <i class="icon-delete"></i>
+                        <span class="sr-only"><?= $escaper->escapeHtml(__('Remove item')) ?></span>
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php if ($product->isSaleable()): ?>
+            <div class="product-item-actions mt-2 lg:mt-3">
+                <div class="actions-primary">
+                    <button type="button"
+                            data-role="tocart"
+                            @click.prevent='addToCart("<?= $escaper->escapeHtmlAttr($item->getId()) ?>",
+                        <?= /* @noEscape */ $block->getItemAddToCartParams($item) ?>)'
+                            title="<?= $escaper->escapeHtmlAttr(__('Add to Cart')) ?>"
+                            class="btn btn-primary w-full">
+                        <i class="icon-cart-mini"></i>
+                        <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                    </button>
+                </div>
+            </div>
+        <?php else: ?>
+            <?php if ($product->getIsSalable()): ?>
+            <p class="available stock" title="<?= $escaper->escapeHtmlAttr(__('Availability')) ?>">
+                <span><?= $escaper->escapeHtml(__('In stock')) ?></span>
+            </p>
+        <?php else: ?>
+            <p class="mt-2 lg:mt-3 py-2.75 text-sm text-error font-bold lg:text-base" title="<?= $escaper->escapeHtmlAttr(__('Availability')) ?>">
+                <span><?= $escaper->escapeHtml(__('Out of stock')) ?></span>
+            </p>
+        <?php endif; ?>
+    <?php endif; ?>
+    </fieldset>
+</div>

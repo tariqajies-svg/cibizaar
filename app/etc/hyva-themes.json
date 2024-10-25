@@ -1,0 +1,28 @@
+{
+    "extensions": [
+        {
+            "src": "vendor\/hyva-themes\/magento2-theme-module\/src"
+        },
+        {
+            "src": "vendor\/amasty\/module-hide-price-hyva"
+        },
+        {
+            "src": "app\/code\/Hyva\/MagedelightGa4"
+        },
+        {
+            "src": "vendor\/amasty\/module-request-quote-hyva"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-klaviyo-reclaim\/src"
+        },
+        {
+            "src": "app\/code\/Hyva\/SetuBridgeCallForPrice"
+        },
+        {
+            "src": "app\/code\/Hyva\/SetuBridgeCallForPrice"
+        },
+        {
+            "src": "vendor\/hyva-themes\/magento2-smile-elasticsuite\/src"
+        }
+    ]
+}

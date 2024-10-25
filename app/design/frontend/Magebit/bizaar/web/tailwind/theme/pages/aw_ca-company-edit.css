@@ -1,0 +1,20 @@
+.aw_ca-company-edit {
+    .fieldset-wrapper-title {
+        @apply mb-7;
+        @apply lg:mb-8;
+    }
+
+    .back-btn {
+        @apply text-blue w-full pt-5 no-underline;
+        @apply flex justify-end items-center;
+        @apply lg:text-left lg:pt-0 lg:w-auto;
+
+        span {
+            @apply text-base ml-2;
+        }
+    }
+
+    .back-btn:hover span {
+        @apply underline;
+    }
+}

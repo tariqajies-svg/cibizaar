@@ -1,0 +1,33 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+?>
+<template x-if="searchResult.type == 'term'">
+    <a class="w-full flex justify-between no-underline group"
+       :href="'<?= $escaper->escapeUrl($block->getData('suggestion_url')) ?>' + searchResult.title"
+       :title="searchResult.title">
+        <span class="text-sm text-[#343434] font-semibold
+                group-active:text-inherit group-active:underline lg:group-hover:text-inherit lg:group-hover:underline"
+              x-text="searchResult.title.charAt(0).toUpperCase() + searchResult.title.slice(1)"></span>
+        <span class="inline-block text-sm font-semibold text-[#343434]"
+              x-text="searchResult.num_results"></span>
+    </a>
+</template>

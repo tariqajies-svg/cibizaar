@@ -1,0 +1,18 @@
+<!--
+/**
+ * This file is part of the Magebit_HyvaKlaviyoReclaim package.
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="klaviyo.initialize"
+                        template="Magebit_HyvaKlaviyoReclaim::analytics/hyva_initialize.phtml"/>
+    </body>
+</page>

@@ -1,0 +1,62 @@
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="aw_ca_company_ui_form"/>
+    <body>
+        <referenceContainer name="content" htmlClass="aw-ca-company-create" htmlTag="div"/>
+        <referenceBlock class="Magebit\AheadworksCa\Block\Register\Form"
+                        name="aw.ca.company.form"
+                        template="Magebit_HyvaAheadworksCa::company/edit.phtml">
+            <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="awCaForm" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="administrator" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="firstname" xsi:type="array">
+                                            <item name="disabled" xsi:type="boolean">true</item>
+                                        </item>
+                                        <item name="lastname" xsi:type="array">
+                                            <item name="disabled" xsi:type="boolean">true</item>
+                                        </item>
+                                        <item name="email" xsi:type="array">
+                                            <item name="disabled" xsi:type="boolean">true</item>
+                                        </item>
+                                        <item name="telephone" xsi:type="array">
+                                            <item name="disabled" xsi:type="boolean">true</item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="send" xsi:type="array">
+                                    <item name="title" xsi:type="string" translate="true">Save</item>
+                                </item>
+                            </item>
+                        </item>
+                        <item name="awCaCompanyProvider" xsi:type="array">
+                            <item name="clientConfig" xsi:type="array">
+                                <item name="urls" xsi:type="array">
+                                    <item name="save" xsi:type="url" path="aw_ca/company/registerPost"/>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

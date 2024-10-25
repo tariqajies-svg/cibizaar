@@ -1,0 +1,51 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\Modal\ModalBuilder;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+
+/** @var Wrapper $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var ModalBuilder $modal */
+
+$pageTitleBlock = $block->getLayout()->getBlock('page.main.title');
+$modal = $viewModels->require(Modal::class)->getModal()
+    ->withBlockName('aw.requisition_list.create.modal')
+    ->withTemplate('Magebit_HyvaRequisitionLists::requisition-list/list_create_modal.phtml')
+    ->withAriaLabel('create-list');
+?>
+<div
+    class="aw-rl__create-list-wrapper"
+    id="create-list"
+>
+    <div class="dashboard-top-info-block lg:pt-6 lg:pb-6.5">
+        <h2 class="title"><?= $escaper->escapeHtml($pageTitleBlock ? $pageTitleBlock->getPageTitle() : '') ?></h2>
+        <div class="action-button lg-max:!mt-1.5" x-data="hyva.modal()">
+            <button
+                @click="<?= $escaper->escapeHtmlAttr($modal->getShowJs()) ?>"
+                type="button"
+                class="btn btn-light btn-primary create-button"
+            >
+                <?= $escaper->escapeHtml(__('Create New Requisition list')) ?>
+            </button>
+            <?= /** @noEscape */ $modal ?>
+        </div>
+    </div>
+</div>

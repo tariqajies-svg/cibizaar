@@ -1,0 +1,81 @@
+<?php
+
+/** @var $block \Smile\ElasticsuiteCatalog\Block\Navigation\FilterRenderer */
+/** @var $this \Smile\ElasticsuiteCatalog\Block\Navigation\Renderer\Attribute */
+/** @var $escaper \Magento\Framework\Escaper  */
+
+?>
+<?php
+  $uniqueId = '_' . uniqid();
+  $jsLayout = $this->getJsLayout();
+  $datascope = $this->getFilter()->getRequestVar() . 'Filter';
+  $filterName = $this->getFilter()->getName();
+?>
+<?php if (!empty($filterItems)) : ?>
+    <?= $block->getChildBlock('attribute-filter-js')
+        ->setUniqueId($uniqueId)
+        ->setJsLayout($jsLayout)
+        ->setScope($datascope)
+        ->toHtml() ?>
+
+    <div
+        class="<?= $escaper->escapeHtml($datascope); ?>"
+        x-data="initSmileAttibute<?= $uniqueId ?>()"
+        x-init="initialize();"
+    >
+        <div class="field search"  x-show="displaySearch">
+            <div class="control">
+                <input class="filter-search form-input form-input-sm w-full mb-5 text-sm font-normal"
+                       type="text"
+                       aria-label="<?= $escaper->escapeHtmlAttr( __('Search %1 filter', $filterName)) ?>"
+                       autocomplete="off"
+                       :placeholder="searchPlaceholder"
+                       @keyup="onSearchChange"
+                       @focusout="onSearchFocusOut" />
+            </div>
+        </div>
+        <ol class="items"
+            aria-label="<?= $escaper->escapeHtmlAttr(__('%1 filter options', $filterName)) ?>"
+            tabindex="-1"
+            x-ref="closestItems<?= $uniqueId ?>"
+        >
+            <template x-for="attribute in displayedItems" hidden>
+                <li class="item leading-6 lg:leading-7 lg:space-y-1">
+                    <a class="clear flex lg:hover:text-navy" :href="attribute.url" x-show="attribute.count >= 1" :rel="options.displayRelNofollow">
+                        <label class="inline-label" :for="attribute.id">
+                            <input class="rounded-sm w-3.5 h-3.5 border border-solid border-[#BDBDBD]"
+                                   type="checkbox"
+                                   :id="attribute.id"
+                                   :checked="attribute.is_selected"
+                                   onclick="this.parentNode.parentNode.click();" />
+                            <span class="pl-3">
+                                <span class="font-normal" x-html="attribute.label"></span>
+                                <span class="font-normal"
+                                    x-text="'('+attribute.count+')'"
+                                    x-show ="options.displayProductCount">
+                                </span>
+                            </span>
+                        </label>
+                    </a>
+
+                    <div x-show="attribute.count < 1">
+                        <span x-html="attribute.label"></span>
+                        <span class="count" x-text="attribute.count"></span>
+                    </div>
+                </li>
+            </template>
+        </ol>
+
+        <div class="no-results-message" x-model="result" x-show="getFulltextSearch() && !hasSearchResult()" class="empty">
+            <p x-html="getSearchResultMessage()"></p>
+        </div>
+
+        <div class="actions" x-show="enableExpansion()">
+            <div class="secondary text-right">
+                <button class="action show-more underline text-secondary cursor-pointer" @click="onShowMore(); $refs.closestItems<?= $uniqueId ?>.focus()" x-show="displayShowMore()"><span x-text="showMoreLabel + '+'"></span></button>
+                <button class="action show-less underline text-secondary cursor-pointer" @click="onShowLess(); $refs.closestItems<?= $uniqueId ?>.focus()" x-show="displayShowLess()"><span x-text="showLessLabel + '-'"></span></button>
+            </div>
+        </div>
+    </div>
+
+<?php endif; ?>

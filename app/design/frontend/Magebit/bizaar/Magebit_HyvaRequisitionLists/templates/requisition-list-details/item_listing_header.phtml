@@ -1,0 +1,61 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+use Aheadworks\RequisitionLists\ViewModel\Customer\RequisitionList\DataProvider;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+
+/** @var Wrapper $block */
+/** @var Escaper $escaper */
+/** @var DataProvider $viewModel */
+/** @var ViewModelRegistry $viewModels */
+/** @var Modal $modalViewModel */
+
+$viewModel = $block->getData('requisition_list_view_model');
+$modalViewModel = $viewModels->require(Modal::class);
+?>
+
+<div
+    data-role="aw-requisitionlist-edit-list-wrapper"
+    class="aw-requisitionlist-edit-list-wrapper"
+    id="listing-products"
+>
+    <div class="item-listing-header lg-max:space-y-4.75 lg:flex lg:justify-between lg-max:mt-4">
+        <div>
+            <h2><?= $escaper->escapeHtml($viewModel->getCurrentRequisitionListName()) ?></h2>
+            <p class="mt-1 text-sm"><?= $escaper->escapeHtml($viewModel->getCurrentRequisitionListDescription()) ?></p>
+        </div>
+        <div x-data="initPrint()" class="no-print flex gap-2 lg:gap-x-6">
+            <?= /* @noEscape */ $block->getChildHtml('aw_requisition_list_item_listing.header.edit') ?>
+            <button @click="printDocument()" class="w-full btn btn-primary btn-light btn-sm lg-max:!px-0 lg:h-[fit-content] lg:gap-x-2">
+                <i class="icon icon-printer"></i>
+                <span class="lg:!mx-0"><?= $escaper->escapeHtml(__('Print')) ?></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initPrint() {
+        return {
+            printDocument () {
+                window.print()
+            }
+        }
+    }
+</script>

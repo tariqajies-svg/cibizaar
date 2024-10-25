@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+*
+* Magedelight
+* Copyright (C) 2023 Magedelight <info@Magedelight.com>
+*
+* @category Magedelight
+* @package Magedelight_Ga4
+* @copyright Copyright (c) 2023 Mage Delight (http://www.Magedelight.com/)
+* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+* @author Magedelight <info@Magedelight.com>
+*/
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Customer\CustomerData\SectionPoolInterface">
+        <arguments>
+            <argument name="sectionSourceMap" xsi:type="array">
+                <item xsi:type="string" name="ga4">Magedelight\Ga4\CustomerData\TagManager\Ga4</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\App\FrontController">
+        <plugin name="ga4-cookie" type="Magedelight\Ga4\Plugin\ManagerCK" />
+    </type>
+    <type name="Magento\Framework\App\ActionInterface">
+        <plugin name="customersessiondata-to-context" type="Magedelight\Ga4\Plugin\CustomerSessionContext" sortOrder="15"/>
+    </type>
+</config>

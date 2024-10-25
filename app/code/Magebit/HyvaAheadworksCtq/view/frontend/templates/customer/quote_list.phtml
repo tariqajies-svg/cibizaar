@@ -1,0 +1,99 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Api\Data\QuoteInterface;
+use Aheadworks\Ctq\Block\Customer\QuoteList;
+use Magebit\HyvaAheadworksCtq\ViewModel\Customer\Quote;
+use Magento\Framework\Escaper;
+
+/** @var QuoteList $block */
+/** @var Escaper $escaper */
+/** @var Quote $quoteViewModel */
+
+$quoteList = $block->getQuoteListViewModel()->getQuoteList();
+$quoteViewModel = $block->getQuoteViewModel();
+?>
+<h2 class="mb-4.75 mt-4 lg:mb-7.75 lg:mt-0"><?= $escaper->escapeHtml(__('My Quotes')) ?></h2>
+<?php if ($quoteList && count($quoteList)): ?>
+    <table class="data table mb-5">
+        <thead>
+        <tr>
+            <th scope="col"><?= $escaper->escapeHtml(__('ID')) ?></th>
+            <th scope="col"><?= $escaper->escapeHtml(__('Quote Name')) ?></th>
+            <th scope="col"><?= $escaper->escapeHtml(__('Created')) ?></th>
+            <th scope="col"><?= $escaper->escapeHtml(__('Status')) ?></th>
+            <th scope="col"><?= $escaper->escapeHtml(__('Last Updated')) ?></th>
+            <th scope="col"><?= $escaper->escapeHtml(__('Total')) ?></th>
+            <?= /** @noEscape */ $block->getChildHtml('extra.column.header') ?>
+            <th scope="col" class="text-right"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php /** @var $quote QuoteInterface */ ?>
+        <?php foreach ($quoteList as $quote): ?>
+            <tr>
+                <td data-th="<?= $escaper->escapeHtml(__('ID')) ?>">
+                    <?= $escaper->escapeHtml($quote->getId()) ?>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Quote Name')) ?>">
+                    <?= $escaper->escapeHtml($quote->getName()) ?>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Created')) ?>">
+                    <?php $createdAt = $quoteViewModel->getCreatedAtFormatted($quote->getCreatedAt()) ?>
+                    <span class="uppercase hidden lg:inline">
+                        <?= /** @noEscape */ str_replace(',', ',<br>', $createdAt) ?>
+                    </span>
+                    <span class="uppercase lg:hidden">
+                        <?= /** @noEscape */ $createdAt ?>
+                    </span>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Status')) ?>" class="items-center">
+                    <i class="w-2 h-2 rounded-full lg-max:mb-0.75 lg-max:ml-1.25 lg-max:mr-2 lg:mr-1 lg:mb-px lg:inline-block
+                        bg-<?= $escaper->escapeHtmlAttr($quoteViewModel->getStatusColor($quote->getStatus())) ?>"></i>
+                    <?= $escaper->escapeHtml($quoteViewModel->getStatusLabel($quote->getStatus())) ?>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Last Updated')) ?>">
+                    <?php $lastUpdatedAt = $quoteViewModel->getLastUpdatedAtFormatted($quote->getLastUpdatedAt()) ?>
+                    <span class="uppercase hidden lg:inline">
+                        <?= /** @noEscape */ str_replace(',', ',<br>', $lastUpdatedAt) ?>
+                    </span>
+                    <span class="uppercase lg:hidden">
+                        <?= /** @noEscape */ $lastUpdatedAt ?>
+                    </span>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Total')) ?>" class="!font-bold text-navy">
+                    <?= $escaper->escapeHtml($quoteViewModel->getQuoteTotalFormatted($quote->getBaseQuoteTotal())) ?>
+                </td>
+                <?php if ($extra = $block->getChildBlock('extra.container')): ?>
+                    <?php $extra->setQuote($quote); ?>
+                    <?= /* @noEscape */ $extra->getChildHtml() ?>
+                <?php endif; ?>
+                <td class="table-actions lg:text-right">
+                    <a class="btn btn-secondary btn-sq lg-max:!h-[40px]"
+                       href="<?= $escaper->escapeUrl($quoteViewModel->getEditQuoteUrl($quote->getId())) ?>">
+                        <i class="icon-eye"></i>
+                    </a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php if ($block->getChildHtml('pager')): ?>
+        <?= /** @noEscape */ $block->getChildHtml('pager') ?>
+    <?php endif ?>
+<?php else: ?>
+    <div class="message info empty">
+        <span><?= $escaper->escapeHtml(__('You have created no quotes.')) ?></span>
+    </div>
+<?php endif ?>

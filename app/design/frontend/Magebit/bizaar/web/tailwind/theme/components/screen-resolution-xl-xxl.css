@@ -1,0 +1,205 @@
+@media only screen and (min-width: 1280px) and (max-width: 1500px) {
+    header #header .container,
+    .top-header-bg .container,
+    .cms-home .category-menu-block .pagebuilder-column-group,
+    .cms-home .brand-menu-block .pagebuilder-column-group,
+    .cms-home .product-slider[data-content-type='row'] > [data-content-type='heading'],
+    .cms-home .product-slider[data-content-type='row'] > [data-content-type='text'],
+    .cms-home [data-content-type='products'][data-appearance='carousel'],
+    .cms-home [data-content-type='row'][data-appearance='contained'],
+    .cms-home [data-content-type='row'][data-appearance='full-width'] > .row-full-width-inner,
+    footer .newsletter-bg .container, .footer .bg-navy > .container,
+    .footer .bg-navy-darker > .container {
+        @apply px-12;
+    }
+    .breadcrumbs > .container,
+    .columns {
+        @apply px-12;
+    }
+    .header-top-message .header-top-message-inner {
+        @apply text-[13px] leading-4;
+    }
+    .minisearch .form-input {
+        @apply text-sm py-2;
+    }
+    header {
+        .main-menu-link {
+            @apply text-sm py-6;
+        }
+        nav .lavel01 ul li > a,
+        nav .lavel01 ul li span {
+            @apply text-[#343434] text-[13px];
+        }
+    }
+    .top-header-bg ul li, .top-header-bg a, .switcher-box-lang, .switcher-box-store {
+        @apply text-[13px];
+    }
+    .header-quote-icon {
+        @apply leading-[18px];
+    }
+    .cms-home .hero-banner-content h3 {
+        @apply text-[24px];
+    }
+    .cms-home [data-content-type='products'][data-appearance='carousel'] .glider-contain .carousel-nav button,
+    .cms-home .swiper-button-next,
+    .cms-home .swiper-button-prev {
+        @apply h-9 w-9;
+    }
+    .category-menu.widget .menu-item .view-all-bg,
+    .category-menu.widget .menu-item a picture {
+        @apply w-[90px] h-[90px];
+    }
+    .category-menu.widget .menu-item a picture img {
+        @apply max-w-[90px];
+    }
+    .category-menu.widget .menu-item a span {
+        @apply text-[13px];
+    }
+    /* .inq-form h3 {
+        @apply text-[20px] leading-5;
+    } */
+    .inq-form-inner .textarea {
+        @apply text-sm;
+    }
+    .inq-form-inner .btn {
+        @apply text-base leading-[22px];
+    }
+    .cms-home .brand-menu h2.text-xl,
+    .cms-home .home-product-slider-title {
+        @apply text-xl leading-[34px];
+    }
+    .brand-menu h2 .text-lg,
+    .cms-home .see-all a .icon-arrow-right,
+    .cms-home .see-all a {
+        @apply text-base;
+    }
+    .product-item .product-info .product-item-link {
+        @apply text-sm;
+    }
+    .product-info .text-sm {
+        @apply text-[13px];
+    }
+    .pro-content-box .final-price .price {
+        @apply text-base;
+    }
+    .product-item .product-attribute-list li {
+        @apply text-[13px];
+    }
+    .wishlist-container .btn i {
+        @apply text-sm;
+    }
+    .wishlist-container .btn {
+        @apply !w-[25px] !h-[25px] p-0;
+    }
+    .product-item-content .btn-primary.add-to-quote,
+    .product-item-content .btn-primary.add-to-cart {
+        @apply text-[13px];
+    }
+    .product-card-left .discount-strip .font-bold {
+        @apply font-medium;
+    }
+    .popular-section-main .feature-image h2.feature-title {
+        @apply text-[22px] leading-[34px] top-[30px] left-[25px];
+    }
+    .popular-section-main .glider-contain .carousel-nav button.glider-prev i:before,
+    .popular-section-main .glider-contain .carousel-nav button.glider-next i:before {
+        @apply text-lg leading-[22px];
+    }
+    .popular-section-main .glider-contain .carousel-nav {
+        @apply top-[96px] left-0;
+    }
+    .cms-home .products-on-sale [data-content-type="products"][data-appearance="carousel"] .glider-contain [data-role="glider-content"]
+    .glider-track {
+        @apply mx-0;
+    }
+    .cms-home .benefit-section .benefit-title.big {
+        @apply text-[22px] leading-8 pb-10;
+    }
+    .cms-home .benifitsslider-content {
+        @apply px-5;
+    }
+    .cms-home .benifitsslider-content p {
+        @apply leading-[22px] text-sm;
+    }
+    .cms-home .testimonial-container-main h2 {
+        @apply text-[26px];
+    }
+    .cms-home .testimonial-container-main .testimonial-name {
+        @apply text-[13px];
+    }
+      .cms-home .testimonial-container-main .testimonial-filed {
+        @apply text-[13px];
+    }
+    .cms-home .testimonial-container-main .gallery-thumbs .swiper-button-next,
+    .cms-home .testimonial-container-main .gallery-thumbs .swiper-button-prev {
+        @apply top-[65px];
+    }
+    .cms-home .tabs-inner .tabs-title {
+        @apply py-4 text-base;
+    }
+    .cms-home .tabs-inner .tab-content-text b {
+        @apply text-base leading-[22px];
+    }
+    .cms-home .tabs-inner .tabs-logo p {
+        @apply text-xl;
+    }
+    .homepage-blogpost .title {
+        @apply text-[26px];
+    }
+    .homepage-blogpost .post-list .post-holder:first-child .post-header .post-title .post-item-link {
+        @apply text-xl leading-[30px];
+    }
+    .homepage-blogpost ul.post-list li:not(:first-child) .post-text-hld {
+        @apply leading-[18px];
+    }
+    .homepage-blogpost .post-list .post-holder .post-header .post-title {
+        @apply my-[5px];
+    }
+    .homepage-blogpost
+    .post-list
+    .post-holder
+    .post-header
+    .post-title
+    .post-item-link {
+        @apply text-[13px] leading-5;
+    }
+    .homepage-blogpost .post-list .post-holder p {
+        @apply text-sm leading-[18px];
+    }
+    footer .newsletter-bg .form.subscribe {
+        @apply py-[40px];
+    }
+
+    .product-slider.popular-section-main,
+    .product-slider.products-on-sale {
+        @apply py-12;
+    }
+    .cms-home .brand-menu .menu-items,
+    .cms-home .discount-banner-small-container {
+        @apply mb-12;
+    }
+    .cms-home .discount-banner-small .discount-content .text {
+        @apply text-[14px];
+    }
+    .cms-home .testimonial-section,
+    .cms-home .benefit-section {
+        @apply pt-12;
+    }
+    .cms-home .tabs-inner,
+    .cms-home .brand-menu-block .pagebuilder-column-group,
+    .flex-banner-section {
+        @apply mt-12;
+    }
+    .flex-banner-section p {
+        @apply text-base leading-[normal];
+    }
+    .flex-banner-section .text-xl {
+        @apply text-[22px];
+    }
+    .flex-banner-section .text-2xl {
+        @apply text-[26px];
+    }
+    .homepage-blogpost {
+        @apply my-12;
+    }
+}

@@ -1,0 +1,54 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+?>
+<template x-if="searchResult.type == 'product_attribute'">
+    <a class="w-full block no-underline group" :href="searchResult.url" :title="searchResult.title">
+        <span class="text-sm lg:text-base text-gray font-semibold
+                group-active:text-inherit group-active:underline lg:group-hover:text-inherit lg:group-hover:underline"
+              x-text="searchResult.title"></span>
+        <span class="inline-block text-xs font-extrabold bg-gray-e6 text-gray rounded px-2
+                group-active:bg-navy lg:group-hover:bg-blue-darker lg:group-active:bg-navy group-active:text-white lg:group-hover:text-white"
+              x-text="searchResult.count"></span>
+    </a>
+</template>
+<script>
+    function renderEsAutocompleteTitleAttribute(data)
+    {
+        data = data.filter(function(item) {
+            return item.type === 'product_attribute';
+        }).map(function(item) {
+            return item['attribute_label']
+        }).reduce(function(prev, item) {
+            if (item in prev) {
+                prev[item]++;
+            } else {
+                prev[item] = 1;
+            }
+            return prev;
+        }, {});
+
+        data = Object.entries(data).sort(function(item1, item2) {
+            return item2[1] - item1[1]
+        }).map(function(item) {return item[0]});
+
+        if (data.length > 2) {
+            data = data.slice(0, 2);
+            data.push('...');
+        }
+
+        return data.join(', ');
+    }
+</script>

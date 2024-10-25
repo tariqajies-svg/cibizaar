@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_MagefanBlog package.
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="mfblog">
+            <group id="placeholder" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Blog Post Placeholder</label>
+                <field id="placeholder_upload"
+                       translate="label"
+                       type="image"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1" >
+                    <label>Upload Placeholder image</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                    <comment>Allowed file types: jpg, jpeg, gif, png.</comment>
+                    <upload_dir config="system/filesystem/media" scope_info="1">magefan_blog</upload_dir>
+                    <base_url type="media" scope_info="1">magefan_blog</base_url>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

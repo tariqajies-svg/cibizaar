@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_modal"/>
+    <update handle="ajax_actions"/>
+    <update handle="layered-navigation-component"/>
+    <body>
+        <referenceBlock name="page.main.title">
+            <arguments>
+                <argument name="css_class" xsi:type="string">text-xl lg:text-4xl</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceContainer name="category.view.container"
+                            htmlClass="category-view">
+            <referenceBlock name="category.image" remove="true"/>
+        </referenceContainer>
+        <move element="category.view.container" destination="content" before="-"/>
+        <!-- <move element="category.image" destination="content" before="category.products" /> -->
+        <referenceBlock name="page.main.title" remove="true"/>
+    </body>
+</page>

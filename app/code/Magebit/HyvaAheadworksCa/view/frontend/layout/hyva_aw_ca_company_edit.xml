@@ -1,0 +1,32 @@
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="aw_ca_company_ui_form"/>
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Company Information</argument>
+            </action>
+            <action method="setCssClass">
+                <argument name="cssClass" xsi:type="string">hidden md:block</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content" htmlClass="aw-ca-company-create" htmlTag="div"/>
+        <referenceBlock name="aw.ca.company.form" template="Magebit_HyvaAheadworksCa::company/edit.phtml">
+            <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,72 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Customer\Block\Account\Dashboard\Address;
+use Magento\Framework\Escaper;
+
+/** @var Address $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+?>
+<div class="block block-dashboard-addresses mb-7.25 lg:mb-12.5">
+    <div class="block-title order mb-4.75 lg:mb-7.75 flex justify-between items-center">
+        <h2 class="text-2xl font-semibold"><?= $escaper->escapeHtml(__('Address Book')) ?></h2>
+        <a class="font-bold !text-right"
+           href="<?= $escaper->escapeUrl($block->getAddressBookUrl()) ?>"><span><?= $escaper->escapeHtml(__('Manage Addresses')) ?></span>
+        </a>
+    </div>
+    <div class="block-content">
+        <div class="flex flex-col justify-between lg:flex-row gap-y-1.75 lg:gap-6">
+            <div class="lg:w-1/2 w-full">
+                <div class="flex p-5 sm:flex-row flex-col h-full border border-gray-e6 rounded lg:py-8 lg:px-7.5">
+                    <div class="flex-grow">
+                        <h5 class="mb-3 lg:mb-5">
+                            <span><?= $escaper->escapeHtml(__('Default Billing Address')) ?></span>
+                        </h5>
+                        <address class="not-italic mb-2.75 lg:mb-5">
+                            <?= $block->getPrimaryBillingAddressHtml() ?>
+                        </address>
+                        <a
+                            class="btn btn-secondary lg:w-[11.2rem] lg:px-0 text-[#4A40F6] rounded-md border-[#4A40F6] hover:text-white hover:bg-[#0165FF] hover:border-[#0165FF]"
+                            href="<?= $escaper->escapeUrl($block->getPrimaryBillingAddressEditUrl()) ?>"
+                            data-ui-id="default-billing-edit-link"><span><?= $escaper->escapeHtml(
+                                __('Edit Address')
+                            ) ?></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:w-1/2 w-full">
+                <div class="flex p-5 sm:flex-row flex-col h-full border border-gray-e6 rounded lg:py-8 lg:px-7.5">
+                    <div class="flex-grow">
+                        <h5 class="mb-3 lg:mb-5">
+                            <span><?= $escaper->escapeHtml(__('Default Shipping Address')) ?></span>
+                        </h5>
+                        <address class="not-italic mb-1 mb-2.75 lg:mb-5">
+                            <?= $block->getPrimaryShippingAddressHtml() ?>
+                        </address>
+                        <a
+                            class="btn btn-secondary lg:w-[11.2rem] lg:px-0 text-[#4A40F6] rounded-md border-[#4A40F6] hover:text-white hover:bg-[#0165FF] hover:border-[#0165FF]"
+                            href="<?= $escaper->escapeUrl($block->getPrimaryShippingAddressEditUrl()) ?>"
+                            data-ui-id="default-billing-edit-link"><span><?= $escaper->escapeHtml(
+                                __('Edit Address')
+                            ) ?></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

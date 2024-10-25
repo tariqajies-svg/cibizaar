@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_StockFilter package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_StockFilter
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <stockfilter>
+            <settings>
+                <enabled>1</enabled>
+                <label>Availability</label>
+                <url_param>in-stock</url_param>
+                <position>after_category</position>
+            </settings>
+        </stockfilter>
+    </default>
+</config>

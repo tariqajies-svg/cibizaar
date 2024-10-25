@@ -1,0 +1,130 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Magento\Customer\Block\Address\Grid;
+use Magento\Framework\Escaper;
+
+/** @var Grid $block */
+/** @var Escaper $escaper */
+?>
+
+<div class="block block-addresses-list">
+    <h2><?= $escaper->escapeHtml(__('Address Book')) ?></h2>
+    <div class="block-content mt-5 lg:mt-7.75" x-data="initAddresses()">
+        <?php if ($additionalAddresses = $block->getAdditionalAddresses()): ?>
+            <table class="table">
+            <thead>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Company')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Name')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Street Address')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('City')) ?></th>
+                    <th><?= $escaper->escapeHtml(__('Country')) ?></th>
+                    <th ><?= $escaper->escapeHtml(__('Actions')) ?></th>
+                </tr>
+            </thead>
+            <tbody class="sm-only:grid grid-cols-2 gap-2">
+                <?php foreach ($additionalAddresses as $address): ?>
+                <tr class="sm-only:!m-0 ">
+                    <td data-th="<?= $escaper->escapeHtml(__('Company')) ?>">
+                        <?= $escaper->escapeHtml($address->getCompany()) ?></td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Name')) ?>">
+                        <?= $escaper->escapeHtml($address->getFirstname()) ?>
+                        <?= $escaper->escapeHtml($address->getLastname()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Street Address')) ?>">
+                        <?= $escaper->escapeHtml($block->getStreetAddress($address)) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('City')) ?>">
+                        <?= $escaper->escapeHtml($address->getCity()) ?>
+                    </td>
+                    <td data-th="<?= $escaper->escapeHtml(__('Country')) ?>">
+                        <?= $escaper->escapeHtml($block->getCountryByCode($address->getCountryId())) ?>
+                    </td>
+                    <td class="table-actions">
+                        <a class="btn btn-secondary btn-sq"
+                            title="<?= $escaper->escapeHtmlAttr(__('Edit')) ?>"
+                            href="
+                                <?= $escaper->escapeUrl($block->getUrl(
+                                    'customer/address/edit',
+                                    ['id' => $address->getId()]
+                                )) ?>
+                            ">
+                            <i class="icon-edit"></i>
+                        </a>
+                        <a class="btn btn-secondary btn-sq"
+                           title="<?= $escaper->escapeHtmlAttr(__('Delete')) ?>"
+                           @click.prevent="deleteAddressById(<?= $escaper->escapeJs($address->getId()) ?>)" href="#">
+                            <i class="icon-delete"></i>
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+            </table>
+
+            <?php if ($block->getChildHtml('pager')): ?>
+                <div class="customer-addresses-toolbar bottom pt-7 pb-6.75 border-b">
+                    <?= $block->getChildHtml('pager') ?>
+                </div>
+            <?php endif; ?>
+
+        <?php else: ?>
+            <p class="empty">
+                <?= $escaper->escapeHtml(__('You have no other address entries in your address book.')) ?>
+            </p>
+        <?php endif; ?>
+
+        <script>
+            function initAddresses() {
+                return {
+                    deleteAddressById(id) {
+                        if (window.confirm(
+                            '<?= $escaper->escapeJs(__('Are you sure you want to delete this address?')) ?>'
+                        )) {
+                            hyva.postForm(
+                                {
+                                    "action": '<?= $escaper->escapeJs($block->getDeleteUrl()) ?>',
+                                    "data": {
+                                        "id": id
+                                    }
+                                }
+                            );
+                        }
+                    }
+                }
+            }
+        </script>
+    </div>
+</div>
+
+<div class="actions-toolbar">
+    <div class="primary w-full sm:w-fit">
+        <a href="<?= $escaper->escapeUrl($block->getUrl('customer/address/new')) ?>"
+           class="btn btn-primary block w-full text-center">
+            <span>
+                <?= $escaper->escapeHtml(__('Add New Address')) ?>
+            </span>
+        </a>
+    </div>
+    <div class="secondary">
+        <a class="clear group flex items-center text-blue lg:hover:text-blue-darker active:text-navy"
+           href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>">
+            <i class="icon-arrow-left pr-2"></i>
+            <span class="lg:group-hover:underline underline-offset-0.75">
+                <?= $escaper->escapeHtml(__('Back')) ?>
+            </span>
+        </a>
+    </div>
+</div>

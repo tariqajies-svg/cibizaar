@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Sales package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Sales
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="reserved_order_cancel" instance="Magebit\Sales\Cron\ReservedOrderCancel" method="execute">
+            <schedule>0 * * * *</schedule>
+        </job>
+        <job name="send_credit_due_date_email" instance="Magebit\Sales\Cron\SendCreditDueDateEmail" method="execute">
+            <schedule>0 8 * * *</schedule>
+        </job>
+    </group>
+</config>

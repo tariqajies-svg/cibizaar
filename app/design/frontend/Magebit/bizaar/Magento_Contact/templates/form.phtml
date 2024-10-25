@@ -1,0 +1,167 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ReCaptcha;
+use Magebit\Contact\ViewModel\ContactUsSubjects;
+use Magento\Contact\Block\ContactForm;
+use Magento\Contact\Helper\Data as ContactHelper;
+use Magento\Framework\Escaper;
+use Magento\Customer\Block\Widget\Telephone;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var ContactForm $block */
+/** @var Escaper $escaper */
+/** @var ReCaptcha $recaptcha|null */
+/* @var ViewModelRegistry $viewModels */
+
+$formId = 'contact';
+/** @var ContactHelper $contactHelper */
+$contactHelper = $this->helper(ContactHelper::class);
+$subjectModel = $viewModels->require(ContactUsSubjects::class);
+$subjectOptions = $subjectModel->getOptions();
+
+// Do not replace this with $viewModels->require(ReCaptcha::class); that would break the dependency
+// on the Magento_ReCaptchaContact module
+$recaptcha = $block->getData('viewModelRecaptcha');
+?>
+<div class="flex flex-col md:flex-row pt-3 lg:pt-7 lg:pb-2.5 gap-6">
+    <form class="form contact card lg:w-1/2 md:w-2/3"
+          action="<?= $escaper->escapeUrl($block->getFormAction()) ?>"
+          id="<?= $escaper->escapeHtmlAttr($formId) ?>"
+          method="post"
+          x-data="{...initContactForm(), ...hyva.formValidation($el, {fieldWrapperClassName: 'field-reserved'})}"
+          @submit.prevent="submitForm()"
+    >
+        <?= $block->getChildHtml('loading') ?>
+        <fieldset class="">
+            <div class="flex flex-col w-full mb-4.75 lg:mb-7.5">
+                <h3 class="mb-2">
+                    <span><?= $escaper->escapeHtml(__('Write Us')) ?></span>
+                </h3>
+                <p class="w-full mx-auto">
+                    <?= $escaper->escapeHtml(
+                        __('Drop us a note and we’ll get back to you as quickly as possible.')
+                    ) ?>
+                </p>
+            </div>
+            <div class="flex flex-col">
+                <div class="field field-reserved name required">
+                    <label class="label" for="name">
+                        <span><?= $escaper->escapeHtml(__('Name')) ?></span>
+                    </label>
+                    <input name="name" id="name" required title="<?= $escaper->escapeHtmlAttr(__('Name')) ?>"
+                           value="<?= $escaper->escapeHtmlAttr(
+                               $contactHelper->getPostValue('name')
+                                   ?: $contactHelper->getUserName()
+                           ) ?>"
+                           class="form-input"
+                           type="text"
+                           placeholder="<?= $escaper->escapeHtml(__('Name')) ?>"
+                    />
+                </div>
+                <div class="field email required field-reserved">
+                    <label class="label" for="email">
+                        <span><?= $escaper->escapeHtml(__('Email')) ?></span>
+                    </label>
+                    <input name="email" id="email" required title="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"
+                           value="<?= $escaper->escapeHtmlAttr(
+                               $contactHelper->getPostValue('email')
+                                   ?: $contactHelper->getUserEmail()
+                           ) ?>"
+                           class="form-input"
+                           placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"
+                           type="email"/>
+                </div>
+                <?= $block->getLayout()->createBlock(Telephone::class)
+                    ->setPhoneRequired(false)
+                    ->toHtml() ?>
+                <?php if (!empty($subjectOptions)): ?>
+                    <div class="field field-reserved subject">
+                        <label class="label" for="subject">
+                            <span><?= $escaper->escapeHtml(__('Subject')) ?></span>
+                        </label>
+                        <select class="form-select" id="subject" name="subject">
+                            <?php foreach ($subjectOptions as $option): ?>
+                                <option value="<?= $escaper->escapeHtmlAttr($option) ?>">
+                                    <?= $escaper->escapeHtml($option) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php endif; ?>
+                <div class="field comment required field-reserved">
+                    <label class="label" for="comment">
+                        <span><?= $escaper->escapeHtml(__('What’s on your mind?')) ?></span>
+                    </label>
+                    <textarea name="comment" id="comment" required
+                              title="<?= $escaper->escapeHtmlAttr(__('What’s on your mind?')) ?>"
+                              placeholder="<?= $escaper->escapeHtmlAttr(__('Enter text here')) ?>"
+                              class="form-input" cols="5" rows="3"><?= $escaper->escapeHtml(
+                                  $contactHelper->getPostValue('comment')
+                              ) ?></textarea>
+                </div>
+                <?= $block->getChildHtml('form.additional.info') ?>
+                <?= $recaptcha ? $recaptcha->getInputHtml('contact') : '' ?>
+            </div>
+        </fieldset>
+        <div class="w-full">
+            <?= $block->getBlockHtml('formkey') ?>
+            <button type="submit" title="<?= $escaper->escapeHtmlAttr(__('Submit')) ?>" class="btn btn-primary">
+                <span><?= $escaper->escapeHtml(__('Submit')) ?></span>
+            </button>
+        </div>
+        <div class="w-full">
+            <?= $block->getChildHtml('form.additional.after') ?>
+            <?= $recaptcha ? $recaptcha->getLegalNoticeHtml('contact') : '' ?>
+        </div>
+    </form>
+    <script>
+        function initContactForm() {
+            return {
+                errors: 0,
+                hasCaptchaToken: 0,
+                isLoading: false,
+                submitForm() {
+                    this.validate().then(() => {
+                        this.isLoading = true;
+                        // Do not rename $form, the variable is expected to be declared in the recaptcha output
+                        const $form = document.querySelector('#<?= $escaper->escapeJs($formId) ?>');
+                        <?= $recaptcha ? $recaptcha->getValidationJsHtml('contact') : '' ?>
+
+                        if (this.errors === 0) {
+                            $form.submit();
+                        }
+                    }).catch(invalid => {
+                        this.isLoading = false;
+                        if (invalid.length > 0) {
+                            invalid[0].focus();
+                        }
+                    })
+                }
+            }
+        }
+    </script>
+    <div class="card info lg:w-1/2 md:w-1/3">
+        <h3 class="mb-5">
+            <span>
+                <?= $escaper->escapeHtml(__('Contact Details')) ?>
+            </span>
+        </h3>
+       <?= $block->getBlockHtml('contact-us-info') ?>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+<?php
+/**
+ * This file is part of the Magebit_MagedelightGa4 package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\MagedelightGa4\ViewModel\MagedelightGa4;
+use Magedelight\Ga4\Block\TagManager\Manager;
+use Magedelight\Ga4\Helper\Data;
+use Magento\Framework\Escaper;
+
+/** @var Manager $block */
+/** @var Data $helper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+$magedelightGa4ViewModel = $viewModels->require(MagedelightGa4::class);
+
+$helper = $block->dataHelper();
+$cookieConcent = $helper->getCookie();
+$accessible = 1;
+if ($helper->getGDPRStatus()) {
+    $accessible = isset($cookieConcent) ? 1 : 0;
+}
+?>
+<?php if ($helper->isGTMStatus() && $accessible == 1): ?>
+    <!-- Start of MageDelight GA4 Extension -->
+    <script>
+        window.addEventListener('init-external-scripts', () => {
+            <?= /** @noEscape */ $magedelightGa4ViewModel->getScriptTagContent($helper->getGTMJSCode()) ?>
+            <?php if ($helper->getGaStatus()): ?>
+                <?= /** @noEscape */ $magedelightGa4ViewModel->getScriptTagContent($helper->getGADRemarketing()) ?>
+                <?= /** @noEscape */ $magedelightGa4ViewModel->getScriptTagContent($helper->getGADJSCode()) ?>
+            <?php endif; ?>
+        }, {once: true, passive: true});
+    </script>
+    <!-- End of MageDelight GA4 Extension -->
+<?php endif; ?>

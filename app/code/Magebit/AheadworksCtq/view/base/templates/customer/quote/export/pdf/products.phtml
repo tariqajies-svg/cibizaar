@@ -1,0 +1,170 @@
+<?php
+/**
+ * This file is part of the Magebit_AheadworksCtq package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+// @codingStandardsIgnoreFile
+use Aheadworks\Ctq\ViewModel\Customer\Export\Quote\Item;
+use Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Quote\Model\Quote;
+
+/* @var $block Template */
+/* @var $viewModel DataProvider */
+/* @var $itemViewModel Item */
+/* @var $cart Quote */
+/** @var $escaper Escaper */
+
+$viewModel = $block->getDataProviderViewModel();
+$viewModel->setMethodToLocateQuote($block->getMethodToLocateQuote());
+$itemViewModel = $block->getItemViewModel();
+$quote = $viewModel->getQuote();
+$cart = $viewModel->getCart();
+$items = $cart->getAllVisibleItems();
+$calculator = $itemViewModel->getTotalCalculator();
+?>
+<div class="block-title">
+    <span><?= $escaper->escapeHtml(__('Products')) ?></span>
+</div>
+<table class="products">
+    <thead>
+    <tr>
+        <th><?= $escaper->escapeHtml(__('Product Name')) ?></th>
+        <th><?= $escaper->escapeHtml(__('SKU')) ?></th>
+        <th><?= $escaper->escapeHtml(__('Proposed Price')) ?></th>
+        <th><?= $escaper->escapeHtml(__('Qty')) ?></th>
+        <th><?= $escaper->escapeHtml(__('Subtotal')) ?></th>
+        <th><?= $escaper->escapeHtml(__('Negotiated Discount')) ?></th>
+        <th><?= $escaper->escapeHtml(__('Estimated Tax')) ?></th>
+        <th><?= $escaper->escapeHtml(__('Raw Subtotal')) ?></th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php /* @var $item Quote\Item */ ?>
+    <?php foreach ($items as $item): ?>
+    <tr>
+        <td>
+            <span><?= $escaper->escapeHtml($item->getName()) ?></span>
+        </td>
+        <td>
+            <span>
+                <?= /* @noEscape */
+                implode(
+                    '<br />',
+                    $this->helper(Magento\Catalog\Helper\Data::class)->splitSku($escaper->escapeHtml($item->getSku()))
+                ) ?>
+            </span>
+        </td>
+        <td>
+            <span><?= /* @noEscape */
+                $itemViewModel->formatPrice(
+                    $calculator->calculateItemProposedPrice($item),
+                    $cart->getStoreId() ?: $quote->getStoreId()
+                    ) ?>
+            </span>
+        </td>
+        <td class="qty">
+            <span><?= $escaper->escapeHtml($item->getQty()) ?></span>
+        </td>
+        <td>
+            <?= /* @noEscape */
+            $itemViewModel->formatPrice(
+                $item->getRowTotal(),
+                $cart->getStoreId() ?: $quote->getStoreId()
+            ) ?>
+        </td>
+        <td>
+            <?= /* @noEscape */
+            $itemViewModel->formatPrice(
+                -$calculator->calculateItemNegotiatedDiscount($item),
+                $cart->getStoreId() ?: $quote->getStoreId()
+            ) ?>
+        </td>
+        <td>
+            <?= /* @noEscape */
+            $itemViewModel->formatPrice(
+                $item->getTaxAmount(),
+                $cart->getStoreId() ?: $quote->getStoreId()
+            ) ?>
+        </td>
+        <td>
+            <?= /* @noEscape */
+            $itemViewModel->formatPrice(
+                $calculator->calculateItemRowSubtotal($item),
+                $cart->getStoreId() ?: $quote->getStoreId()
+            ) ?>
+        </td>
+        <?php endforeach; ?>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="4">
+            <?= /* @noEscape */
+            __('Total %1 product(s)', count($items)) ?>
+        </td>
+        <td>
+            <strong>
+                <?= /* @noEscape */
+                $itemViewModel->formatPrice(
+                    $calculator->getSubtotal($cart),
+                    $cart->getStoreId() ?: $quote->getStoreId()
+                ) ?>
+            </strong>
+        </td>
+        <td>
+            <strong>
+                <?= /* @noEscape */
+                $itemViewModel->formatPrice(
+                    $calculator->getNegotiatedDiscountAmount($cart),
+                    $cart->getStoreId() ?: $quote->getStoreId()
+                ) ?>
+            </strong>
+        </td>
+        <td>
+            <strong>
+                <?= /* @noEscape */
+                $itemViewModel->formatPrice(
+                    $calculator->getEstimatedTaxTotal($cart),
+                    $cart->getStoreId() ?: $quote->getStoreId()
+                ) ?>
+            </strong>
+        </td>
+        <td>
+            <strong>
+                <?= /* @noEscape */
+                $itemViewModel->formatPrice(
+                    $calculator->calculateSubtotalInclDiscountAndTax($cart),
+                    $cart->getStoreId() ?: $quote->getStoreId()
+                ) ?>
+            </strong>
+        </td>
+    </tr>
+    </tfoot>
+</table>
+
+<style type="text/css">
+    .block-title {
+        margin: 2.5rem 0 0.5rem 0;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 24px;
+        color: #062B48;
+    }
+    .products {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+        color: #000000;
+    }
+    .products th {
+        color: #062B48;
+        border-top: 1px solid #E6E9EB;
+    }
+    .products td, .products th {
+        padding: 5px;
+        border-bottom: 1px solid #E6E9EB;
+    }
+</style>

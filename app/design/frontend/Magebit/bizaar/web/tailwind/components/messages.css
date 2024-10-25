@@ -1,0 +1,73 @@
+section#messages,
+.messages-wrapper {
+    .messages {
+        /* @apply mb-4 lg:mb-8; */
+    }
+
+    .message {
+        @apply flex content-start justify-between bg-gray-f2 border-t-2 rounded-b pt-2.5 pb-3 px-5 lg:px-6;
+
+        & > span {
+            @apply px-3 w-full;
+        }
+
+        &.error,
+        &.success,
+        &.warning,
+        &.notice,
+        &.info {
+            &::before {
+                @apply font-icomoon;
+            }
+        }
+
+        &.error {
+            @apply border-error;
+
+            &::before {
+                @apply text-error;
+
+                content: '\e91d';
+            }
+        }
+
+        &.success {
+            @apply border-success;
+
+            &::before {
+                @apply text-success;
+
+                content: '\e91e';
+            }
+        }
+
+        &.warning,
+        &.notice {
+            @apply border-warning;
+
+            &::before {
+                @apply text-warning;
+
+                content: '\e91f';
+            }
+        }
+
+        &.info {
+            @apply border-blue;
+
+            &::before {
+                @apply text-blue;
+
+                content: '\e920';
+            }
+        }
+
+        .close {
+            @apply ml-auto cursor-pointer;
+
+            i {
+                @apply block text-gray lg:hover:text-blue-darker active:text-navy leading-6 lg:leading-7;
+            }
+        }
+    }
+}

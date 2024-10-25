@@ -1,0 +1,361 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ca\ViewModel\Company\Customer;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductAttributes;
+use Hyva\Theme\ViewModel\Wishlist;
+use Magento\Catalog\Block\Product\Compare\ListCompare;
+use Magento\Catalog\Helper\Product\Compare;
+use Magento\Catalog\Model\Product;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Escaper;
+use Magento\Wishlist\Helper\Data as WishlistHelper;
+
+// phpcs:disable PSR2.ControlStructures.SwitchDeclaration
+// phpcs:disable Generic.WhiteSpace.ScopeIndent
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var ListCompare $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Compare $compareHelper */
+$compareHelper = $this->helper(Compare::class);
+
+/** @var WishlistHelper $wishlistHelper */
+$wishlistHelper = $this->helper(WishlistHelper::class);
+
+/** @var ProductAttributes $attributesViewModel */
+$attributesViewModel = $viewModels->require(ProductAttributes::class);
+
+/** @var Wishlist $wishlistViewModel */
+$wishlistViewModel = $viewModels->require(Wishlist::class);
+
+/** @var CustomerInterface $companyUser */
+$companyUser = $viewModels->require(Customer::class)->getCurrentCompanyUser();
+?>
+<?php if ($block->getItems()->getSize()): ?>
+<script>
+function initComparePage() {
+    return {
+        showPageContent: true,
+        isRedirecting: null,
+        redirectIfMobile() {
+            if (window.innerWidth < 1024 && this.isRedirecting === null) {
+                this.isRedirecting = true;
+                this.showPageContent = false;
+                window.location.replace('<?= $escaper->escapeUrl($block->getBaseUrl()) ?>');
+            }
+        }
+    }
+}
+function initPrint() {
+    return {
+        print() {
+            window.print();
+        }
+    };
+}
+function initCompareOnCompareList() {
+    return {
+        removeFromCompare(productId, productName) {
+            const formKey = hyva.getFormKey();
+            const postUrl = BASE_URL + 'catalog/product_compare/remove/';
+            const confirmMessage = "<?= $escaper->escapeHtml(
+                __('Are you sure you want to remove this item from your Compare Products list?')
+            ) ?>";
+            if (!window.confirm(confirmMessage)) {
+                return;
+            }
+
+            fetch(postUrl, {
+                "headers": {
+                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                },
+                "body": "form_key=" + formKey + "&product=" + productId + "&uenc=" + hyva.getUenc(),
+                "method": "POST",
+                "mode": "cors",
+                "credentials": "include"
+            }).then(function (response) {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else if (response.ok) {
+                    return response.json();
+                } else {
+                    typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                        [{
+                            type: "warning",
+                            text: "<?= $escaper->escapeHtml(__('Could not remove item from compare.')) ?>"
+                        }], 5000
+                    );
+                }
+            }).then(function (response) {
+                if (!response) { return; }
+                typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                    [{
+                        type: (response.success) ? "success" : "error",
+                        text: (response.success)
+                            ? "<?= $escaper->escapeHtml(
+                                __("You removed product %1 from the comparison list")
+                            ) ?>".replace('%1', productName)
+                            : response.error_message
+                    }], 5000
+                );
+                let reloadCustomerDataEvent = new CustomEvent("reload-customer-section-data");
+                window.dispatchEvent(reloadCustomerDataEvent);
+            }).catch(function (error) {
+                typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                    [{
+                        type: "error",
+                        text: error
+                    }], 5000
+                );
+            });
+        }
+    };
+}
+function initWishlist() {
+    return {
+        addToWishlist(productId) {
+            const formKey = hyva.getFormKey();
+            const postUrl = BASE_URL + 'wishlist/index/add/?isAjax=1';
+
+            fetch(postUrl, {
+                "headers": {
+                    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                },
+                "body": "form_key=" + formKey + "&product=" + productId + "&uenc=" + hyva.getUenc(),
+                "method": "POST",
+                "mode": "cors",
+                "credentials": "include"
+            }).then(function (response) {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else if (response.ok) {
+                    return response.json();
+                } else {
+                    typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                        [{
+                            type: "warning",
+                            text: "<?= $escaper->escapeHtml(__('Could not add item to wishlist.')) ?>"
+                        }], 5000
+                    );
+                }
+            }).then(function (response) {
+                if (!response) { return }
+                typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                    [{
+                        type: (response.success) ? "success" : "error",
+                        text: (response.success)
+                            ? "<?= $escaper->escapeHtml(__("%1 has been added to your Wish List.", __("Product"))) ?>"
+                            : response.error_message
+                    }], 5000
+                );
+                const reloadCustomerDataEvent = new CustomEvent("reload-customer-section-data");
+                window.dispatchEvent(reloadCustomerDataEvent);
+            }).catch(function (error) {
+                typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                    [{
+                        type: "error",
+                        text: error
+                    }], 5000
+                );
+            });
+        }
+    }
+}
+</script>
+<section x-data="initComparePage()" x-init="redirectIfMobile()" @resize.window="redirectIfMobile()">
+    <template x-if="showPageContent">
+        <div class="mt-3">
+            <div class="table-wrapper max-w-full overflow-x-auto mt-3">
+                <table class="compare-table">
+                    <caption class="sr-only"><?= $escaper->escapeHtml(__('Compare Products')); ?></caption>
+                    <tbody>
+                        <tr>
+                            <?php $index = 0; ?>
+                            <?php /** @var Product $product */ ?>
+                            <?php foreach ($block->getItems() as $product): ?>
+                                <?php if ($index++ === 0): ?>
+                                    <th scope="row" class="w-44 text-left align-top">
+                                        <span><?= $escaper->escapeHtml(__('Product')) ?></span>
+                                    </th>
+                                <?php endif; ?>
+                                <td class="compare-product-item relative w-60 align-top min-w-[300px] last:min-w-[280px]">
+                                    <span class="list-counter"><?= $escaper->escapeHtml($index) ?>)</span>
+                                    <div class="flex flex-col">
+                                        <a href="<?= $escaper->escapeUrl($block->getProductUrl($product)) ?>"
+                                            class="block mb-3"
+                                            title="<?= $escaper->escapeHtmlAttr($product->getName()) ?>">
+                                            <?= $block->getImage($product, 'product_comparison_list')
+                                                ->setTemplate('Magento_Catalog::product/image.phtml')->toHtml() ?>
+                                        </a>
+                                        <?php if ($brandSwatchBlock = $block->getChildBlock('product.item.brand_swatch')): ?>
+                                            <div class="mb-3 leading-none h-6">
+                                                <?= $brandSwatchBlock->setProduct($product)->toHtml() ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <a href="<?= $escaper->escapeUrl($block->getProductUrl($product)) ?>"
+                                           title="<?= $escaper->escapeHtmlAttr($product->getName()) ?>"
+                                           class="clear text-gray font-semibold active:text-navy lg:hover:text-blue-darker
+                                               active:text-navy text-xs lg:text-base mb-1">
+                                            <?= $escaper->escapeHtml($product->getName()) ?>
+                                        </a>
+                                        <?= /* @noEscape */ $block->getProductPrice($product) ?>
+                                    </div>
+                                    <div class="compare-actions hidden lg:block absolute top-0 right-0 mx-5 my-7.25 space-y-2 z-10">
+                                        <button x-data="initCompareOnCompareList()"
+                                            @click.prevent="removeFromCompare(
+                                                <?= (int)$product->getId() ?>,
+                                                '<?= $escaper->escapeJs($product->getName()) ?>'
+                                            )"
+                                            aria-label="<?= $escaper->escapeHtmlAttr(__('Remove Product')) ?>"
+                                            class="btn btn-secondary p-1.75 w-9 h-9 text-gray"
+                                            title="<?= $escaper->escapeHtmlAttr(__('Remove Product')) ?>">
+                                            <i class="icon-close"></i>
+                                        </button>
+                                        <?php if ($wishlistViewModel->isEnabled() && !$companyUser): ?>
+                                            <button x-data="initWishlist()"
+                                                @click.prevent="addToWishlist(<?= (int)$product->getId() ?>)"
+                                                aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>"
+                                                title="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>"
+                                                class="btn btn-secondary p-1.75 p-1.75 w-9 h-9 text-gray"
+                                            >
+                                                <template x-if="isLoading">
+                                                    <svg class="animate-spin min-w-4 p-0.5 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                         viewBox="0 0 24 24">
+                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                        <path class="opacity-75" fill="currentColor"
+                                                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                        </path>
+                                                    </svg>
+                                                </template>
+                                                <i class="icon-heart" x-show="!isLoading"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                        <?php if ($saveToBlock = $block->getChildBlock('product.item.addtorlist')): ?>
+                                            <?= $saveToBlock->setProductId($product->getId())->toHtml() ?>
+                                        <?php endif; ?>
+                                        <?php if ($product->isSaleable()): ?>
+                                            <form data-role="tocart-form"
+                                                action="<?= $escaper
+                                                    ->escapeUrl($compareHelper->getAddToCartUrl($product)) ?>"
+                                                method="post"
+                                                @submit.prevent="ajaxForm('addToCart')"
+                                                id="product_addtocart_form<?= $escaper->escapeHtmlAttr($product->getId()) ?>"
+                                                x-data="hyva.ajaxActions()"
+                                            >
+                                                <input type="hidden" name="product" value="<?= (int)$product->getId() ?>"/>
+                                                <?= $block->getBlockHtml('formkey') ?>
+                                                <button type="submit"
+                                                        class="btn btn-primary p-1.75 w-9 h-9"
+                                                        aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Cart')) ?>"
+                                                        title="<?= $escaper->escapeHtmlAttr(__('Add to Cart')) ?>"
+                                                >
+                                                    <template x-if="loading.addToCart">
+                                                        <svg class="animate-spin p-0.5 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                             viewBox="0 0 24 24">
+                                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                            <path class="opacity-75" fill="currentColor"
+                                                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                            </path>
+                                                        </svg>
+                                                    </template>
+                                                    <i class="icon-cart-mini" x-show="!loading.addToCart"></i>
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            <?php endforeach; ?>
+                        </tr>
+
+                       <?php /* REVIEW SCORE WAS THERE */ ?>
+
+                        <?php foreach ($block->getAttributes() as $attribute): ?>
+                            <?php $index = 0; ?>
+                            <?php if ($block->hasAttributeValueForProducts($attribute)): ?>
+                                <tr>
+                                    <?php /** @var Product $product */ ?>
+                                    <?php foreach ($block->getItems() as $product): ?>
+                                        <?php if ($index++ === 0): ?>
+                                            <th scope="row" class="text-left align-top">
+                                                <span>
+                                                    <?= $escaper
+                                                        ->escapeHtml(
+                                                            $attribute->getStoreLabel() ?:
+                                                                __($attribute->getFrontendLabel())
+                                                        ) ?>
+                                                </span>
+                                            </th>
+                                        <?php endif; ?>
+                                        <td class="align-top">
+                                            <span class="list-counter"><?= $escaper->escapeHtml($index) ?>)</span>
+                                            <div>
+                                                <?php switch ($attribute->getAttributeCode()) {
+                                                    case 'price': ?>
+                                                        <?= /* @noEscape */ $block->getProductPrice(
+                                                            $product,
+                                                            '-compare-list-' . $attribute->getCode()
+                                                        ) ?>
+                                                        <?php break;
+                                                    case 'small_image': ?>
+                                                        <?= $block->getImage($product, 'product_small_image')->toHtml(); ?>
+                                                        <?php break;
+                                                    case 'short_description':
+                                                    case 'description': ?>
+                                                        <?php $attributeData = $attributesViewModel->getAttributeData(
+                                                            $attribute,
+                                                            $product
+                                                        ) ?>
+                                                            <?= /* @noEscape */ $attributeData['value'] ?>
+                                                        <?php break;
+                                                    default: ?>
+                                                        <?php $attributeData = $attributesViewModel->getAttributeData(
+                                                            $attribute,
+                                                            $product
+                                                        ) ?>
+                                                        <?= $escaper->escapeHtml($attributeData['value'], ['p', 'br']) ?>
+                                                        <?php break;
+                                                } ?>
+                                            </div>
+                                        </td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-8">
+                <button x-data="initPrint()"
+                    @click.prevent="print()"
+                    class="compare-print btn btn-secondary ml-auto"
+                    title="<?= $escaper->escapeHtmlAttr(__('Print This Page')) ?>">
+                    <i class="icon-printer"></i>
+                    <span><?= $escaper->escapeHtml(__('Print This Page')) ?></span>
+                </button>
+            </div>
+        </div>
+    </template>
+    <template x-if="!showPageContent">
+        <div><?= $escaper->escapeHtml(__('Product compare page is not available on mobile devices.')) ?></div>
+    </template>
+</section>
+<?php else: ?>
+<section>
+    <div><?= $escaper->escapeHtml(__('You have no items to compare.')) ?></div>
+</section>
+<?php endif; ?>

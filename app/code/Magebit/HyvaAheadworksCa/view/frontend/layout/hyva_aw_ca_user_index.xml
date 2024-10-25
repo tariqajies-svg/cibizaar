@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="2columns-left">
+    <update handle="customer_account"/>
+    <body>
+        <referenceContainer name="content">
+            <container name="aw_ca.customer.user.list.add.container" htmlTag="div"
+                       htmlClass="aw-ca__customer-btn-wrapper text-right mb-4">
+                <block class="Aheadworks\Ca\Block\ButtonWithCheckAcl"
+                       name="aw_ca.customer.user.list.add">
+                    <action method="setTemplate">
+                        <argument name="template" xsi:type="string">Magebit_HyvaAheadworksCa::button_with_check_acl.phtml</argument>
+                    </action>
+                    <arguments>
+                        <argument name="label" translate="true" xsi:type="string">Add New User</argument>
+                        <argument name="link" xsi:type="string">aw_ca/user/create</argument>
+                        <argument name="additional_classes" xsi:type="string">inline-flex flex-shrink-0 ml-auto xl:mt-0 btn btn-secondary float-right no-underline</argument>
+                    </arguments>
+                </block>
+            </container>
+            <block class="Aheadworks\Ca\Block\User\UserList"
+                   name="aw_ca.customer.user.list"
+                   template="Magebit_HyvaAheadworksCa::company_user/list.phtml"
+                   cacheable="false">
+                <arguments>
+                    <argument name="user_view_model" xsi:type="object">Aheadworks\Ca\ViewModel\User\User</argument>
+                    <argument name="user_list_view_model" xsi:type="object">Aheadworks\Ca\ViewModel\User\UserList
+                    </argument>
+                </arguments>
+            </block>
+            <referenceBlock name="customer.account.link.back" remove="true"/>
+        </referenceContainer>
+        <block class="Aheadworks\Ca\Block\ButtonWithCheckAcl"
+               name="aw_ca.customer.user.list.edit">
+            <arguments>
+                <argument name="label" xsi:type="string" translate="true">Edit</argument>
+            </arguments>
+        </block>
+        <block class="Aheadworks\Ca\Block\ButtonWithCheckAcl"
+               name="aw_ca.customer.user.list.activate">
+            <arguments>
+                <argument name="label" xsi:type="string" translate="true">Activate</argument>
+            </arguments>
+        </block>
+        <block class="Aheadworks\Ca\Block\ButtonWithCheckAcl"
+               name="aw_ca.customer.user.list.deactivate">
+            <arguments>
+                <argument name="label" xsi:type="string" translate="true">Deactivate</argument>
+            </arguments>
+        </block>
+    </body>
+</page>

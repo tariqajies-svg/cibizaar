@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_PageBuilder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_PageBuilder:etc/content_type.xsd">
+    <type name="image">
+        <appearances>
+            <appearance name="full-width"
+                        master_template="Magebit_PageBuilder/content-type/image/full-width/master">
+                <elements>
+                    <!-- Addition attributes for desktop table -->
+                    <element name="desktop_image">
+                        <attribute name="srcset"
+                                   source="srcset"
+                                   converter="Magebit_PageBuilder/js/converter/attribute/srcset"
+                                   preview_converter="Magento_PageBuilder/js/converter/attribute/preview/src"/>
+                        <attribute name="width" source="width"/>
+                        <attribute name="height" source="height"/>
+                        <attribute name="loading" source="loading"/>
+                    </element>
+
+                    <element name="mobile_image">
+                        <attribute name="srcset_mobile"
+                                   source="srcset"
+                                   converter="Magebit_PageBuilder/js/converter/attribute/srcset"
+                                   preview_converter="Magento_PageBuilder/js/converter/attribute/preview/src"/>
+                        <attribute name="width_mobile" source="width"/>
+                        <attribute name="height_mobile" source="height"/>
+                        <attribute name="loading_mobile" source="loading"/>
+                    </element>
+                </elements>
+            </appearance>
+        </appearances>
+    </type>
+</config>

@@ -1,0 +1,61 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Customer\Block\Newsletter;
+use Magento\Framework\Escaper;
+
+/** @var Newsletter $block */
+/** @var Escaper $escaper */
+?>
+<h2 class="mt-3.75 md:mt-0"><?= $escaper->escapeHtml(__('Newsletter Subscription')) ?></h2>
+<?= $block->getChildHtml('form_before') ?>
+<form class="form form-newsletter-manage border-t mt-5.75 lg:mt-7.75  pt-8"
+      action="<?= $escaper->escapeUrl($block->getAction()) ?>"
+      method="post"
+      id="form-validate">
+    <fieldset class="fieldset">
+        <?= $block->getBlockHtml('formkey') ?>
+        <h3><?= $escaper->escapeHtml(__('Subscription options')) ?></h3>
+        <div class="field pt-5 lg:pt-7">
+            <label for="subscription" class="inline-label">
+                <input type="checkbox"
+                       name="is_subscribed"
+                       id="subscription"
+                       value="1"
+                       title="<?= $escaper->escapeHtmlAttr(__('General Subscription')) ?>"
+                       <?php if ($block->getIsSubscribed()): ?> checked="checked"<?php endif; ?>
+                />
+                <span><?= $escaper->escapeHtml(__('General Subscription')) ?></span>
+            </label>
+        </div>
+        <?php /* Extensions placeholder */ ?>
+        <?= $block->getChildHtml('customer.form.newsletter.extra') ?>
+    </fieldset>
+    <div class="actions-toolbar !flex-row !pt-3 lg:!pt-10 !mt-0 !border-0">
+        <div class="primary w-full sm:w-fit">
+            <button type="submit"
+                    title="<?= $escaper->escapeHtmlAttr(__('Save')) ?>"
+                    class="action save btn btn-primary w-full sm:w-fit"
+            >
+                <span>
+                    <?= $escaper->escapeHtml(__('Save')) ?>
+                </span>
+            </button>
+        </div>
+    </div>
+</form>
+<?php /* Extensions placeholder */ ?>
+<?= $block->getChildHtml('customer.form.newsletter.extra2') ?>

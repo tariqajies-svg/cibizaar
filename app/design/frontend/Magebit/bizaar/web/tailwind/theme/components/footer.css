@@ -1,0 +1,181 @@
+footer {
+    [data-content-type='row'] > div {
+        @apply p-0 m-0;
+    }
+
+    ul {
+        /* @apply text-xs lg:text-sm; */
+    }
+
+    .footer.content {
+        @apply relative;
+    }
+
+    /* Footer mein area */
+
+    .main {
+        .section-heading,
+        [data-content-type='heading'] {
+            @apply text-white mb-2 lg:mb-3;
+        }
+        li {
+            @apply pt-2;
+        }
+    }
+    .footer-link-column {
+        @apply pl-0;
+    }
+    .footer-links-container {
+        @apply md:!block;
+        &.grid {
+            @apply md:!grid;
+        }
+    }
+    .newsletter-bg {
+        @apply bg-[#0165FF] relative overflow-hidden;
+        .container {
+            @apply relative z-[1];
+        }
+        &:before {
+            background: url('../images/home/newsletter-circle-lect.png') no-repeat right bottom;
+            @apply content-[""] block absolute w-[423px] h-[422px] top-[-250px] left-[-200px];
+        }
+        &:after {
+            background: url('../images/home/newsletter-circle-right.png') no-repeat right bottom;
+            @apply content-[""] block absolute w-[248px] h-[211px] bottom-[-100px] right-[-70px];
+        }
+        .form.subscribe {
+            @apply px-0 py-[55px];
+            .section-heading {
+                p {
+                    @apply text-base;
+                }
+            }
+        }
+        .form-input {
+            @apply text-white border-white hover:text-white text-[15px] leading-[21px];
+        }
+        .form-input::-webkit-input-placeholder {
+            @apply text-white;
+          }
+          .form-input::-moz-placeholder {
+            @apply text-white text-white;
+          }
+          .form-input::-ms-input-placeholder {
+            @apply text-white;
+          }
+         .subscribe-btn {
+            @apply bg-white text-black hover:bg-black hover:text-white w-full mt-5 text-sm leading-6 font-semibold;
+         }
+    }
+    .footer-contact {
+        li {
+            @apply flex gap-x-3;
+            &.footer-logo {
+                @apply pt-0 pb-2.5;
+            }
+        }
+        .footer-social-links {
+            @apply gap-x-1 mb-5;
+            .btn {
+                @apply bg-[rgba(31,64,90,1)] w-11 h-11 p-2.5 border-0 hover:bg-[rgba(50,101,141,1)] text-[#798C9C] hover:text-white;
+            }
+        }
+    }
+    .main li a:hover {
+        @apply text-[#4A40F6];
+    }
+    /* .branding-block {
+        @apply col-span-2 sm:col-span-1 order-1;
+
+        .pagebuilder-column-group {
+            @apply h-full;
+        }
+
+        .pagebuilder-column {
+            @apply !w-full;
+        }
+
+        .pagebuilder-column-line {
+            @apply flex-col space-y-6 lg:space-y-5 justify-between h-full flex-nowrap;
+        }
+
+        .footer-logo img {
+            @apply !max-w-[148px];
+        }
+
+        .contacts {
+            @apply text-white;
+
+            li {
+                @apply pt-1 lg:pt-2 flex items-center space-x-3;
+            }
+
+            i {
+                @apply opacity-40;
+            }
+
+            span {
+                @apply opacity-80;
+            }
+
+            a {
+                @apply text-opacity-100;
+            }
+        }
+
+        .social-links ul {
+            @apply flex space-x-1 mt-1 lg:mt-3;
+        }
+    } */
+
+    .customer-service {
+        @apply order-4;
+    }
+
+    /* Footer bottom area */
+
+    .bottom-links {
+        ul {
+            @apply grid grid-cols-2 md-max:gap-x-2.5 gap-y-2 md:flex text-xs leading-4 lg:leading-6 md:space-x-4
+                lg:space-x-6;
+        }
+    }
+
+    .payment-methods {
+        /* @apply md:ml-4 lg:ml-6 mt-4 md:mt-2 xl:mt-0; */
+
+        img {
+            @apply !h-5 lg:!h-6;
+        }
+    }
+}
+
+@screen md {
+    footer {
+        .footer-contact .footer-social-links {
+            @apply mb-0;
+        }
+        .newsletter-bg {
+            &:before {
+                @apply left-[-134px] top-[-150px];
+            }
+            &:after {
+                @apply right-[-50px] bottom-0;
+            }
+            .subscribe-btn {
+                @apply w-auto mt-0;
+            }
+        }
+        .footer-link-right {
+            grid-template-columns: repeat(3, minmax(0, 3fr));
+        }
+    }
+}
+@screen lg {
+    footer {
+        .footer-link-column {
+            @apply md:pl-8;
+        }
+    }
+}

@@ -1,0 +1,11 @@
+#search-results-content {
+    @screen lg {
+        @apply h-search-pop-container;
+    }
+}
+
+.search.results {
+    .message {
+        @apply py-4 lg:py-0;
+    }
+}

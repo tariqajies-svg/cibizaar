@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_StockFilter package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_StockFilter
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<requests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:module:Smile_ElasticsuiteCore:etc/elasticsuite_search_request.xsd">
+
+    <!-- Add stock filter and aggregation(facet) for search-->
+    <request name="quick_search_container" label="Catalog Product Search" index="catalog_product" track_total_hits="true" fulltext="true">
+        <filters>
+            <filter name="stockFilter">Magebit\StockFilter\Model\Product\Search\Request\Container\Filter\Stock</filter>
+        </filters>
+        <aggregations>
+            <aggregation xsi:type="termBucket" name="stock" field="stock.is_in_stock"/>
+        </aggregations>
+    </request>
+
+    <!-- Add stock filter and aggregation(facet) for categories-->
+    <request name="catalog_view_container" label="Category Product View" index="catalog_product" track_total_hits="true" fulltext="false">
+        <filters>
+            <filter name="magebitStockFilter">Magebit\StockFilter\Model\Product\Search\Request\Container\Filter\Stock</filter>
+        </filters>
+        <aggregations>
+            <aggregation xsi:type="termBucket" name="stock" field="stock.is_in_stock"/>
+        </aggregations>
+    </request>
+</requests>

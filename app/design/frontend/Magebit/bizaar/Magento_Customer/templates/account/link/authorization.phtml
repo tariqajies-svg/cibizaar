@@ -1,0 +1,38 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+/**
+ * @var AuthorizationLink $block
+ * @var Escaper $escaper
+ */
+
+use Magento\Customer\Block\Account\AuthorizationLink;
+use Magento\Framework\Escaper;
+
+if ($block->isLoggedIn()): ?>
+    <?php $dataPostParam = $block->getPostParams(); ?>
+    <li class="nav item">
+        <a class="uppercase !text-navy font-bold !pt-1.75 px-1.75 !pb-0 lg:px-0 lg:!pt-1.25" <?= /* @noEscape */ $block->getLinkAttributes() ?>
+            @click.prevent='hyva.postForm(<?= /* @noEscape */ $dataPostParam ?>)'
+        >
+            <?= $escaper->escapeHtml($block->getLabel()) ?>
+        </a>
+    </li>
+<?php else: ?>
+    <li class="nav item">
+        <a class="uppercase !text-navy font-bold !pt-1.75 px-1.75 !pb-0 lg:px-0 lg:!pt-1.25" <?= /* @noEscape */ $block->getLinkAttributes() ?>>
+            <?= $escaper->escapeHtml($block->getLabel()) ?>
+        </a>
+    </li>
+<?php endif; ?>

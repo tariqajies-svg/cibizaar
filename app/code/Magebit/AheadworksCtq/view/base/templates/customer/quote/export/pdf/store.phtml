@@ -1,0 +1,59 @@
+<?php
+/**
+ * This file is part of the Magebit_AheadworksCtq package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+
+use Aheadworks\Ctq\ViewModel\Customer\Export\Quote\Store;
+use Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Quote\Model\Quote;
+
+/* @var $block Template */
+/* @var $viewModel DataProvider */
+/* @var $storeViewModel Store */
+/* @var $cart Quote */
+/** @var $escaper Escaper */
+
+$viewModel = $block->getDataProviderViewModel();
+$viewModel->setMethodToLocateQuote($block->getMethodToLocateQuote());
+$storeViewModel = $block->getStoreViewModel();
+$cart = $viewModel->getCart();
+?>
+<?php if (trim($storeViewModel->getFormattedStoreInformation($cart))): ?>
+    <div class="block-title">
+        <span><?= $escaper->escapeHtml(__('Store Information')) ?></span>
+    </div>
+    <div class="store-information">
+        <?= /* @noEscape */ $storeViewModel->getFormattedStoreInformation($cart) ?>
+    </div>
+<?php endif; ?>
+
+<div>
+    <p class="block-title">MAINLAND TERMS</p>
+    <p>Payment Terms: 100% Prepaid via Cash Deposit or Bank Transfer Price Basis: Dubai Mainland</p>
+    <p>Delivery Terms: will arrange it for our mainland Showroom
+    <p>VAT: 5% VAT applicable for transactions in Dubai Mainland and is not included in the above prices</p>
+    <p>Quote Validity: 1 Day</p>
+    <p>Product Availability: As mentioned in the proposal.</p>
+    <p class="block-title">JAFZA TERMS:</p>
+    <p>Currency: AED</p>
+    <p>Payment Terms:  Bank Transfer</p>
+    <p>Price Basis: Jebel Ali Free Zone</p>
+    <p>Delivery Basis: EXW Jebel Ali</p>
+    <p>Quote Validity: 6-7  Days</p>
+    <p>Please let me know if you have any questions or concerns.</p>
+</div>
+
+<style type="text/css">
+    .block-title {
+        margin: 2.5rem 0 0.5rem 0;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 24px;
+        color: #062B48;
+    }
+</style>

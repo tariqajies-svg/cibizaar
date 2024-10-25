@@ -1,0 +1,247 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksQuickOrder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksQuickOrder
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+/** @var $block Wrapper*/
+/** @var Escaper $escaper */
+/** @var Config $viewModel */
+
+use Magebit\HyvaAheadworksQuickOrder\ViewModel\Config;
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+
+$viewModel = $block->getData('view_model');
+$config = $viewModel->getConfig();
+?>
+
+<script>
+    function initContainer() {
+        return {
+            namespace: 'aw_quick_order_item_listing',
+            configFormId: 'quick-order-configuration-form',
+            sorting: {
+                dir: 'DESC',
+                field: 'product_name'
+            },
+            items: [],
+            configureData: {
+                attributes: []
+            },
+            pagination: {
+                totalRecords: 0,
+                currentPage: 1,
+                totalPages: 1
+            },
+            isLoading: false,
+            getRequestData(data) {
+                const formKey = hyva.getFormKey();
+                let request_data = '';
+                for (const key in data) {
+                    if (request_data) {
+                        request_data += '&';
+                    }
+
+                    request_data += key + '=' + encodeURIComponent(data[key]);
+                }
+
+                request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                return request_data;
+            },
+            getItems() {
+                this.isLoading = true;
+                const data = {
+                    namespace: {
+                        key: 'namespace',
+                        value: this.namespace
+                    },
+                    pageSize: {
+                        key: 'paging[pageSize]',
+                        value: 20
+                    },
+                    current: {
+                        key: 'paging[current]',
+                        value: this.pagination.currentPage
+                    }
+
+                }
+
+                let request_data = {};
+                for (let i in data) {
+                    request_data[data[i].key] = data[i].value;
+                }
+
+                fetch('<?= $escaper->escapeUrl($block->getUrl('mui/index/render')) ?>?'  + new URLSearchParams(request_data).toString(), {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json, text/javascript, */*; q=0.01'
+                        }
+                    }
+                ).then(response => {
+                        return response.json()
+                    }
+                ).then(data => {
+                    if (data.errors) {
+                        dispatchMessages([{
+                            type: 'error',
+                            text: data.message
+                        }], 5000);
+                    } else {
+                        this.pagination.totalRecords = data.totalRecords;
+                        this.pagination.totalPages = Math.ceil(data.totalRecords / 20)
+                        this.sortItems(data.items);
+                    }
+                    this.isLoading = false;
+                });
+            },
+            sortItems(items) {
+              items.sort((a, b) => {
+                  if (a[this.sorting.field] < b[this.sorting.field]) {
+                      return this.sorting.dir === 'DESC' ? -1 : 1
+                  } else if (a[this.sorting.field] > b[this.sorting.field]) {
+                      return this.sorting.dir === 'DESC' ? 1 : -1
+                  }
+                  return 0;
+              });
+
+              this.items = items;
+            },
+            changeSorting(field) {
+                if (this.sorting.field === field) {
+                    this.sorting.dir = this.sorting.dir === 'DESC' ? 'ASC' : 'DESC';
+                } else {
+                    this.sorting = {
+                        field,
+                        dir: 'DESC'
+                    };
+                }
+                this.sortItems(this.items);
+            },
+            changePage(pageNum) {
+                if (this.pagination.currentPage === pageNum || pageNum < 0 || pageNum > Math.ceil(this.pagination.totalRecords/20)) return;
+                this.pagination.currentPage = pageNum;
+                this.getItems();
+            },
+            updateQty(itemData, qty) {
+                const data = {
+                    'item_key': itemData.item_key,
+                    'product_qty': qty,
+                }
+                this.sendRequest('<?= $escaper->escapeUrl($config['updateQtyUrl']) ?>', data)
+                .then(() => {
+                    this.getItems()
+                });
+            },
+            deleteItem(itemData) {
+                const data = {
+                    item_key: itemData.item_key
+                };
+
+                this.sendRequest('<?= $escaper->escapeUrl($config['removeItemUrl']) ?>', data)
+                .then((response) => {
+                    this.getItems();
+                    return response.json();
+                }).then(json => {
+                    if (json.success_messages) {
+                        dispatchMessages(json.success_messages, 2000);
+                    } else if (json.error_messages) {
+                        dispatchMessages(json.error_messages, 2000);
+                    }
+                })
+            },
+            sendRequest(url, data) {
+                return fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: this.getRequestData(data)
+                });
+            },
+            addToCart() {
+                hyva.postForm({
+                    action: '/aw_quick_order/quickOrder/addToCart/',
+                    data: {
+                        action_type: 'add_to_cart'
+                    }
+                });
+            },
+            resetList() {
+                hyva.postForm({
+                    action: '/aw_quick_order/quickOrder/resetList/',
+                    data: {
+                        action_type: 'reset_list'
+                    }
+                });
+            },
+            configureItem(itemData) {
+                this.sendRequest('<?= $escaper->escapeUrl($config['configureUrl']) ?>', {
+                    item_key: itemData.item_key
+                }).then(response => response.json())
+                    .then(json => {
+                        this.configureData = {
+                            ...json,
+                            itemData,
+                            ...initConfigurableOptions(
+                                json.productId,
+                                JSON.parse(json.jsonConfig)
+                            ),
+                            ...initSwatchOptions(
+                                JSON.parse(json.jsonSwatchConfig)
+                            )
+                        }
+                        this.configureData.findAllowedAttributeOptions();
+                        this.configureData.showSwatches = true
+                        // Just get some image to show initially
+                        const image = this.configureData.optionConfig.images[Object.keys(this.configureData.optionConfig.images)[0]]
+                        window.dispatchEvent(new CustomEvent(
+                            "update-gallery",
+                            { detail: image }
+                        ));
+                        this.show();
+                    });
+            },
+            updateConfiguration() {
+                const $form = document.getElementById(this.configFormId);
+                const dataForm = new FormData($form);
+                let data = {
+                    ['item_key']: this.configureData.itemData.item_key,
+                    product: this.configureData.productId
+                };
+
+                for (let [name, value] of dataForm) {
+                    data[name] = value;
+                }
+
+                this.sendRequest('<?= $escaper->escapeUrl($config['updateItemOptionUrl']) ?>', data).then((response) => {
+                    this.getItems();
+                    this.hide();
+                    return response.json();
+                }).then(json => {
+                    if (json.success_messages) {
+                        dispatchMessages(json.success_messages, 2000);
+                    } else if (json.error_messages) {
+                        dispatchMessages(json.error_messages, 2000);
+                    }
+                })
+            }
+        }
+    }
+</script>
+
+<div x-data="{...hyva.modal(), ...initContainer()}" x-init="getItems()" @qo-get-items.window="getItems()" @qo-configure-item.window="configureItem($event.detail)">
+    <?= $block->getChildHtml(); ?>
+</div>

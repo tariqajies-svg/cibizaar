@@ -1,0 +1,236 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Search\Helper\Data as SearchHelper;
+use Smile\ElasticsuiteCore\Block\Search\Form\Autocomplete;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/**
+ * Template for quick search mini form.
+ * Overridden to manage template injection for the rendering of autocomplete results.
+ *
+ * @var Autocomplete $block
+ * @var SearchHelper $helper
+ * @var Escaper $escaper
+ */
+
+$helper = $this->helper(SearchHelper::class);
+$suggestionUrl = $helper->getResultUrl() . '?' . $helper->getQueryParamName() . '=';
+?>
+<script>
+    function initMiniSearchComponent() {
+        return {
+            show: false,
+            url: "<?= /* @noEscape */ $block->getUrl('search/ajax/suggest') ?>",
+            templates: <?= /* @noEscape */ $block->getJsonSuggestRenderers() ?>,
+            minSearchLength: <?= /* @noEscape */ $helper->getMinQueryLength() ?>,
+            searchResultsByType: {},
+            currentRequest: null,
+            topHeader: document.getElementById('top-header'),
+            isLoading: false,
+            searchResultsByTypeTitle: null,
+            searchResultsByTypeNumResult:0,
+
+
+            /**
+             * Get search results.
+             */
+            getSearchResults: function() {
+                let value = this.$refs['searchInput'].value.trim();
+
+                if (value.length < parseInt(this.minSearchLength, 10)) {
+                    this.show && this.toggleSearchResults(false);
+                    this.searchResultsByType = [];
+
+                    return false;
+                }
+
+                this.isLoading = true;
+
+                let url = this.url + '?' + new URLSearchParams({
+                    q: this.$refs['searchInput'].value,
+                    _: Date.now(),
+                }).toString();
+
+                if (this.currentRequest !== null) {
+                    this.currentRequest.abort();
+                }
+                this.currentRequest = new AbortController();
+
+                fetch(url, {
+                    method: 'GET',
+                    signal: this.currentRequest.signal,
+                }).then((response) => {
+                    this.isLoading = false;
+                    if (response.ok) {
+                        return response.json();
+                    }
+                }).then((data) => {
+                    this.isLoading = false;
+                    this.toggleSearchResults(true);
+            this.searchResultsByTypeTitle = data[0].title;
+            this.searchResultsByTypeNumResult = data[0].num_results;
+                    this.searchResultsByType = data.reduce((acc, result) => {
+                        if (!acc[result.type]) acc[result.type] = [];
+                        acc[result.type].push(result);
+                        return acc;
+                    }, {});
+                }).catch((error) => {
+                    this.isLoading = false;
+                });
+            },
+            toggleSearchResults(state = null) {
+                if (state !== null) {
+                    this.show = state;
+                } else {
+                    this.show = !this.show;
+                }
+                if (this.show) {
+                    this.adjustForTopHeader();
+                    document.body.classList.add('lg-max:overflow-hidden');
+                } else {
+                    document.body.classList.remove('lg-max:overflow-hidden');
+                }
+            },
+            adjustForTopHeader() {
+                let offset = this.topHeader?.getBoundingClientRect().bottom;
+                let content = this.$refs['search-results-content'];
+                if (offset > 0) {
+                    content.style.top = offset + 'px';
+                } else if (offset <= 0 && content.style.top !== 0) {
+                    content.style.top = 0;
+                }
+            }
+        }
+    }
+</script>
+
+<div id="search-content" class="w-full flex-shrink-1">
+    <div class="mx-auto"
+         x-data="initMiniSearchComponent()"
+         @click.away="show && toggleSearchResults(false)"
+         @scroll.window="show && adjustForTopHeader()"
+         :class="show ? 'search-active' : 'search-inactive'"
+         >
+        <form class="form minisearch relative flex" id="search_mini_form" action="<?= $escaper->escapeUrl($helper->getResultUrl()) ?>" method="get"
+        :class="show ? 'z-20' : ''"
+        >
+            <div class="relative flex-1">
+                <label class="sr-only" for="search">
+                    <?= $escaper->escapeHtmlAttr(__('Search entire store here...')) ?>
+                </label>
+                <input id="search"
+                       x-on:input.debounce="getSearchResults()"
+                       x-ref="searchInput"
+                       type="search"
+                       class="form-input text-[16px] font-extralight leading-6 lg-max:py-[7px] lg-max:pl-5 border-[#BCBCBC]"
+                       :class="show ? 'border-0 rounded-b-none' : ''"
+                       autocapitalize="off" autocomplete="off" autocorrect="off"
+                       name="<?= $escaper->escapeHtmlAttr($helper->getQueryParamName()) ?>"
+                       value="<?= $escaper->escapeHtmlAttr($helper->getEscapedQueryText()) ?>"
+                       placeholder="<?= $escaper->escapeHtmlAttr(__('Search for products ...')) ?>"
+                       maxlength="<?= $escaper->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
+                />
+                <button class="absolute flex items-center h-full top-0 right-0 py-3 px-5 lg:px-6 text-gray w-14 lg:w-16"
+                        :class="show ? 'lg:hover:text-navy' : 'pointer-events-none'"
+                        :disabled="!show"
+                        aria-label="<?= $escaper->escapeHtml(__('Search')) ?>"
+                >
+                    <i x-show="!isLoading" class="icon-search"></i>
+                    <svg x-cloak x-show="isLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                         viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="ml-1 bg-white absolute right-1 overflow-hidden p-3 w-10 h-10 cursor-pointer"
+                 x-show="show"
+                 x-cloak
+                 @click="toggleSearchResults(false)">
+                <i class="icon-close active:text-navy"></i>
+            </div>
+
+            <div id="search-results-content"
+                 class="fixed absolute !top-full w-full top-0 bottom-0 left-0 z-50 pointer-events-none h-full
+                    rounded w-search-pop -translate-x-10"
+                 x-cloak
+                 x-ref="search-results-content"
+                 x-show="show">
+                <div id="search_autocomplete"
+                     class="search-autocomplete bg-gray-f2 bg-transparent absolute w-full bottom-0 top-0
+                        overflow-auto pointer-events-auto w-search-pop-content shadow-search-pop mx-auto inset-x-0
+                        rounded rounded-t-none max-h-search-pop h-min"
+                >
+                    <div class="search-results-wrapper w-full grid grid-cols-1 overflow-auto rounded rounded-t-none"
+                    >
+                        <div x-ref="search-results" class="search-results">
+                            <div x-show="Object.values(searchResultsByType).length === 0"
+                                 class="container w-full p-5 first:border-b-0 last:border-b-0 bg-white">
+                                <p><?= $escaper->escapeHtml(__('Your search returned no results.')) ?></p>
+                            </div>
+                            <template x-for="searchResultByType in Object.values(searchResultsByType)">
+                                <div class="container w-full px-5 pb-5 first:border-b-0 last:border-b-0 bg-white"
+                                :class="{
+                                    'border-b': searchResultByType[0].type === 'product_attribute'
+                                }">
+                                    <template x-if="searchResultByType.hasOwnProperty(0)
+                                                        && templates[searchResultByType[0].type].title
+                                                        && templates[searchResultByType[0].type].titleRenderer === undefined">
+                                        <div class="text-sm lg:text-base leading-6 font-semibold text-navy py-2 px-5 mb-5 bg-gray-f2 -mx-5"
+                                             x-text="templates[searchResultByType[0].type].title">
+                                        </div>
+                                    </template>
+                                    <template x-if="searchResultByType.hasOwnProperty(0)
+                                                        && templates[searchResultByType[0].type].titleRenderer !== undefined">
+                                        <div class="text-sm lg:text-base leading-6 font-semibold text-navy py-2 px-5 mb-5 bg-gray-f2 -mx-5"
+                                             x-text="window[templates[searchResultByType[0].type].titleRenderer](searchResultByType)"></div>
+                                    </template>
+                                    <div class="max-h-[220px] overflow-auto">
+                                    <template x-for="searchResult in searchResultByType">
+                                        <div :class="searchResultByType[0].type === 'product' ? 'pb-5 lg:mb-5 lg:border-b last:pb-0 last:mb-0 last:border-0' : 'mb-1 last:mb-0 lg:mb-2 lg:last:mb-0'">
+                                            <?php foreach (json_decode($block->getJsonSuggestRenderers(), true) as $renderer): ?>
+                                                <?= $block->getLayout()
+                                                    ->createBlock(Template::class)
+                                                    ->setTemplate($renderer['template'])
+                                                    ->setData('suggestion_url', $suggestionUrl)
+                                                    ->toHtml()
+                                                ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="px-5 py-2 show-all-results bg-blue text-center">
+                            <a x-if="searchResultsByTypeTitle" :href="'<?= $escaper->escapeUrl($suggestionUrl)?>'+searchResultsByTypeTitle" class="clear text-white font-semibold uppercase flex items-center justify-center">
+                                <div x-if="searchResultsByTypeNumResult" x-text="'Show All '+ searchResultsByTypeNumResult +' Results'"></div>
+                                <i class="icon-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?= $block->getChildHtml() ?>
+        </form>
+    </div>
+</div>

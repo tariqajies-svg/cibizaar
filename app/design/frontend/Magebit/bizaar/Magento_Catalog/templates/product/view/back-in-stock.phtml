@@ -1,0 +1,80 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\Catalog\Block\Product\View\BackInStock;
+use Magebit\Catalog\ViewModel\Stock;
+use Magento\Catalog\Model\Product;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Framework\Escaper;
+
+/** @var BackInStock $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$stock = $viewModels->require(Stock::class);
+
+/** @var Product $product */
+$product = $block->getProduct();
+?>
+<script>
+    function initBackInStock() {
+        return {
+            stockData: JSON.parse('<?= /* @noEscape */ json_encode($stock->getStockData($product)) ?>'),
+            backInStock: JSON.parse('<?= /* @noEscape */ json_encode($block->getBackInStock()) ?>'),
+            currentProductId: '<?= /* @noEscape */ $block->getProductId() ?>',
+            canShowBlock() {
+                let canShow = false;
+                const items = this.backInStock[this.currentProductId] ?? null;
+                if (items && this.stockData[this.currentProductId].stockLoad <= 0.25) {
+                    items.forEach(item => {
+                        // compare back in stock date with current timestamp excluding hours
+                        if (new Date(item.date).getTime() > Date.now() - 86400000) {
+                            canShow =  true;
+                        }
+                    });
+                }
+
+                return canShow;
+            },
+            updateOnConfigurable(details) {
+                this.currentProductId = details.productIndex;
+            }
+        }
+    }
+</script>
+<div x-data="initBackInStock()"
+     @configurable-selection-changed.window="updateOnConfigurable(event.detail)"
+>
+    <template x-if="canShowBlock()">
+        <div class="mt-2 lg:mt-3 grid">
+            <span class="text-sm font-bold text-navy mb-1"><?= $escaper->escapeHtml(__('Back in stock:')) ?></span>
+            <div class="flex justify-between font-extrabold uppercase text-2xs lg:text-xs pb-1">
+                <span><?= $escaper->escapeHtml(__('Quantity')) ?></span>
+                <span><?= $escaper->escapeHtml(__('Date')) ?></span>
+            </div>
+            <div class="space-y-1 text-xs lg:text-sm">
+                <template x-for="row in backInStock[currentProductId]">
+                    <div class="flex" x-show="new Date(row.date).getTime() > Date.now() - 86400000">
+                        <span class="text-navy" x-text="`+${row.qty}`"></span>
+                        <span class="flex-grow border-b mb-1.5 lg:mb-2 mx-2"></span>
+                        <span class="text-blue" x-text="hyva.formatDate(row.date, {dateStyle: 'short'})"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </template>
+</div>

@@ -1,0 +1,80 @@
+websites:
+  enabled: 1
+  method: code
+  sources:
+    - app/etc/configurator/websites.yaml
+  env:
+    local:
+      log: info
+    stage:
+      log: warning
+    live:
+      log: error
+
+config:
+  enabled: 1
+  method: code
+  sources:
+    - app/etc/configurator/Configuration/global.yaml
+    - app/etc/configurator/Configuration/base-stores-config.yaml
+  env:
+    local:
+      mode: maintain
+      sources:
+        - app/etc/configurator/Configuration/credentials.yaml
+    stage:
+      mode: maintain
+      sources:
+        - app/etc/configurator/Configuration/credentials.yaml
+    live:
+      mode: create
+
+blocks:
+  enabled: 1
+  method: code
+  sources:
+    - app/etc/configurator/Blocks/blocks.yaml
+  env:
+    local:
+      mode: maintain
+    stage:
+      mode: maintain
+    live:
+      mode: create
+
+pages:
+  enabled: 1
+  method: code
+  sources:
+    - app/etc/configurator/Pages/pages.yaml
+  env:
+    local:
+      mode: maintain
+    stage:
+      mode: maintain
+    live:
+      mode: create
+
+attribute_sets:
+  enabled: 1
+  method: code
+  sources:
+    - app/etc/configurator/Attributes/attribute_sets.yaml
+
+taxrates:
+  enabled: 1
+  method: code
+  sources:
+    - app/etc/configurator/TaxRates/taxrates.csv
+
+media:
+  enabled: 1
+  method: code
+  sources:
+    - app/etc/configurator/Media/media.yaml
+
+customer_attributes:
+  enabled: 1
+  method: code
+  sources:
+    - app/etc/configurator/CustomerAttributes/customer_attributes.yaml

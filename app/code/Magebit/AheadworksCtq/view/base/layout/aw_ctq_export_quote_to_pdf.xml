@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_AheadworksCtq package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <container name="content">
+            <block name="aw_ctq.customer.quote.header"
+                   class="Magento\Theme\Block\Html\Header\Logo"
+                   template="Magebit_AheadworksCtq::customer/quote/export/pdf/header.phtml">
+                <arguments>
+                    <argument name="data_provider_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider</argument>
+                    <argument name="quote_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Export\Quote</argument>
+                    <argument name="header_view_model" xsi:type="object">Magebit\Bizaar\ViewModel\PdfHeader</argument>
+                </arguments>
+            </block>
+            <block name="aw_ctq.customer.quote.products"
+                   template="Magebit_AheadworksCtq::customer/quote/export/pdf/products.phtml">
+                <arguments>
+                    <argument name="data_provider_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider</argument>
+                    <argument name="item_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Export\Quote\Item</argument>
+                </arguments>
+            </block>
+            <block name="aw_ctq.customer.quote.shipping"
+                   template="Magebit_AheadworksCtq::customer/quote/export/pdf/shipping.phtml">
+                <arguments>
+                    <argument name="data_provider_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider</argument>
+                    <argument name="shipping_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Export\Quote\Shipping</argument>
+                </arguments>
+            </block>
+            <block name="aw_ctq.customer.quote.totals"
+                   template="Magebit_AheadworksCtq::customer/quote/export/pdf/totals.phtml">
+                <arguments>
+                    <argument name="data_provider_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider</argument>
+                    <argument name="total_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Export\Quote\Total</argument>
+                </arguments>
+            </block>
+            <block name="aw_ctq.customer.quote.store"
+                   template="Magebit_AheadworksCtq::customer/quote/export/pdf/store.phtml">
+                <arguments>
+                    <argument name="data_provider_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider</argument>
+                    <argument name="store_view_model" xsi:type="object">Aheadworks\Ctq\ViewModel\Customer\Export\Quote\Store</argument>
+                </arguments>
+            </block>
+        </container>
+    </body>
+</page>

@@ -1,0 +1,120 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\ViewModel\Company\Formatter;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCa\ViewModel\CustomerData;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+use Aheadworks\Ca\ViewModel\Company\Customer;
+use Aheadworks\Ca\ViewModel\Company\Company;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Customer $customerViewModel */
+/** @var Company $companyViewModel */
+
+$customerViewModel = $block->getCustomerViewModel();
+$companyViewModel = $block->getCompanyViewModel();
+/** @var CustomerData $customerDataModel */
+$customerDataModel = $viewModels->require(CustomerData::class);
+
+$company = $companyViewModel->getCompanyByCustomer($customerViewModel->getCurrentCompanyUser());
+$rootCustomer = $customerViewModel->getRootCompanyUser($company->getId());
+
+/** @var Formatter $formatter */
+$formatter = $block->getFormatterViewModel();
+?>
+<div class="block block-account-information mb-8">
+    <div class="block-content grid lg:grid-cols-2 gap-x-5 lg:gap-y-10 gap-y-8">
+        <div class="flex flex-col">
+            <div class="block-title mb-5 md:mb-10 flex justify-between items-center">
+                <strong class="text-2.4xl text-black font-normal"><?= $escaper->escapeHtml(__('Props')) ?></strong>
+                <div class="block lg:hidden">
+                    <?= $block->getChildHtml('aw.ca.company.edit_link') ?>
+                </div>
+            </div>
+            <div class="box card px-10 py-10 flex flex-1 flex-wrap xl:flex-nowrap">
+                <div class="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mb-5 rounded-full md:mb-5 xl:md-0 bg-container-darker text-secondary mr-10">
+                    <i class="icon icon-briefcase text-blue text-xl"></i>
+                </div>
+                <div class="w-full xs:w-auto sm:w-auto md:w-auto lg:w-full xl:w-auto">
+                    <div class="box-content">
+                        <p class="mb-1"><?= $escaper->escapeHtml($company->getName()) ?></p>
+                        <p class="mb-1"><?= $escaper->escapeHtml($company->getEmail()) ?></p>
+                        <p class="mb-1"><?= $escaper->escapeHtml(__('Reg. No.'))?>: <?= $escaper->escapeHtml($company->getLegalName()) ?></p>
+                        <?php if (!empty($company->getTaxId())): ?>
+                            <p class="mb-1"><?= $escaper->escapeHtml(__('PVN Nr.')) ?>: <?= $escaper->escapeHtml($company->getTaxId()); ?></p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col">
+            <div class="block-title mb-5 md:mb-10 flex justify-between items-center">
+                <strong class="text-2.4xl text-black font-normal"><?= $escaper->escapeHtml(__('Legal address')) ?></strong>
+                <div class="hidden lg:block">
+                    <?= $block->getChildHtml('aw.ca.company.edit_link') ?>
+                </div>
+            </div>
+            <div class="box card px-10 py-10 flex flex-1 flex-wrap xl:flex-nowrap">
+                <div class="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mb-5 rounded-full md:mb-5 xl:md-0 bg-container-darker text-secondary mr-10">
+                    <i class="icon icon-pin text-blue text-xl"></i>
+                </div>
+                <div class="w-full xs:w-auto sm:w-auto md:w-auto lg:w-full xl:w-auto">
+                    <div class="box-content">
+                        <address class="not-italic"><?= /* @noEscape */ $formatter->formatAddress($company) ?></address>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="lg:grid-cols-2 grid lg:col-span-2 gap-x-5 gap-y-2 lg:gap-y-0">
+            <div class="block-title mb-5 md:mb-10 lg:col-span-2">
+                <strong class="text-2.4xl text-black font-normal"><?= $escaper->escapeHtml(__('Contacts')) ?></strong>
+            </div>
+            <?php if ($rootCustomer): ?>
+                <div class="flex flex-col">
+                    <div class="box card px-10 py-10 flex flex-1 flex-wrap xl:flex-nowrap">
+                        <div class="inline-flex items-center justify-center flex-shrink-0 w-16 h-16 mb-5 rounded-full md:mb-5 xl:md-0 bg-container-darker text-secondary mr-10">
+                            <i class="icon icon-phone text-blue text-xl"></i>
+                        </div>
+                        <div class="w-full xs:w-auto sm:w-auto md:w-auto lg:w-full xl:w-auto">
+                            <div class="box-content">
+                                <h4 class="text-black mb-5"><?= $escaper->escapeHtml(__('Company administrator')) ?></h4>
+                                <?php if ($formatter->getCompanyAdministratorJobTitle($rootCustomer)): ?>
+                                    <p class="mb-1"><?= $escaper->escapeHtml($formatter->getCompanyAdministratorJobTitle($rootCustomer)) ?></p>
+                                <?php endif; ?>
+                                <?php if ($formatter->formatCompanyAdministratorName($rootCustomer)): ?>
+                                    <p class="mb-1"><?= $escaper->escapeHtml($formatter->formatCompanyAdministratorName($rootCustomer)) ?></p>
+                                <?php endif; ?>
+                                <p class="mb-1"><?= $escaper->escapeHtml($customerDataModel->getEmailForDisplay($rootCustomer)) ?></p>
+                                <?php if ($formatter->getCompanyAdministratorTelephone($rootCustomer)): ?>
+                                    <p class="mb-1">
+                                        <a class="font-normal text-grey-darker" href="tel:<?= $escaper->escapeHtml($formatter->getCompanyAdministratorTelephone($rootCustomer)) ?>">
+                                            <?= $escaper->escapeHtml($formatter->getCompanyAdministratorTelephone($rootCustomer)) ?>
+                                        </a>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?= /* @noEscape */ $block->getChildHtml('aw_ca_sales_rep_info'); ?>
+        </div>
+    </div>
+</div>

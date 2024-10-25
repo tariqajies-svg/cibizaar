@@ -1,0 +1,7 @@
+.menu-tooltip::after {
+    @apply absolute top-0 left-[279px] xl:left-[313px] w-2 h-2 bg-gray-e6 transform translate-y-[-4px] -rotate-45;
+
+    content: '';
+    clip-path: polygon(100% 0%, 100% 100%, 0% 0%);
+    border-radius: 0 0 0 0.25em;
+}

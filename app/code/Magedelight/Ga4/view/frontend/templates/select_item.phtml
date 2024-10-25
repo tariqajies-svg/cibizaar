@@ -1,0 +1,61 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2023 Magedelight <info@Magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_Ga4
+ * @copyright Copyright (c) 2023 Mage Delight (http://www.Magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@Magedelight.com>
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+// phpcs:disable Magento2.Files.LineLength.MaxExceeded
+// phpcs:disable Magento2.Security.LanguageConstruct.DirectOutput
+?>
+
+<?php
+$helper = $block->dataHelper();
+$cookieConcent = $helper->getCookie();
+$accessible = 1;
+if ($helper->getGDPRStatus()) {
+    if (isset($cookieConcent)) {
+        $accessible = 1;
+    } else {
+        $accessible = 0;
+    }
+}
+if ($block->isGTMStatus() && $accessible == 1) {
+    $product = $block->getProduct();
+    if (isset($product)) {
+            $list = $block->getList();
+            $listId = $block->getListId();
+            $index = $block->getIndex();
+            $itemDetails = [];
+            $itemDetails['name'] = $product->getName();
+            $itemDetails['id'] = $helper->getProductIdentifier($product);
+            $itemDetails['price'] = $helper->getPriceFormat($product);
+        if ($helper->isBrandEnabled()) {
+            $itemDetails['brand'] = $helper->getBrandData($product);
+        }
+            $itemDetails['index'] = $index;
+            $itemDetails['currency'] = $helper->getCurrencyCode();
+            $itemDetails[] = $itemDetails;
+            $itemDetails['item_list_name'] = $list;
+            $itemDetails['item_list_id'] = $listId;
+
+            $data = [
+                'event' => 'select_item',
+                'ecommerce' => [
+                'action' => [
+                    'items' => [$itemDetails]
+                    ]
+                ]
+            ];
+            
+            $finalData=$block->escapeHtml($block->helper(Magento\Framework\Json\Helper\Data::class)->jsonEncode($data));
+            ?>
+            window.dataLayer.push(<?=/* @noEscape */$finalData ?>);
+    <?php }
+} ?>

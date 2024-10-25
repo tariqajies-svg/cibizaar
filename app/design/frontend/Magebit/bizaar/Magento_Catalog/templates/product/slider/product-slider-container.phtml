@@ -1,0 +1,130 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Magento\Catalog\Block\Product\ReviewRendererInterface as ProductReviewRenderer;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ProductListItem $productListItemViewModel */
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+
+$viewMode = 'grid';
+$imageDisplayArea = 'category_page_grid';
+$showDescription = false;
+$items = $block->getItems() ?? [];
+if (is_object($items) && $items instanceof Iterator) {
+    $items = iterator_to_array($items);
+}
+if (!$itemCount = count($items)) {
+    return '';
+}
+
+$sliderItemRenderer = $block->getLayout()->getBlock('product_list_item')
+    ?: $block->getChildBlock('slider.item.template')
+    ?: $block->getLayout()->createBlock(Template::class);
+
+// The slider item renderer block is often a shared instance.
+// If a specific item template is set for this slider, the previously set template must be reset later
+// so the item template is only replaced for the one slider it is specified on.
+$sharedItemRendererTemplate = null;
+$isSharedItemRenderer       = $sliderItemRenderer !== $block->getChildBlock('slider.item.template');
+if ($isSharedItemRenderer && $block->getChildBlock('slider.item.template')) {
+    $sharedItemRendererTemplate = $sliderItemRenderer->getTemplate();
+    $sliderSpecificItemTemplate = $block->getChildBlock('slider.item.template')->getTemplate();
+    $sliderItemRenderer->setTemplate($sliderSpecificItemTemplate);
+}
+
+?>
+<?php if ($items): ?>
+    <div class="glider-contain product-items relative" x-data="initProductSlider()" x-spread="eventListeners">
+        <div class="glider-border-left" x-ref="glider-border-left"></div>
+        <div data-role="glider-content"
+             data-count="<?= $escaper->escapeHtml($itemCount) ?>"
+             x-ref="slider-content"
+             class="mx-auto relative">
+            <?php foreach ($items as $product): ?>
+                            <?= /** @noEscape */ $productListItemViewModel->getItemHtmlWithRenderer(
+                                $sliderItemRenderer,
+                                $product,
+                                $block,
+                                $viewMode,
+                                ProductReviewRenderer::SHORT_VIEW,
+                                $imageDisplayArea,
+                                $showDescription
+                            ) ?>
+            <?php endforeach ?>
+        </div>
+        <?php if ($itemCount > 3): ?>
+        <div class="carousel-nav absolute w-full top-1/2 transform -translate-y-1/2 hidden lg:block">
+            <button
+                aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>"
+                class="glider-prev btn btn-round absolute top-1/2 left-0 transform -translate-y-1/2">
+                <i class="icon-arrow-left"></i>
+            </button>
+            <button
+                aria-label="<?= $escaper->escapeHtml(__('Next')) ?>"
+                class="glider-next btn btn-round absolute top-1/2 right-0 transform -translate-y-1/2">
+                <i class="icon-arrow-right"></i>
+            </button>
+        </div>
+        <?php endif; ?>
+        <div role="tablist" class="glider-dots select-none flex flex-wrap justify-center py-4 lg:py-3 focus:outline-none lg:hidden"></div>
+        <div class="glider-border-right" x-ref="glider-border-right"></div>
+    </div>
+    <script>
+        function initProductSlider() {
+            return {
+                initialHeight: null,
+                eventListeners: {
+                    ['@product-item-mouseenter.window'](event) {
+                        const item = event.detail.querySelector('div.product-item-content');
+                        const slider = this.$refs['slider-content']
+                        const itemViewportOffset = item.getBoundingClientRect();
+                        const sliderViewportOffset = slider.getBoundingClientRect();
+
+                        if (itemViewportOffset.top > sliderViewportOffset.top && itemViewportOffset.bottom < sliderViewportOffset.bottom) {
+                            if (itemViewportOffset.left - 2 <=  sliderViewportOffset.left) {
+                                this.$refs['glider-border-left'].style.height = `${item.clientHeight}px`;
+                            }
+
+                            if (itemViewportOffset.right + 2 >=  sliderViewportOffset.right) {
+                                this.$refs['glider-border-right'].style.height = `${item.clientHeight}px`;
+                            }
+                        }
+                    },
+                    ['@product-item-mouseleave.window'](event) {
+                        this.$refs['glider-border-left'].style.height = 0;
+                        this.$refs['glider-border-right'].style.height = 0;
+                    },
+                }
+            }
+        }
+    </script>
+<?php endif ?>
+
+<?php
+
+if ($sharedItemRendererTemplate) {
+    $sliderItemRenderer->setTemplate($sharedItemRendererTemplate);
+}
+
+?>

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_PaymentFee package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="ccavenue">
+                <field id="payment_fee_percentage" translate="label comment" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Fee percentage</label>
+                    <comment><![CDATA[
+                        - Float value from 0 to 100 (e.g.: 2.5).<br>
+                        - Payment fee calculates from grand total (subtotal + shipping + tax + discounts).<br>
+                        - Set 0 to disable.
+                    ]]></comment>
+                </field>
+            </group>
+            <group id="ngeniusonline">
+                <field id="payment_fee_percentage" translate="label comment" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Fee percentage</label>
+                    <comment><![CDATA[
+                        - Float value from 0 to 100 (e.g.: 2.5).<br>
+                        - Payment fee calculates from grand total (subtotal + shipping + tax + discounts).<br>
+                        - Set 0 to disable.
+                    ]]></comment>
+                </field>
+            </group>
+        </section>
+        <section id="sales">
+            <group id="totals_sort">
+                <field id="payment_fee" translate="label" type="text" sortOrder="4"
+                       showInDefault="1" showInWebsite="1" canRestore="1">
+                    <label>Payment Fee</label>
+                    <validate>required-number validate-number</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

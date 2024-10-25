@@ -1,0 +1,41 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-tailwindcss"
+  ],
+  "customSyntax": "postcss",
+  "rules": {
+    "indentation": 4,
+    "block-opening-brace-space-before": "always",
+    "block-opening-brace-newline-after": "always",
+    "block-closing-brace-newline-before": "always",
+    "selector-list-comma-newline-after": "always",
+    "string-quotes": "single",
+    "selector-combinator-space-after": "always",
+    "selector-combinator-space-before": "always",
+    "declaration-block-semicolon-newline-after": "always",
+    "declaration-colon-space-after": "always",
+    "declaration-colon-space-before": "never",
+    "rule-empty-line-before": [ "always", {
+      "except": ["first-nested"],
+      "ignore": ["after-comment"]
+    } ],
+    "declaration-block-trailing-semicolon":"always",
+    "no-extra-semicolons": true,
+    "declaration-block-semicolon-space-before": "never",
+    "comment-empty-line-before": "always",
+    "comment-whitespace-inside": "always",
+    "comment-no-empty": true,
+    "selector-type-case": "lower",
+    "length-zero-no-unit": true,
+    "number-leading-zero": null,
+    "unit-case": "lower",
+    "color-hex-case": "lower",
+    "color-no-invalid-hex": true,
+    "color-hex-length": "short",
+    "block-no-empty": true,
+    "max-empty-lines": 2,
+    "no-descending-specificity": null,
+    "selector-class-pattern": null
+  }
+}

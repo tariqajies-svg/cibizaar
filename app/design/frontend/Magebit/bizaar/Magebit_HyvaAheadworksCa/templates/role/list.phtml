@@ -1,0 +1,84 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Aheadworks\Ca\Block\Role\RoleList;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Escaper;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCa\ViewModel\AuthManagement;
+
+/** @var RoleList $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var AuthManagement $authManagement */
+$authManagement = $viewModels->require(AuthManagement::class);
+
+$roleList = $block->getRoleListViewModel()->getSearchResults()->getItems();
+$roleViewModel = $block->getRoleViewModel();
+$title = $block->getTitle();
+$allowedEdit = $authManagement->isAllowed('aw_ca/role/edit');
+
+?>
+<div class="mt-4 mb-5 lg:mt-0 lg:mb-8 lg:flex lg:justify-between lg:items-start">
+    <?php if ($title): ?>
+        <h2 class="mb-4.75 lg:mb-0"><?= $escaper->escapeHtml($block->getTitle()) ?></h2>
+    <?php endif; ?>
+    <?= $block->getChildBlock('aw_ca.role.list.add')->toHtml()?>
+</div>
+<?php if ($roleList && count($roleList)): ?>
+    <table class="table">
+        <thead>
+        <tr>
+            <th class="lg:w-[8.4%]" scope="col"><?= $escaper->escapeHtml(__('ID')) ?></th>
+            <th class="lg:w-[55.4%]" scope="col"><?= $escaper->escapeHtml(__('Name')) ?></th>
+            <th scope="col"><?= $escaper->escapeHtml(__('Users')) ?></th>
+            <?php if ($allowedEdit): ?>
+                <th scope="col" class="text-right"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+            <?php endif; ?>
+        </tr>
+        </thead>
+        <tbody>
+        <?php /** @var $role CustomerInterface */ ?>
+        <?php foreach ($roleList as $role): ?>
+            <tr>
+                <td data-th="<?= $escaper->escapeHtml(__('ID')) ?>">
+                    <?= $escaper->escapeHtml($role->getId()) ?>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Name')) ?>">
+                    <?= $escaper->escapeHtml($role->getName()) ?>
+                    <?php if ($role->isDefault()): ?><?= $escaper->escapeHtml('(default)') ?><?php endif; ?>
+                </td>
+                <td data-th="<?= $escaper->escapeHtml(__('Users')) ?>">
+                    <?= $escaper->escapeHtml($role->getCountUsers()) ?>
+                </td>
+                <?php if ($allowedEdit): ?>
+                    <td class="table-actions text-right">
+                        <?php if ($role->getName() !== 'Administrator'): ?>
+                            <a class="btn btn-secondary btn-sq"
+                               href="<?= $escaper->escapeUrl($roleViewModel->getEditUrl($role->getId())) ?>">
+                                <i class="icon-edit"></i>
+                            </a>
+                        <?php endif; ?>
+                    </td>
+                <?php endif; ?>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <div class="message info empty">
+        <span><?= $escaper->escapeHtml(__('You have created no roles.')) ?></span>
+    </div>
+<?php endif ?>

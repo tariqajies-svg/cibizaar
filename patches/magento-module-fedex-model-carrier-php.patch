@@ -1,0 +1,63 @@
+--- /dev/null
++++ ../Model/Carrier.php
+@@ -1053,8 +1053,9 @@
+      * @return string 3-digit currency code
+      * @throws \Magento\Framework\Exception\NoSuchEntityException
+      */
+-    public function getCurrencyCode()
++    public function getCurrencyCode(string $currencyCode = null)
+     {
++        $currencyCode = $currencyCode ?? $this->_storeManager->getStore()->getBaseCurrencyCode();
+         $codes = [
+             'DOP' => 'RDD',
+             'XCD' => 'ECD',
+@@ -1072,7 +1073,6 @@
+             'CLP' => 'CHP',
+             'TWD' => 'NTD',
+         ];
+-        $currencyCode = $this->_storeManager->getStore()->getBaseCurrencyCode();
+ 
+         return $codes[$currencyCode] ?? $currencyCode;
+     }
+@@ -1409,10 +1409,18 @@
+             ],
+         ];
+ 
++        /**
++         * Assign Item Description as Electronics for all shipments that are inside UAE
++         */
++        if ($request->getRecipientAddressCountryCode() === 'AE') {
++            $requestClient['RequestedShipment']['RequestedPackageLineItems']['ItemDescriptionForClearance'] = 'Electronics';
++            $requestClient['RequestedShipment']['RequestedPackageLineItems']['ItemDescription'] = 'Electronics';
++        }
++
+         // for international shipping
+         if ($request->getShipperAddressCountryCode() != $request->getRecipientAddressCountryCode()) {
+             $requestClient['RequestedShipment']['CustomsClearanceDetail'] = [
+-                'CustomsValue' => ['Currency' => $request->getBaseCurrencyCode(), 'Amount' => $customsValue],
++                'CustomsValue' => ['Currency' => $this->getCurrencyCode($request->getBaseCurrencyCode()), 'Amount' => $customsValue],
+                 'DutiesPayment' => [
+                     'PaymentType' => $paymentType,
+                     'Payor' => [
+@@ -1431,8 +1439,8 @@
+                     'Description' => implode(', ', $itemsDesc),
+                     'Quantity' => ceil($itemsQty),
+                     'QuantityUnits' => 'pcs',
+-                    'UnitPrice' => ['Currency' => $request->getBaseCurrencyCode(), 'Amount' => $unitPrice],
+-                    'CustomsValue' => ['Currency' => $request->getBaseCurrencyCode(), 'Amount' => $customsValue],
++                    'UnitPrice' => ['Currency' => $this->getCurrencyCode($request->getBaseCurrencyCode()), 'Amount' => $unitPrice],
++                    'CustomsValue' => ['Currency' => $this->getCurrencyCode($request->getBaseCurrencyCode()), 'Amount' => $customsValue],
+                 ],
+             ];
+         }
+@@ -1558,8 +1566,8 @@
+         $countryRecipient = $params->getCountryRecipient();
+ 
+         if (($countryShipper == self::USA_COUNTRY_ID && $countryRecipient == self::CANADA_COUNTRY_ID ||
+-            $countryShipper == self::CANADA_COUNTRY_ID &&
+-            $countryRecipient == self::USA_COUNTRY_ID) &&
++                $countryShipper == self::CANADA_COUNTRY_ID &&
++                $countryRecipient == self::USA_COUNTRY_ID) &&
+             $method == 'FEDEX_GROUND'
+         ) {
+             return ['YOUR_PACKAGING' => __('Your Packaging')];

@@ -1,0 +1,27 @@
+ {
+  "name": "skyexlabel/magento-2-slabel",
+  "description": "Magento 2 SkyExLabel extension",
+  "require": {
+    "php": "~5.5.0|~5.6.0|~7.0.0"
+  },
+  "type": "magento2-module",
+  "version": "1.0.0",
+  "license": [
+  ],
+  "authors": [
+    {
+      "name": "",
+      "email": "",
+      "homepage": "",
+      "role": ""
+    }
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "SkyExLabel\\Slabel\\": ""
+    }
+  }
+}

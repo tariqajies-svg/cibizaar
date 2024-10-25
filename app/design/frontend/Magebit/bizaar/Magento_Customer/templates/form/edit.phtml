@@ -1,0 +1,196 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\ViewModel\ReCaptcha;
+use Magento\Customer\Block\Form\Edit;
+use Magento\Customer\Block\Widget\Dob;
+use Magento\Customer\Block\Widget\Gender;
+use Magento\Customer\Block\Widget\Name;
+use Magento\Customer\Block\Widget\Taxvat;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+
+/** @var Edit $block */
+/** @var SecureHtmlRenderer $secureRenderer */
+/** @var Escaper $escaper */
+/** @var ReCaptcha|null $recaptcha */
+
+// Do not replace this with $viewModels->require(ReCaptcha::class); that might break the dependency
+// on the Magento_ReCaptchaCustomer module
+$recaptcha = $block->getData('viewModelRecaptcha');
+?>
+<form class="form form-edit-account"
+      action="<?= $escaper->escapeUrl($block->getUrl('customer/account/editPost')) ?>"
+      method="post" id="form-validate"
+      enctype="multipart/form-data"
+      x-data="{...initForm(), ...hyva.formValidation($el)}"
+      @submit.prevent="submitForm()"
+      autocomplete="off">
+    <fieldset class="fieldset info max-w-[496px]">
+        <?= $block->getBlockHtml('formkey') ?>
+        <h2><?= $escaper->escapeHtml(__('Account Information')) ?></h2>
+        <br>
+        <?= $block->getLayout()->createBlock(Name::class)->setObject($block->getCustomer())->toHtml() ?>
+        <?php $dob = $block->getLayout()->createBlock(Dob::class) ?>
+        <?php $taxvat = $block->getLayout()->createBlock(Taxvat::class) ?>
+        <?php $gender = $block->getLayout()->createBlock(Gender::class) ?>
+        <?php if ($dob->isEnabled()): ?>
+            <?= $dob->setDate($block->getCustomer()->getDob())->toHtml() ?>
+        <?php endif ?>
+        <?php if ($taxvat->isEnabled()): ?>
+            <?= $taxvat->setTaxvat($block->getCustomer()->getTaxvat())->toHtml() ?>
+        <?php endif ?>
+        <?php if ($gender->isEnabled()): ?>
+            <?= $gender->setGender($block->getCustomer()->getGender())->toHtml() ?>
+        <?php endif ?>
+
+        <?= $block->getChildHtml('form_additional_info') ?>
+
+        <div class="field mb-1">
+            <label class="inline-label">
+                <input type="checkbox" name="change_email" value="1"
+                       title="<?= $escaper->escapeHtmlAttr(__('Change Email')) ?>"
+                       x-on:change="showEmailField = !showEmailField"
+                       class="checkbox"/>
+                <span><?= $escaper->escapeHtml(__('Change Email')) ?></span>
+            </label>
+        </div>
+
+        <div class="field mb-4 lg:mb-5">
+            <label class="inline-label">
+                <input type="checkbox" name="change_password" value="1"
+                       title="<?= $escaper->escapeHtmlAttr(__('Change Password')) ?>"
+                       x-on:change="showPasswordFields = !showPasswordFields"
+                       <?php if ($block->getChangePassword()): ?> checked="checked"<?php endif; ?>
+                       class="checkbox"/>
+                <span><?= $escaper->escapeHtml(__('Change Password')) ?></span>
+            </label>
+        </div>
+
+        <template x-if="showEmailField">
+            <div class="field field-reserved email">
+                <label class="label" for="email">
+                    <span><?= $escaper->escapeHtml(__('Email')) ?></span>
+                </label>
+                <div class="control">
+                    <input type="email" name="email" id="email" autocomplete="email" required
+                           value="<?= $escaper->escapeHtmlAttr($block->getCustomer()->getEmail()) ?>"
+                           title="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"
+                           class="form-input"/>
+                </div>
+            </div>
+        </template>
+
+        <template x-if="showEmailField || showPasswordFields">
+            <div class="field field-reserved password current">
+                <label class="label" for="current-password">
+                    <span><?= $escaper->escapeHtml(__('Current Password')) ?></span>
+                </label>
+                <div class="control">
+                    <input type="password" class="form-input" name="current_password" id="current-password"
+                           data-input="current-password"
+                           autocomplete="off"/>
+                </div>
+            </div>
+        </template>
+
+        <template x-if="showPasswordFields">
+            <div>
+                <div class="field field-reserved">
+                    <label class="label" for="password">
+                        <span><?= $escaper->escapeHtml(__('New Password')) ?></span>
+                    </label>
+                    <div class="control">
+                        <?php $minimumPasswordLength = $block->getMinimumPasswordLength() ?>
+                        <input type="password" class="form-input" name="password" id="password" required
+                               minlength="<?= $escaper->escapeHtmlAttr($minimumPasswordLength) ?>" autocomplete="off"
+                               data-validate='{ "required": true, "password": true }'/>
+                    </div>
+                </div>
+
+                <div class="field field-reserved">
+                    <label class="label" for="password-confirmation">
+                        <span><?= $escaper->escapeHtml(__('Confirm New Password')) ?></span>
+                    </label>
+                    <div class="control">
+                        <input type="password" class="form-input" name="password_confirmation"
+                               id="password-confirmation"
+                               autocomplete="off"
+                               data-validate='{ "required": true, "equalTo": "password" }''/>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </fieldset>
+    <?= $recaptcha ? $recaptcha->getInputHtml('customer_edit') : '' ?>
+    <div class="actions-toolbar border-t !border-solid">
+        <div class="primary w-full sm:w-fit">
+            <button type="submit" class="btn btn-primary w-full"
+                    title="<?= $escaper->escapeHtmlAttr(__('Save')) ?>">
+                <span><?= $escaper->escapeHtml(__('Save')) ?></span>
+            </button>
+        </div>
+        <div class="secondary">
+            <a class="clear group flex items-center text-blue lg:hover:text-blue-darker active:text-navy"
+               href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>">
+                <i class="icon-arrow-left pr-2"></i>
+                <span class="lg:group-hover:underline underline-offset-0.75">
+                    <?= $escaper->escapeHtml(__('Back')) ?>
+                </span>
+            </a>
+        </div>
+    </div>
+</form>
+<div class="w-full">
+    <?= $recaptcha ? $recaptcha->getLegalNoticeHtml('customer_edit') : '' ?>
+</div>
+<script>
+    function initForm() {
+        return {
+            errors: 0,
+            hasCaptchaToken: 0,
+            displayErrorMessage: false,
+            errorMessages: [],
+            showEmailField: false,
+            showPasswordFields: <?= $block->getChangePassword()
+                ? $escaper->escapeJs('true')
+                : $escaper->escapeJs(
+                    'false'
+                ) ?>,
+            setErrorMessages(messages) {
+                this.errorMessages = [messages]
+                this.displayErrorMessage = this.errorMessages.length
+            },
+            submitForm() {
+                // Do not rename $form, the variable is expected to be declared in the recaptcha output
+                const $form = document.querySelector('#form-validate');
+
+                 this.validate()
+                    .then(() => {
+                        <?= $recaptcha ? $recaptcha->getValidationJsHtml('customer_edit') : '' ?>
+
+                        if (this.errors === 0) {
+                            $form.submit();
+                        }
+                    }).catch((invalid) => {
+                        if (invalid.length > 0) {
+                            invalid[0].focus();
+                        }
+                    });
+            }
+        }
+    }
+</script>

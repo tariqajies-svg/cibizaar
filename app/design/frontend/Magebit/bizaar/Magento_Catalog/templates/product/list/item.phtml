@@ -1,0 +1,382 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductCompare;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magebit\Catalog\ViewModel\CategoryListImageScr;
+use Magento\Catalog\Block\Product\AbstractProduct;
+use Magento\Catalog\Helper\Output as CatalogOutputHelper;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\CurrentCategory;
+use Hyva\Theme\ViewModel\Wishlist;
+use Hyva\Theme\ViewModel\HeroiconsSolid;
+use Aheadworks\Ca\ViewModel\Company\Customer;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var AbstractProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+/** @var ProductListItem $productListItemViewModel */
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+
+/** @var CatalogOutputHelper $catalogOutputHelper */
+$catalogOutputHelper = $this->helper(CatalogOutputHelper::class);
+
+/** @var ProductCompare $compareViewModel */
+$compareViewModel = $viewModels->require(ProductCompare::class);
+
+$categoryListImageSrc = $viewModels->require(CategoryListImageScr::class);
+$currentCategoryViewModel = $viewModels->require(CurrentCategory::class);
+
+/** @var Magento\Catalog\Model\Product $product */
+$product = $block->getData('product');
+$imageDisplayArea = explode(',', $block->getData('image_display_area'));
+$templateType = $block->getData('template_type');
+$showAddToCompare = $compareViewModel->showInProductList();
+
+/** @var Wishlist $wishlistViewModel */
+$wishlistViewModel = $viewModels->require(Wishlist::class);
+
+$showAddToWishlist = $wishlistViewModel->isEnabled();
+
+/** @var HeroiconsSolid $heroiconsSolid */
+$heroiconsSolid = $viewModels->require(HeroiconsSolid::class);
+
+/** @var CustomerInterface $companyUser */
+$companyUser = $viewModels->require(Customer::class)->getCurrentCompanyUser();
+
+if (!$product) {
+    return '';
+}
+$productId = $product->getId();
+
+$hideDetails = $block->getData('hide_details') ?: false;
+$additionalData = $block->getData('additional_data') ?? [];
+$isPreload = isset($additionalData['preload_image']) ? true : false;
+
+$block->setData('cache_tags', [...$block->getCacheTags(), ...$currentCategoryViewModel->getIdentities()]);
+$hidePriceHelper = $this->helper('\Amasty\HidePrice\Helper\Data');
+?>
+
+<?php if ($product->isSaleable()): ?>
+<form method="post"
+    id="product_addtocart_form<?= (int) $productId ?>"
+    action="<?= $escaper->escapeUrl($productViewModel->getAddToCartUrl($product, ['useUencPlaceholder' => true])) ?>"
+    class="item product product-item product_addtocart_form relative w-full <?= $escaper->escapeHtmlAttr($additionalData['classes'] ?? '') ?>"
+    <?php if ($product->getOptions()): ?>
+    enctype="multipart/form-data"
+    <?php endif; ?>
+    @submit.prevent="ajaxForm('addToCart')"
+    x-data="window.bizaar.initProductTile()"
+    @mouseenter="addHover($el)"
+    @mouseleave="removeHover($el)"
+>
+    <?= /** @noEscape */ $block->getBlockHtml('formkey') ?>
+    <input type="hidden" name="product" value="<?= (int)$productId ?>"/>
+<?php else: ?>
+<div class="item product product-item relative w-full <?= $escaper->escapeHtmlAttr($additionalData['classes'] ?? '') ?>"
+     x-data="window.bizaar.initProductTile()">
+<?php endif; ?>
+    <div class="product-item-content flex flex-col h-full w-full bg-white rounded-xl">
+        <div class="product-card-left">
+<?php if($product->getSale()):?>
+    <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #0165ff;">
+        <span class="text-white text-xs uppercase font-semibold uppercase">Sale</span>
+    </div>
+<?php endif; ?>
+
+<?php if($product->getNew()):?>
+    <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #FD4331;">
+        <span class="text-white text-xs uppercase font-semibold uppercase">New</span>
+    </div>
+<?php endif; ?>
+
+<?php if($product->getTopSeller()):?>
+    <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #F63972;">
+        <span class="text-white text-xs uppercase font-semibold uppercase">Top Seller</span>
+    </div>
+<?php endif; ?>
+
+<?php if($product->getLimitedStock()):?>
+    <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #F4CA3D;">
+        <span class="text-white text-xs uppercase font-semibold uppercase">Limited Stock</span>
+    </div>
+<?php endif; ?>
+
+<?php if($product->getBizaarChoice()):?>
+    <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #0165ff;">
+        <span class="text-white text-xs uppercase font-semibold uppercase">Bizaar's Choice</span>
+    </div>
+<?php endif; ?>
+<?php if($product->getLowestPrice()):?>
+    <div class="btn-danger rounded px-1 py-0.5 lg:px-2 lg:py-0 lg:leading-4 mb-2 pro-label" style="background: #545454;">
+        <span class="text-white text-xs uppercase font-semibold uppercase">Lowest Price</span>
+    </div>
+<?php endif; ?>
+            <div class="block space-y-2 z-10 wishlist-container">
+                <?php /* if ($showAddToCompare): ?>
+                    <button x-data="initCompareOnProductList()"
+                    @click.prevent="addToCompare(<?= (int) $productId ?>, '<?= $escaper->escapeHtml($product->getName()) ?>')"
+                    aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>"
+                    type="button"
+                    class="btn btn-secondary btn-sq !w-9 !h-9 text-gray"
+                    title="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>">
+                    <template x-if="isLoading">
+                        <svg class="animate-spin min-w-4 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                    </template>
+                    <i class="icon-compare" x-show="!isLoading"></i>
+                </button>
+                <?php endif; */ ?>
+                <?php if ($showAddToWishlist): ?>
+                    <div x-data="window.bizaar.initToListButton(
+    {
+        isCompanyUser: <?= !!$companyUser ? 'true' : 'false' ?>,
+        showWishlist: <?= $wishlistViewModel->isEnabled() ? 'true' : 'false' ?>
+    })"
+     @private-content-loaded.window="getData($event.detail.data)"
+     x-init="getData(null)"
+>
+    <div x-show="showWishlist"
+         x-transition:enter="ease-in-out duration-100"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         style="display: none"
+    >
+        <button x-data="initWishlist()"
+                @click.prevent="addToWishlist(<?= (int)$productId ?>)"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>"
+                type="button"
+                class="btn btn-secondary btn-sq !w-[30px] !h-[30px] text-yellow-300">
+            <template x-if="isLoading">
+                <svg class="animate-spin min-w-4 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+            </template>
+            <i class="icon-heart" x-show="!isLoading"></i>
+        </button>
+    </div>
+    <?php if ($saveToBlock = $block->getChildBlock('product.item.addtorlist')): ?>
+        <?= $saveToBlock->setProduct($product)->toHtml() ?>
+    <?php endif; ?>
+</div>
+                <!-- <button x-data="initWishlist()"
+                        x-defer="intersect"
+                        @click.prevent="addToWishlist(<?= (int)$productId ?>)"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Add to Wish List') . ' ' . $product->getName()) ?>"
+                        type="button"
+                        class="btn btn-secondary btn-sq !w-[30px] !h-[30px] text-yellow-300"
+                        data-addto="wishlist"
+                ><i class="icon-heart"></i>
+                </button> -->
+                <?php endif; ?>
+            </div>
+            <a href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
+                class="product photo product-item-photo relative max-h-[192px] overflow-hidden before:block before:pt-[100%] before:w-full"
+                tabindex="-1"
+            >
+                <div  class="product-item-photo-wrapper block w-full absolute left-0 top-1/2 -translate-y-1/2 px-3">
+                    <?php
+                    if (isset($imageDisplayArea[0])) {
+                        $imageBlock = $block->getImage($product, $imageDisplayArea[0])
+                            ->setTemplate('Magento_Catalog::product/list/image.phtml')
+                            ->setProductId($productId)
+                            ->setData('is_preload', $isPreload);
+                        $imageBlock->setImageSrc($categoryListImageSrc->init($product, $imageDisplayArea));
+                        $imageBlock->setData('cache_tags', $block->getCacheTags());
+                        echo $imageBlock->toHtml();
+                    }
+                    ?>
+                </div>
+            </a>
+            
+            <div class="z-10 discount-strip">
+                <?php if ($discountBlock = $block->getChildBlock('product.item.discount')): ?>
+                <div class="w-full">
+                    <?= $discountBlock->setProduct($product)->toHtml() ?>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <div class="pro-content-box pt-3 p-6">
+            <?php if ($brandSwatchBlock = $block->getChildBlock('product.item.brand_swatch')): ?>
+                <div class="mb-3 flex justify-between items-center">
+                    <div class="leading-none h-6">
+                        <?= $brandSwatchBlock->setProduct($product)->setIsLazy(!$isPreload)->toHtml() ?>
+                    </div>
+                    <div>
+                        <?php 
+                            if($product->getTypeId() == 'configurable') { 
+                                $configurableData = $product->getTypeInstance()->getConfigurableAttributesAsArray($product);?>
+                            <a class="product-item-link text-sm color-black clear"
+                                href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
+                                title="<?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $product->getName(), 'name') ?>"
+                                >
+                                    <?php echo '+'.count($configurableData).__(' OPTIONS') ?>
+                                </a>                
+                        <?php } ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <div class="product-info flex flex-col flex-grow">
+            <?php if ($sku = $product->getSku()): ?>
+            <div class="uppercase text-[#4B40F6] text-sm">
+                <span class="font-bold"><?= $escaper->escapeHtml($sku) ?></span>
+            </div>
+            <div class="uppercase text-[#4B40F6] text-sm">
+            <?php 
+                $category_ids = $product->getData('category_ids');
+                if($category_ids)
+                {
+                echo "<div class='font-normal'>".$this->helper('Ktpl\Catalog\Helper\Data')->getCategoryName($category_ids)."</div>"; 
+                }
+                ?>
+            </div>
+            <?php endif; ?>
+                <div class="my-2 items-center justify-center text-primary">
+                    <a class="product-item-link text-[16px] leading-[24px] min-h-[48px] no-underline"
+                    href="<?= $escaper->escapeUrl($product->getProductUrl()) ?>"
+                    title="<?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $product->getName(), 'name') ?>"
+                    >
+                        <?= /* @noEscape */ $catalogOutputHelper->productAttribute($product, $product->getName(), 'name') ?>
+                    </a>
+                </div>
+
+                <div class="relative flex justify-between">
+                    <?php 
+if (!$hidePriceHelper->isNeedHideProduct($block->getProduct()))
+{
+?>
+                    <?php if ($priceBlock = $block->getChildBlock('product.item.price')): ?>
+                        <?= $priceBlock->setProduct($product)->toHtml() ?>
+                    <?php endif; ?>
+<?php } ?>
+                    <?php if ($attributesBlock = $block->getChildBlock('product.item.attributes')): ?>
+                    <div class="text-right">
+                        <?= $attributesBlock->setProduct($product)->toHtml() ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+
+                
+
+                <div class="pt-3 lg:hidden">
+                    <?php 
+
+if (!$hidePriceHelper->isNeedHideProduct($block->getProduct()) && $product->isSaleable())
+{
+?>
+                    <button title="<?= $escaper->escapeHtmlAttr(__('Add to Cart')) ?>"
+                            class="add-to-cart btn-primary"
+                            <?php if ($product->isSaleable()): ?>
+                            type="submit"
+                            form="product_addtocart_form<?= (int) $product->getId() ?>"
+                            <?php else: ?>
+                            disabled
+                            <?php endif ?>
+                    >
+                        <template x-if="loading.addToCart">
+                            <svg class="animate-spin min-w-4 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                        </template>
+                        <i class="" x-show="!loading.addToCart"></i>
+                        <span>
+                            <?php if ($product->isSaleable()): ?>
+                                <?= $escaper->escapeHtml(__('Add to Cart')) ?>
+                            <?php else: ?>
+                                <?= $escaper->escapeHtml(__('Out of Stock')) ?>
+                            <?php endif ?>
+                        </span>
+                    </button>
+<?php } ?>
+                     <div class="flex flex-wrap gap-2 addto">
+                <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
+                    <?= $addToBlock->setProduct($product)->getChildHtml() ?>
+                <?php endif; ?>
+
+            </div>
+                </div>
+            </div>
+
+            <div class="product-info-additional mt-3 hidden">
+                <div class="flex gap-x-2.5 md:flex-nowrap">
+                    <?php /* if ($qtyBlock = $block->getChildBlock('product.item.quantity')): ?>
+                    <div class="w-full">
+                        <?//= $qtyBlock->setProduct($product)->toHtml() ?>
+                    </div>
+                    <?php endif; */ ?>
+                    
+                <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
+                    <?= $addToBlock->setProduct($product)->getChildHtml() ?>
+                <?php endif; ?>
+            <?php 
+
+if (!$hidePriceHelper->isNeedHideProduct($block->getProduct()) && $product->isSaleable())
+{
+?>
+                    <button title="<?= $escaper->escapeHtmlAttr(__('Add to Cart')) ?>"
+                            class="add-to-cart btn-primary"
+                            <?php if ($product->isSaleable()): ?>
+                            type="submit"
+                            form="product_addtocart_form<?= (int) $product->getId() ?>"
+                            <?php else: ?>
+                            disabled
+                            <?php endif ?>
+                    >
+                        <template x-if="loading.addToCart">
+                            <svg class="animate-spin min-w-4 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                        </template>
+                        <!-- <i class="icon-cart" x-show="!loading.addToCart"></i> -->
+                        <?php echo __('Add to Cart') ?>
+                    </button>
+<?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php if ($product->isSaleable()): ?>
+</form>
+<?php else: ?>
+</div>
+<?php endif; ?>

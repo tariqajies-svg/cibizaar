@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Customer package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <referenceContainer name="fieldset.create.info.additional">
+                <block name="telephone_input" template="Magebit_Customer::customer_telephone.phtml"/>
+            </referenceContainer>
+        </referenceContainer>
+
+        <referenceBlock name="customer_form_register">
+            <block name="company_register" template="Magebit_Customer::company_form.phtml" />
+        </referenceBlock>
+    </body>
+</page>

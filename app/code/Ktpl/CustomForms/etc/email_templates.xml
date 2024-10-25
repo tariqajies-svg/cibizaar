@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="custom_form_request_quote_requestquote_template" label="Request Quote Email" file="requestquote.html" type="html" module="Ktpl_CustomForms" area="frontend"/>    
+    <template id="custom_form_layouts_layouts_template" label="Layouts Email" file="layouts.html" type="html" module="Ktpl_CustomForms" area="frontend"/>    
+    <template id="custom_form_creditapp_creditapp_template" label="Creditapp Email" file="creditapp.html" type="html" module="Ktpl_CustomForms" area="frontend"/>    
+    <template id="custom_form_return_request_rgarequest_template" label="Return Request Email" file="rgarequest.html" type="html" module="Ktpl_CustomForms" area="frontend"/>    
+    <template id="custom_form_taxexempt_taxexempt_template" label="Tax Exempt Email" file="taxexempt.html" type="html" module="Ktpl_CustomForms" area="frontend"/>    
+    <template id="custom_form_warranty_warranty_template" label="Warranty Email" file="warranty.html" type="html" module="Ktpl_CustomForms" area="frontend"/>    
+    <template id="custom_form_mfgonboard_mfgonboard_template" label="Manufacturer Onboard Email" file="mfg-onboard.html" type="html" module="Ktpl_CustomForms" area="frontend"/>    
+    <template id="custom_form_trade_trade_template" label="Trade Account Email" file="trade.html" type="html" module="Ktpl_CustomForms" area="frontend"/>    
+
+</config>

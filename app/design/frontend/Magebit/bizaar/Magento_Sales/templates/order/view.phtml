@@ -1,0 +1,104 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\GiftMessage\Helper\Message;
+use Magento\Sales\Block\Order\View;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var View $block */
+/** @var Escaper $escaper */
+
+$giftMessageHelper = $this->helper(Message::class);
+?>
+<?php $order = $block->getOrder() ?>
+<div class="order-toolbar flex md:justify-between mb-3 gap-y-4.75 gap-2 lg:gap-4 flex-wrap lg:mb-5.75">
+    <div class="md:flex">
+        <div class="lg:inline-block">
+            <h2><?= $escaper->escapeHtml(__('Order # %1', $order->getRealOrderId())) ?></h2>
+            <?= $block->getChildHtml('order.date') ?>
+        </div>
+        <div class="mt-5 lg:mt-0 lg:inline-block lg:ml-5">
+            <?= $block->getChildHtml('order.status') ?>
+        </div>
+    </div>
+    <?php if (!$block->getData('is_context_shipment')): ?>
+        <?= $block->getChildHtml('sales.order.buttons') ?>
+    <?php else: ?>
+        <?= $block->getChildHtml('sales.shipment.buttons') ?>
+    <?php endif; ?>
+</div>
+<div class="order-details-items ordered">
+    <div>
+        <?= $block->getChildHtml('order_top_items') ?>
+    </div>
+    <div">
+        <div class="pt-4">
+            <?= $block->getChildHtml('sales.order.info') ?>
+        </div>
+
+        <?= $block->getChildHtml('order.comments') ?>
+
+        <?php if (!$block->getData('is_context_shipment')): ?>
+            <div class="order-title">
+                <h3 class="py-5 lg:py-8"><?= $escaper->escapeHtml(__('Items Ordered')) ?></h3>
+                <?php if (!empty($order->getTracksCollection()->getItems())): ?>
+                <div class="mb-6">
+                    <?= $block->getChildHtml('tracking-info-link') ?>
+                </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+
+        <?= $block->getChildHtml('order_items') ?>
+
+        <?php if ($giftMessageHelper->isMessagesAllowed('order', $order) && $order->getGiftMessageId()): ?>
+            <div class="block block-order-details-gift-message">
+                <div class="block-title"><strong><?= $escaper->escapeHtml(__('Gift Message for This Order')) ?></strong>
+                </div>
+                <?php $giftMessage = $giftMessageHelper->getGiftMessageForEntity($order) ?>
+                <div class="block-content">
+                    <dl class="item-options">
+                        <dt class="item-sender">
+                            <strong class="label">
+                                <?= $escaper->escapeHtml(__('From')) ?>
+                            </strong>
+                            <?= $escaper->escapeHtml($giftMessage->getSender()) ?>
+                        </dt>
+                        <dt class="item-recipient">
+                            <strong class="label">
+                                <?= $escaper->escapeHtml(__('To')) ?>
+                            </strong>
+                            <?= $escaper->escapeHtml($giftMessage->getRecipient()) ?>
+                        </dt>
+                        <dd class="item-message">
+                            <?= /* @noEscape */ $giftMessageHelper->getEscapedGiftMessage($order) ?>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        <?php endif; ?>
+        <div class="actions-toolbar">
+            <div class="secondary">
+                <a class="action back" href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>">
+                    <span class="hidden lg:inline-block"><?= $escaper->escapeHtml($block->getBackTitle()) ?></span>
+                    <span class="lg:hidden"><?= $escaper->escapeHtml(__('Back')) ?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

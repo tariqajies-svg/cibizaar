@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setCssClass">
+                <argument name="cssClass" xsi:type="string"></argument>
+            </action>
+        </referenceBlock>
+
+        <referenceBlock name="aw.ca.company.form">
+            <block name="recaptcha_validation" template="Magento_ReCaptchaFrontendUi::js/script_token.phtml"/>
+            <block name="company_loading" template="Hyva_Theme::ui/loading.phtml"/>
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="awCaForm" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="general" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="name" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter company name</item>
+                                        </item>
+                                        <item name="legal_name" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter company legal name</item>
+                                        </item>
+                                        <item name="email" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter company e-mail address</item>
+                                        </item>
+                                        <item name="tax_id" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter VAT/TAX ID</item>
+                                            <item name="validation" xsi:type="array">
+                                                <item name="required-entry" xsi:type="boolean">true</item>
+                                            </item>
+                                        </item>
+                                        <item name="re_seller_id" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter reseller ID</item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="address" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="street" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter street address</item>
+                                        </item>
+                                        <item name="city" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter city</item>
+                                        </item>
+                                        <item name="postcode" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter ZIP/Postal code</item>
+                                        </item>
+                                        <item name="telephone" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter company phone number</item>
+                                            <item name="validation" xsi:type="array">
+                                                <item name="required-entry" xsi:type="boolean">true</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="administrator" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="job_title" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter job position</item>
+                                        </item>
+                                        <item name="firstname" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter first name</item>
+                                        </item>
+                                        <item name="lastname" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter last name</item>
+                                        </item>
+                                        <item name="email" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter e-mail address</item>
+                                        </item>
+                                        <item name="telephone" xsi:type="array">
+                                            <item name="placeholder" xsi:type="string" translate="true">Enter phone number</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+
+    </body>
+</page>

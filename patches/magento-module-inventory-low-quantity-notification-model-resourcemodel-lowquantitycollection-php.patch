@@ -1,0 +1,11 @@
+--- /dev/null
++++ ../Model/ResourceModel/LowQuantityCollection.php
+@@ -231,7 +231,7 @@
+     {
+         $sourceItemConfigurationTable = $this->getTable('inventory_low_stock_notification_configuration');
+ 
+-        $this->getSelect()->joinInner(
++        $this->getSelect()->joinLeft(
+             ['notification_configuration' => $sourceItemConfigurationTable],
+             sprintf(
+                 'main_table.%s = notification_configuration.%s AND main_table.%s = notification_configuration.%s',

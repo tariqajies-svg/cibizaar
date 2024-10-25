@@ -1,0 +1,41 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Checkout\Block\Cart;
+use Magento\Framework\Escaper;
+use Magento\Cms\Block\BlockByIdentifier;
+
+/** @var Cart $block */
+/** @var Escaper $escaper */
+?>
+<div class=" w-full flex flex-col lg:flex-row lg:mb-6.25">
+    <div class="w-full lg:w-[35%] xl:w-1/4 lg:order-2 lg:pl-6 mb-5">
+        <div class="cart-wrapper-summary lg:sticky lg:top-[130px] p-5 rounded">
+            <div class="flex flex-col lg:text-4xl border-b border-gray-e6 pb-5 mb-5 lg-max:-mx-5 lg-max:px-5 lg:pb-4 lg:mb-5.75">
+                <h3 class="w-full text-lg font-normal leading-6">
+                    <?= $escaper->escapeHtml(__('Order Summary')) ?>
+                </h3>
+            </div>
+            <?= $block->getChildHtml('cart.summary') ?>
+            <?= $block->getLayout()->createBlock(BlockByIdentifier::class)->setIdentifier('terms-and-conditions-notice')->toHtml() ?>
+        </div>
+    </div>
+    <div class="w-full lg:w-2/3 xl:w-3/4 lg:order-1 lg:pr-6">
+        <?= $block->getChildHtml('form_before') ?>
+        <?= $block->getChildHtml('cart-items') ?>
+        <?= $block->getChildHtml('checkout_cart_widget') ?>
+    </div>
+</div>

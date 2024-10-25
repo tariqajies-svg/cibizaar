@@ -1,0 +1,56 @@
+/* stylelint-disable value-no-vendor-prefix */
+.post-list .post-holder {
+    .post-header {
+        .post-title .post-item-link {
+            @apply text-navy;
+        }
+
+        .post-info {
+            .post-data .item {
+                @apply after:content-['•'] after:inline-block after:px-2 last:after:content-none;
+
+                &.post-tags {
+                    & a {
+                        @apply lg:hover:no-underline;
+                    }
+                }
+            }
+        }
+    }
+
+    .post-content {
+        [data-content-type='row'][data-appearance='contained'] {
+            @apply p-0;
+
+            & div {
+                @apply p-0 m-0;
+            }
+
+            & p {
+                @apply overflow-hidden;
+
+                display: -webkit-box;
+                -webkit-line-clamp: 6;
+                -webkit-box-orient: vertical;
+            }
+
+            @screen lg {
+                & p {
+                    -webkit-line-clamp: 4;
+                }
+            }
+        }
+    }
+}
+
+.blog-listing.post-comments-link {
+    &:hover {
+        .count {
+            @apply lg:bg-blue lg:text-white;
+        }
+
+        .triangle {
+            @apply lg:border-t-blue;
+        }
+    }
+}

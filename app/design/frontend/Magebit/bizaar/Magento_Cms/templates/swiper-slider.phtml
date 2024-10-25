@@ -1,0 +1,63 @@
+<script>
+    'use strict';
+ 
+    (function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            const home_hero_banner = new Swiper(".home-hero-banner", {
+
+			loop: true,
+			effect: 'slide',
+			slidesPerView: 1.1,
+			centeredSlides: true,
+			slidesOffsetBefore: 0,
+			autoplay: 
+			{
+				delay: 2000,
+			},
+			navigation: {
+				nextEl: ".hero-next",
+				prevEl: ".hero-prev",
+			},
+			breakpoints: {
+				768: {
+					slidesPerView: 1.9,
+					autoplay: false
+				},
+			}
+			});
+
+			var benifitsslider = new Swiper(".benifitsslider", {
+			loop: true,
+			effect: 'slide',
+			slidesPerView: 1.1,
+			centeredSlides: true,
+			slidesOffsetBefore: 0,
+			navigation: {
+				prevEl: ".benifitsslider-prev",
+				nextEl: ".benifitsslider-next",
+			},
+			breakpoints: {
+				768: {
+					slidesPerView: 2.1,
+				},
+			}
+			});
+			var galleryTop = new Swiper('.swiper-container.testimonial', {
+			loop: true,
+			autoplay: {
+				delay: 10000,
+			},
+			pagination: {
+				el: '.swiper-pagination',
+			},
+			navigation: {
+				nextEl: ".swiper-button-next",
+				prevEl: ".swiper-button-prev",
+			},
+			thumbs: {
+				swiper: galleryThumbs,
+			},
+			});
+        });
+    })()
+</script>

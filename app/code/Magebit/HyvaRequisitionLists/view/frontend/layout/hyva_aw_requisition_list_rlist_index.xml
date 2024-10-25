@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <update handle="hyva_modal"/>
+    <body>
+        <referenceBlock name="aw_requisition_list_listing.menu" remove="true"/>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">My Requisition Lists</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block class="Magento\Theme\Block\Html\Breadcrumbs" name="breadcrumbs" >
+                <action method="addCrumb">
+                    <argument name="crumbName" xsi:type="string" translate="true">Home</argument>
+                    <argument name="crumbInfo" xsi:type="array">
+                        <item name="title" xsi:type="string" translate="true">Home</item>
+                        <item name="label" xsi:type="string" translate="true">Home</item>
+                        <item name="link" xsi:type="string">/customer/account/</item>
+                    </argument>
+                </action>
+                <action method="addCrumb">
+                    <argument name="crumbName" xsi:type="string" translate="true">My Account</argument>
+                    <argument name="crumbInfo" xsi:type="array">
+                        <item name="title" xsi:type="string" translate="true">My Account</item>
+                        <item name="label" xsi:type="string" translate="true">My Account</item>
+                    </argument>
+                </action>
+                <action method="addCrumb">
+                    <argument name="crumbName" xsi:type="string" translate="true">Requisition Lists</argument>
+                    <argument name="crumbInfo" xsi:type="array">
+                        <item name="title" xsi:type="string" translate="true">Requisition Lists</item>
+                        <item name="label" xsi:type="string" translate="true">Requisition Lists</item>
+                    </argument>
+                </action>
+            </block>
+            <block class="Magento\Ui\Block\Wrapper"
+                   name="aw_requisition_list_listing.header"
+                   template="Magebit_HyvaRequisitionLists::requisition-list/requisition_list.phtml"
+                   cacheable="false">
+                <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+                <action method="setFormAction">
+                    <argument name="form_action" xsi:type="string">aw_rl/rlist/save</argument>
+                </action>
+            </block>
+            <block class="Magebit\HyvaRequisitionLists\ViewModel\RequisitionList"
+                   name="aw_requisition_list_listing.list"
+                   template="Magebit_HyvaRequisitionLists::requisition-list/list.phtml"
+                   cacheable="false">
+                <action method="setEditAction">
+                    <argument name="edit_action" xsi:type="string">aw_rl/rlist/edit</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+
+</page>

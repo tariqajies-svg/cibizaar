@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="aw.ca.company.form">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="awCaForm" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="general" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="re_seller_id" xsi:type="array">
+                                            <item name="component" xsi:type="null"/>
+                                        </item>
+                                    </item>
+                                </item>
+                                <item name="administrator" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="job_title" xsi:type="array">
+                                            <item name="label" xsi:type="string" translate="true">Designation</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

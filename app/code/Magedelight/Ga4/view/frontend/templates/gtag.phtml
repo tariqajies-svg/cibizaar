@@ -1,0 +1,57 @@
+<?php
+/**
+ * Magedelight
+ *
+ * Copyright (C) 2023 Magedelight <info@Magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_Ga4
+ * @copyright Copyright (c) 2023 Mage Delight (http://www.Magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@Magedelight.com>
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+// phpcs:disable Magento2.Files.LineLength.MaxExceeded
+// phpcs:disable Magento2.Security.LanguageConstruct.DirectOutput
+?>
+
+<?php
+$cookieConcent = $block->dataHelper()->getCookie();
+$accessible = 1;
+if ($block->dataHelper()->getGDPRStatus()) {
+    if (isset($cookieConcent)) {
+        $accessible = 1;
+    } else {
+        $accessible = 0;
+    }
+}
+?>
+<?php if ($block->isGTMStatus() && $accessible == 1): ?>
+    <?php $eventObj = $block->getJsonDataEventLayer(); ?>
+    <!-- Start of MageDelight GA4 Extension -->
+    <script>
+        window.getStoreCookies = function(name) {
+            match = document.cookie.match(new RegExp(name + '=([^;]+)'));
+            if (match) return decodeURIComponent(match[1].replace(/\+/g, ' ')) ;
+        };
+
+        window.dataLayer = window.dataLayer || [];
+        <?php if ($eventObj != '[[]]') { ?>
+        var mdObj = <?= /* @noEscape */ $eventObj; ?>;
+        for (var i in mdObj) {
+            window.dataLayer.push(mdObj[i]);
+        }
+        <?php } ?>
+        var obtainCookie = [<?= /* @noEscape */ $block->getCookiesForEventJsCode(); ?>];
+        obtainCookie.map(function(cookieName) {
+            var cookieValue = window.getStoreCookies(cookieName);
+            if (cookieValue) {
+                var mdObj = {};
+                mdObj[cookieName.replace('md_', '')] = cookieValue;
+                window.dataLayer.push(mdObj);
+            }
+        });
+    </script>
+    <!-- End of MageDelight GA4 Extension -->
+<?php endif; ?>

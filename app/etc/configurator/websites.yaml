@@ -1,0 +1,21 @@
+websites:
+  base:
+    name: Bizaar
+    store_groups:
+      -
+        group_id: 1
+        name: Bizaar
+        default_store: default
+        store_views:
+          default:
+            name: English
+            website_id: 1
+            is_active: 1
+          biz_fr:
+            name: French
+            website_id: 1
+            is_active: 0
+          biz_ar:
+            name: Arabic
+            website_id: 1
+            is_active: 0

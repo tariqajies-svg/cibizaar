@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_Aheadworks package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+   <type name="Aheadworks\RequisitionLists\Controller\RList\Index">
+        <plugin name="Magebit_Aheadworks_Rlist_Controller_index"
+                type="Magebit\Aheadworks\Plugin\RequisitionList\Controller\Index"/>
+    </type>
+    <type name="Aheadworks\Ctq\Controller\Quote\Index">
+        <plugin name="Magebit_Aheadworks_Quote_Controller_index"
+                type="Magebit\Aheadworks\Plugin\Ctq\Controller\Index"/>
+    </type>
+    <preference for="Aheadworks\Ca\ViewModel\Company\Formatter"
+                type="Magebit\Aheadworks\ViewModel\Ca\Company\Formatter"/>
+    <preference for="Magebit\Aheadworks\Api\Data\CompanyExtendInterface"
+                type="Magebit\Aheadworks\Model\CompanyExtendModel"/>
+    <preference for="Magebit\Aheadworks\Api\CompanyExtendRepositoryInterface"
+                type="Magebit\Aheadworks\Model\CompanyExtendRepository"/>
+    <type name="Aheadworks\Ca\Model\CompanyRepository">
+        <plugin name="magebit_aheadworks_company_repository_plugin"
+                type="Magebit\Aheadworks\Plugin\CompanyRepositoryPlugin"/>
+    </type>
+    <type name="Aheadworks\Ca\Model\Company\Address\Renderer">
+        <plugin name="magebit_ac_address_renderer_plugin"
+                type="Magebit\Aheadworks\Plugin\AddressRendererPlugin"/>
+    </type>
+
+    <virtualType name="Aheadworks\Ca\Ui\DataProvider\Company\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="company_extend_modifier" xsi:type="array">
+                    <item name="class" xsi:type="string">Magebit\Aheadworks\Ui\DataProvider\Company\Form\Modifier\CompanyExtend</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Aheadworks\Ca\Controller\Company\SavePost">
+        <plugin name="company_save_save_plugin"
+                type="Magebit\Aheadworks\Plugin\PostSavePlugin"/>
+    </type>
+    <type name="Aheadworks\Ca\Controller\Adminhtml\Company\Save">
+        <plugin name="company_admin_save_save_plugin"
+                type="Magebit\Aheadworks\Plugin\PostSavePlugin"/>
+    </type>
+    <type name="Aheadworks\QuickOrder\Controller\Index\Index">
+        <plugin name="aheadworks_quick_order_controller_index_index"
+                type="Magebit\Aheadworks\Plugin\QuickOrderControllerIndexIndex"/>
+    </type>
+</config>

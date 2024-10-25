@@ -1,0 +1,46 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCreditLimit package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\CreditLimit\Block\Customer\TotalList;
+use Magebit\HyvaAheadworksCreditLimit\ViewModel\Pricing;
+use Magento\Framework\Escaper;
+
+/** @var TotalList $block */
+/** @var Pricing $viewModel */
+/** @var Escaper $escaper */
+
+$viewModel = $block->getData('view_model');
+
+$jsonData = json_decode($block->getJsLayout());
+$totals = $jsonData->components->aw_cl_top_totals_data_provider->data->aw_credit_limit->totals;
+?>
+
+<div class="flex justify-evenly">
+    <div class="text-center">
+        <label class="block"><?= $escaper->escapeHtml(__('Credit Balance')) ?>:</label>
+        <span><?= $escaper->escapeHtml($viewModel->getFormattedPrice($totals->credit_balance)) ?></span>
+    </div>
+
+    <div class="text-center">
+        <label class="block"><?= $escaper->escapeHtml(__('Available Credit')) ?>:</label>
+        <span><?= $escaper->escapeHtml($viewModel->getFormattedPrice($totals->credit_available)) ?></span>
+    </div>
+
+    <div class="text-center">
+        <label class="block"><?= $escaper->escapeHtml(__('Credit Limit')) ?>:</label>
+        <span><?= $escaper->escapeHtml($viewModel->getFormattedPrice($totals->credit_limit)) ?></span>
+    </div>
+</div>

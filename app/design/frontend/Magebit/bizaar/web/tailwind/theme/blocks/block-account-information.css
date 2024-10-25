@@ -1,0 +1,15 @@
+.block-account-information {
+    .block-title {
+        @apply font-bold text-navy;
+    }
+
+    .box-content {
+        @apply break-all;
+    }
+
+    .box {
+        a {
+            @apply text-gray font-semibold;
+        }
+    }
+}

@@ -1,0 +1,128 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Amasty\Xnotif\Model\Config\GdprXnotif;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\Catalog\ViewModel\OutOfStockTooltip;
+use Magento\Framework\App\ActionInterface;
+use Magento\Framework\Url\Helper\Data as UrlHelper;
+use Amasty\Xnotif\Helper\Data as XnotifHelper;
+use Magento\ProductAlert\Block\Product\View;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var Escaper $escaper */
+/** @var View $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var UrlHelper $urlHelper */
+$urlHelper = $this->helper(UrlHelper::class);
+/** @var XnotifHelper $helper */
+$helper = $this->helper(XnotifHelper::class);
+
+$tooltipViewModel = $viewModels->require(OutOfStockTooltip::class);
+$tooltipText = $tooltipViewModel->getTooltipText();
+
+$productId = (int)$helper->getOriginalProduct($block)->getId();
+$parentId = (int)$block->getData('parent_product_id');
+$url = $escaper->escapeHtml($helper->getEmailUrl('stock'));
+?>
+<?php 
+$product = $helper->getOriginalProduct($block);
+$hidePriceHelper = $this->helper('\Amasty\HidePrice\Helper\Data');
+
+if (!$hidePriceHelper->isNeedHideProduct($block->getProduct())) {
+?>
+<div class="amxnotif-block mt-2 lg:mt-3">
+    <form x-data="hyva.formValidation($el)"
+          @submit="onSubmit"
+          id="form-validate-stock"
+          method="post"
+          action="<?= /** @noEscape */ $url; ?>"
+    >
+        <label for="notification-container-<?= /** @noEscape */ $productId ?>">
+            <?= /** @noEscape */ __('Notify about the arrival') ?>
+        </label>
+        <div class="notification-container" id="notification-container-<?= /** @noEscape */ $productId ?>">
+            <div class="fieldset">
+                <input name="guest_email"
+                       class="form-input amxnotif-guest-email"
+                       id="amxnotif-guest-email-<?= /** @noEscape */ $productId ?>"
+                       size="30"
+                       type="email"
+                       data-validate='{"required": true, "email": true}'
+                       @change="onChange"
+                       placeholder="<?= $escaper->escapeHtml($helper->getPlaceholder()) ?>"
+                />
+                <input type="hidden" name="product_id"
+                       value="<?= /** @noEscape */ $productId ?>"/>
+                <input type="hidden" name="type" value="email"/>
+
+                <?php if ($parentId): ?>
+                <input type="hidden" name="parent_id"
+                       value="<?= /** @noEscape */ $parentId ?>"/>
+                <?php endif; ?>
+
+                <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($helper->getFormKey()) ?>">
+                <input type="hidden"
+                       name="<?= /** @noEscape */ ActionInterface::PARAM_NAME_URL_ENCODED ?>"
+                       value="<?= /** @noEscape */ $urlHelper->getEncodedUrl(); ?>"/>
+                <?php if ($helper->isGDRPEnabled()): ?>
+                    <div class="field required my-2 lg:my-3">
+                        <label class="inline-label mb-0" for="amxnotif-stock-gdrp-<?= /** @noEscape */ $productId ?>">
+                            <input type="checkbox"
+                               name="gdrp"
+                               id="amxnotif-stock-gdrp-<?= /** @noEscape */ $productId ?>"
+                               title="<?= $escaper->escapeHtml(__('GDRP')); ?>"
+                               data-validate='{"required": true}'
+                               value="1">
+                            <span><?= /** @noEscape */ $helper->getGDRPText(); ?></span>
+                        </label>
+                    </div>
+                <?php endif; ?>
+
+                <?php $gdprCheckboxesHtml = $helper->getGdprCheckboxHtml(GdprXnotif::GDPR_XNOTIF_STOCK_FORM); ?>
+                <?php if (!empty($gdprCheckboxesHtml)): ?>
+                    <?= /** @noEscape */ $gdprCheckboxesHtml ?>
+                <?php endif; ?>
+            </div>
+
+            <div class="amxnotif_guest_action relative mt-2 lg:mt-3" x-data="{ tooltip: false, bottom: 0 }">
+                <?php if ($tooltipText): ?>
+                    <div class="absolute w-full z-50 bubble-bottom"
+                         x-cloak
+                         x-show="tooltip"
+                         :style="'bottom:' + (bottom + 8) + 'px'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-90"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-200"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-90">
+                        <?= $escaper->escapeHtml($tooltipText) ?>
+                    </div>
+                <?php endif; ?>
+                <button type="submit" class="btn btn-primary w-full">
+                    <span><?= $escaper->escapeHtml(__('Notify About Arrival')); ?></span>
+                    <?php if ($tooltipText): ?>
+                        <i class="icon icon-info relative bottom-px lg-max:hidden"
+                           x-on:mouseover=" bottom = $el.getBoundingClientRect().height; tooltip = true;"
+                           x-on:mouseleave="tooltip = false"></i>
+                    <?php endif; ?>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<?php } ?>

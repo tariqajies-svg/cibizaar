@@ -1,0 +1,116 @@
+.account {
+    .sidebar.sidebar-main {
+        @apply order-1 md-max:col-span-2;
+    }
+
+    .column {
+        @apply md-max:col-span-2;
+    }
+
+    address {
+        a {
+            @apply !text-gray;
+        }
+    }
+
+    .block-dashboard-orders,
+    .block-orders {
+        .table-actions {
+            a,
+            form {
+                flex: 1 0 50%;
+            }
+        }
+    }
+
+    @screen lg {
+        .order-filters {
+            grid-template-columns: 39% 1fr 12%;
+        }
+    }
+
+    .account-nav {
+        @apply mb-7;
+
+        @screen lg {
+            .account-nav-title {
+                &:hover span,
+                &:hover i {
+                    @apply text-blue-darker;
+                }
+
+                &:active span,
+                &:active i {
+                    @apply text-navy;
+                }
+            }
+        }
+
+        .account-nav-content {
+            .items {
+                @apply p-0 list-none lg:pt-1.5;
+
+                .item {
+                    @apply font-semibold text-sm lg:text-base lg:!pb-0;
+
+                    a {
+                        @apply hover:text-[#4A40F6] lg:hover:!text-[#4A40F6] active:!text-[#4A40F6] lg:active:!text-[#4A40F6];
+                    }
+
+                    &.current strong {
+                        @apply text-[#4A40F6] no-underline font-bold;
+                    }
+
+                    &.item-delimiter {
+                        @apply -mx-6 lg:-mx-8;
+                    }
+                }
+            }
+        }
+    }
+
+    .actions-toolbar {
+        @apply border-t border-solid border-gray-e6 mt-4.75 lg:pt-15;
+
+        .back {
+            @apply flex items-center text-base gap-x-2.25 hover:no-underline;
+
+            span {
+                @apply hover:underline;
+            }
+
+            &::before {
+                @apply font-icomoon;
+
+                content: '\e913';
+            }
+        }
+
+        .secondary a {
+            @apply text-sm lg:text-base;
+        }
+    }
+}
+
+.aw_requisition_list-rlist-edit {
+    .swatch-attribute {
+        ul[id*='requisition-list-configuration-form-'] {
+            @apply absolute w-[150px] left-0;
+        }
+    }
+}
+
+@media print {
+    .aw_requisition_list-rlist-edit {
+        header,
+        footer,
+        .page-title-wrapper,
+        .sidebar {
+            @apply hidden;
+        }
+
+        .no-print {
+            @apply hidden;
+        }
+    }
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar_fallback design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit/bizaar
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+ -->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_layout.xsd">
+    <update handle="empty"/>
+    <referenceContainer name="page.wrapper">
+        <referenceContainer name="checkout.header.wrapper">
+            <block template="Magento_Checkout::page/header.phtml" name="checkout.header"/>
+        </referenceContainer>
+        <container name="footer-container" as="footer" before="before.body.end" label="Page Footer Container" htmlTag="footer" htmlClass="page-footer">
+            <block template="Magento_Checkout::page/footer.phtml" name="checkout.footer"/>
+            <referenceBlock name="form.subscribe" remove="true"/>
+            <referenceBlock name="footer_links" remove="true"/>
+            <referenceBlock name="copyright" remove="true"/>
+            <referenceBlock name="elasticsuite_footer" remove="true"/>
+        </container>
+        <referenceBlock name="page.main.title" remove="true"/>
+    </referenceContainer>
+    <move element="logo" destination="checkout.header"/>
+</layout>

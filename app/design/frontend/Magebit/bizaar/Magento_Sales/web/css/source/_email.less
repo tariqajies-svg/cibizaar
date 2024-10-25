@@ -1,0 +1,310 @@
+// /**
+//  * This file is part of the Magebit/bizaar design package.
+//  *
+//  * DISCLAIMER
+//  *
+//  * Do not edit or add to this file if you wish to upgrade this package
+//  * to newer versions in the future.
+//  *
+//  * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+//  * @author    Magebit <info@magebit.com>
+//  * @license   MIT
+//  */
+
+//
+//  Sales Module Styles
+//  _____________________________________________
+
+
+.email-intro {
+  td {
+    padding-bottom: 4px;
+  }
+}
+
+.email-summary {
+  border-top: 1px solid @color-gray-e6;
+
+  & > td {
+    padding-top: 27px;
+  }
+
+  h1 {
+    margin-bottom: 8px;
+  }
+}
+
+//
+//  Order Summary
+//  ---------------------------------------------
+
+.order-details {
+  width: 100%;
+  margin-bottom: 8px;
+
+  tr {
+    > .address-details {
+      padding-top: 16px @email-content__padding__base @email-content__padding__base 0;
+      width: 50%;
+
+      h3 {
+        margin-bottom: 12px;
+      }
+    }
+
+    > .method-info {
+      padding: 16px @email-content__padding__base @email-content__padding__base 0;
+      width: 50%;
+
+      h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+      }
+    }
+
+    //  Prevent extra spacing on Payment & Shipping Method row
+    & + .method-info {
+      > td {
+        padding: 0 0 @email-content__padding__base;
+      }
+    }
+  }
+
+  .payment-method {
+    margin-bottom: @indent__s;
+
+    .title {
+      font-weight: @font-weight__regular;
+    }
+
+    .data.table {
+      > caption {
+        display: none;
+      }
+
+      th {
+        padding-right: @email-content__padding__base;
+      }
+    }
+  }
+}
+
+//  Remove address and phone number link color on iOS
+.email-non-inline() {
+  .address-details a {
+    &:extend(.no-link a);
+  }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__xs) {
+  //  Stack columns
+  .order-details {
+    .address-details,
+    .method-info {
+      display: block;
+      padding: @email-content__padding__base 0 !important;
+      width: auto !important;
+
+      h3 {
+        margin-bottom: @indent__xs !important;
+        margin-top: 0 !important;
+      }
+    }
+  }
+}
+
+//
+//  Shipment Tracking
+//  ---------------------------------------------
+
+.shipment-track {
+  .lib-table(@table__width, 0);
+
+  thead,
+  tbody {
+    > tr {
+      > th,
+      > td {
+        background-color: @email__background-color;
+        padding: @email-content__padding__base;
+        width: 50%;
+      }
+
+      & + tr {
+        th,
+        td {
+          padding-top: 0;
+        }
+      }
+    }
+  }
+}
+
+//
+//  Items Table
+//  ---------------------------------------------
+
+.email-items {
+  .lib-table(@table__width, 0);
+  border: @table__border-width @table__border-style @table__border-color;
+  border-left: unset;
+  border-right: unset;
+
+  tfoot {
+    > tr {
+      > th,
+      > td {
+        background-color: @color-gray-f2;
+      }
+    }
+  }
+
+  > thead {
+    color: @color-navy;
+  }
+
+  > thead,
+  > tbody {
+    > tr {
+      > td {
+        &.message-gift {
+          border-top: none;
+          padding-top: 0;
+        }
+      }
+    }
+  }
+
+  > tbody {
+    > tr {
+      > th,
+      > td {
+        border-top: @table__border-width @table__border-style @table__border-color;
+      }
+
+      & + tr {
+        > th,
+        > td {
+          border-top: 0;
+        }
+      }
+    }
+
+    .item-price,
+    .item-subtotal,
+    .item-qty {
+      color: @color-navy;
+      font-weight: @font-weight__semibold;
+    }
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+
+  .sku {
+    font-size: 12px;
+    line-height: 20px;
+
+    .sku-number {
+      font-weight: @font-weight__semibold;
+      color: @color-navy;
+    }
+  }
+
+  .has-extra .sku {
+    margin-bottom: @email-content__padding__base;
+  }
+
+  .item-info {
+    padding: 15px 10px 16px 23px;
+
+    dl {
+      font-size: 12px;
+      line-height: 20px;
+      margin-bottom: 0;
+      padding-left: @email-content__padding__m;
+
+      dt,
+      dd {
+        strong {
+          font-weight: @font-weight__semibold;
+          color: @color-navy;
+        }
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      dd {
+        padding-left: @email-content__padding__base;
+      }
+    }
+  }
+
+  .item-qty {
+    padding: 15px 13px 16px;
+  }
+
+  .item-price,
+  .item-subtotal {
+    text-align: right;
+    padding: 15px 23px 16px 10px;
+  }
+
+  .item-extra {
+    padding-top: 0;
+  }
+
+  .order-totals {
+    > tr {
+      > th {
+        font-weight: @font-weight__regular;
+
+        & + td {
+          text-align: right;
+        }
+      }
+
+      > th,
+      > td {
+        padding: 14px 24px 8px;
+      }
+
+      & + tr {
+        th,
+        td {
+          padding-top: 0;
+        }
+      }
+    }
+
+    .price {
+      color: @color-navy;
+      font-weight: @font-weight__semibold;
+      white-space: nowrap;
+    }
+
+    .grand_total {
+      th {
+        strong {
+          font-weight: @font-weight__regular;
+        }
+      }
+
+      > th,
+      > td {
+        padding: 0 24px 16px;
+      }
+
+      .price {
+        color: @color-blue;
+      }
+    }
+  }
+}
+
+.email-non-inline() {
+  .email-items {
+    .lib-table-overflow();
+  }
+}

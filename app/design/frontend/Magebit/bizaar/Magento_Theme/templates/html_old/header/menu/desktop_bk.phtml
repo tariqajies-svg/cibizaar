@@ -1,0 +1,198 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaTheme\ViewModel\BrandsNavigation;
+use Magebit\HyvaTheme\ViewModel\Navigation;
+use CtiDigital\Configurator\ViewModel\Cms;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$uniqueId = '_' . uniqid();
+
+$navigation = $viewModels->require(Navigation::class);
+$brandsNavigation = $viewModels->require(BrandsNavigation::class);
+$cms = $viewModels->require(Cms::class);
+
+$rootCategoryId = $navigation->getRootCategoryId();
+$mainCategoryId = $navigation->getMainCategoryId() ?: null;
+$brandsCategoryId = $brandsNavigation->getBrandsCategoryId() ?: null;
+
+/* Do not render menu if default category hasn't required sub-categories */
+if (!$mainCategoryId || !$brandsCategoryId) {
+    return '';
+}
+
+/* Prepare main category menu data */
+$categoryMenu = $navigation->getCustomNavigation([$rootCategoryId, $mainCategoryId], 3);
+$subMenuItems = $navigation->getCustomNavigation([$rootCategoryId, $mainCategoryId], 5, 4);
+
+/* Prepare brand category menu data */
+$brandMenu = $navigation->getCustomNavigation([$rootCategoryId, $brandsCategoryId], 3);
+$brandSubMenuItems = $brandsNavigation->getCustomNavigation([$rootCategoryId, $brandsCategoryId], 5, 4, $brandMenu);
+
+/* Merge main and brand categories */
+$subMenuItems = array_merge($subMenuItems, $brandSubMenuItems);
+$sideMenuItems = array_merge($categoryMenu, $brandMenu);
+
+/* Set cache tags */
+$block->setData('cache_tags', $navigation->getIdentities());
+?>
+<script>
+    'use strict';
+
+    const initMenuDesktop<?= $escaper->escapeHtml($uniqueId) ?> = () => {
+        return {
+            brandFilterAttribute: 'manufacturer',
+            rootActiveId: '<?= /* @noEscape */ $mainCategoryId ?>',
+            selectedId: '<?= /* @noEscape */ $sideMenuItems[0]['id'] ?>',
+            selectedBrandUrl: '',
+            resize() {
+                if (window.innerWidth < 1024) {
+                    window.dispatchEvent(new CustomEvent('close-desktop-menu'));
+                }
+            },
+            buildCategoryUrl(urlKeysArray) {
+                return this.selectedBrandUrl.replace('<?= $escaper->escapeUrl($navigation->getCategoryUrlSuffix()) ?>', '')
+                    + '/' + urlKeysArray.join('/')
+                    + '<?= $escaper->escapeUrl($navigation->getCategoryUrlSuffix()) ?>';
+            }
+        }
+    }
+</script>
+<div x-cloak x-spread="overlay('desktop-menu')" x-bind="overlay('desktop-menu')"
+     class="fixed inset-0 bg-opacity-50 z-50 backdrop !m-0">
+    <div class="fixed flex justify-center items-start text-left z-10 pop-up inset-x-0 bottom-0 pb-1">
+        <div x-ref="desktop-menu" role="desktop-menu" aria-modal="true"
+             class="relative menu-tooltip top-[110px] inline-block bg-white pop-up-menu"
+             @click.away="hideCatalogMenu()">
+            <i @click="hideCatalogMenu()"
+               class="absolute text-gray icon-close top-0 right-0 p-3.5 bg-gray-f2 rounded-bl rounded-tr
+                   hover:cursor-pointer lg:hover:text-blue-darker"
+            ></i>
+            <!--desktop-->
+            <div x-data="initMenuDesktop<?= $escaper->escapeHtml($uniqueId) ?>()"
+                 @resize.window="resize()"
+                 class="grid grid-cols-menu h-full">
+                <div class="relative p-8 bg-gray-f2 min-w-[366px] max-h-[720px] border-r rounded-l border-gray-e6 lg:h-menu">
+                    <div class="grid grid-cols-2 mb-8">
+                        <button @click="
+                                    rootActiveId = '<?= /* @noEscape */ $brandsCategoryId ?>';
+                                    selectedId = '<?= /* @noEscape */ array_key_first($brandMenu) ?>';
+                                    selectedBrandUrl = '<?= $escaper->escapeJs($brandMenu[array_key_first($brandMenu)]['url']) ?>';
+                                "
+                                class="btn btn-sm rounded-r-none category-switch"
+                                :class="rootActiveId == '<?= /* @noEscape */ $brandsCategoryId ?>' ? 'btn-primary' : 'btn-secondary text-gray'"
+                                :disabled="rootActiveId == '<?= /* @noEscape */ $brandsCategoryId ?>'"
+                        >
+                            <?= $escaper->escapeHtml(__('Brands')) ?>
+                        </button>
+                        <button @click="
+                                    rootActiveId = '<?= /* @noEscape */ $mainCategoryId ?>';
+                                    selectedId = '<?= /* @noEscape */ $sideMenuItems[0]['id'] ?>'
+                                "
+                                class="btn btn-sm rounded-l-none category-switch transform -translate-x-px w-full-px"
+                                :class="rootActiveId == '<?= /* @noEscape */ $mainCategoryId ?>' ? 'btn-primary' : 'btn-secondary text-gray'"
+                                :disabled="rootActiveId == '<?= /* @noEscape */ $mainCategoryId ?>'"
+                        >
+                            <?= $escaper->escapeHtml(__('Categories')) ?>
+                        </button>
+                    </div>
+                    <div class="flex flex-col gap-2 overflow-y-auto lg:h-menu-sidebar max-h-[580px]">
+                        <?php foreach ($sideMenuItems as $sideMenuItem): ?>
+                            <a data-id="<?= /* @noEscape */ $sideMenuItem['id'] ?>"
+                                <?php if ($sideMenuItem['has_child']): ?>
+                                    @click="
+                                    selectedId = '<?= /* @noEscape */ $sideMenuItem['id'] ?>';
+                                    selectedBrandUrl = '<?= $escaper->escapeJs($sideMenuItem['url']) ?>';
+                                "
+                                <?php else: ?>
+                                    href="<?= $escaper->escapeUrl($sideMenuItem['url'])?>"
+                                <?php endif; ?>
+                               class="clear main-categories font-semibold lg:hover:text-blue-darker hover:cursor-pointer
+                                  active:!text-navy lg:hover:underline underline-offset-0.75"
+                               :class="{
+                               'hidden' : rootActiveId !== '<?= /* @noEscape */ $sideMenuItem['parent_id'] ?>',
+                               'block' : rootActiveId === '<?= /* @noEscape */ $sideMenuItem['parent_id'] ?>',
+                               'text-blue' : selectedId === '<?= /* @noEscape */ $sideMenuItem['id'] ?>'
+                           }"
+                            >
+                                <?= $escaper->escapeHtml($sideMenuItem['name']) ?>
+                            </a>
+                        <?php endforeach; ?>
+                        <?php if ($saleCategory = $cms->getCategory('sale')): ?>
+                            <?php if ($saleCategory->getIsActive()): ?>
+                                <a href="<?= $escaper->escapeUrl($saleCategory->getUrl()) ?>"
+                                   class="clear group flex items-center font-semibold lg:hover:text-blue-darker active:!text-navy
+                                          hover:cursor-pointer underline-offset-0.75 text-blue"
+                                >
+                                    <i class="icon-discount pr-2"></i>
+                                    <span class="lg:group-hover:underline"><?= $escaper->escapeHtml(__('Sale')) ?></span>
+                                </a>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div x-ref="nav-desktop" class="w-full p-8 max-h-[720px] lg:h-menu">
+                    <?php foreach ($sideMenuItems as $sideMenuItem): ?>
+                        <h3 class="my-1.5" :class="selectedId === '<?= /* @noEscape */ $sideMenuItem['id'] ?>' ? 'block' : 'hidden'">
+                            <a class="clear text-navy font-bold lg:hover:underline lg:hover:text-navy-darker underline-offset-0.75"
+                               href="<?= $escaper->escapeUrl($sideMenuItem['url'])?>"><?= $escaper->escapeHtml($sideMenuItem['name']) ?></a>
+                        </h3>
+                    <?php endforeach; ?>
+                    <nav class="max-h-[600px] flex-col pt-8 content-start w-full flex flex-wrap gap-8 overflow-y-auto lg:h-menu-main">
+                        <?php foreach ($subMenuItems as $subMenuItem):?>
+                            <div class="grid w-[260px] flex-shrink-1"
+                                <?php if (isset($subMenuItem['parent_ids']) && $subMenuItem['parent_ids']): ?>
+                                    :class="[<?= /* @noEscape */ implode(', ', $subMenuItem['parent_ids']) ?>].includes(parseInt(selectedId)) ? 'block' : 'hidden'"
+                                <?php else: ?>
+                                    :class="selectedId === '<?= /* @noEscape */ $subMenuItem['parent_id'] ?>' ? 'block' : 'hidden'"
+                                <?php endif; ?>
+                            >
+                                <a class="clear text-navy font-bold lg:hover:underline lg:hover:text-navy-darker underline-offset-0.75"
+                                    <?php if (isset($subMenuItem['parent_ids']) && $subMenuItem['parent_ids']): ?>
+                                        :href="buildCategoryUrl(['<?= /** @noEscape */ $subMenuItem['url_key'] ?>'])"
+                                    <?php else: ?>
+                                        href="<?= $escaper->escapeUrl($subMenuItem['url'])?>"
+                                    <?php endif; ?>
+                                   title="<?= $escaper->escapeHtmlAttr($subMenuItem['name'])?>"
+                                >
+                                    <?= $escaper->escapeHtml($subMenuItem['name'])?>
+                                </a>
+                                <?php foreach ($subMenuItem['childData'] as $subMenuChildItem):?>
+                                    <a title="<?= $escaper->escapeHtmlAttr($subMenuChildItem['name'])?>"
+                                        <?php if (isset($subMenuItem['parent_ids']) && $subMenuItem['parent_ids']): ?>
+                                            :href="buildCategoryUrl(['<?= /** @noEscape */ $subMenuItem['url_key'] ?>', '<?= /** @noEscape */ $subMenuChildItem['url_key'] ?>'])"
+                                            :class="[<?= /* @noEscape */ implode(', ', $subMenuChildItem['parent_ids']) ?>].includes(parseInt(selectedId)) ? 'block' : 'hidden'"
+                                        <?php else: ?>
+                                            href="<?= $escaper->escapeUrl($subMenuChildItem['url'])?>"
+                                        <?php endif; ?>
+                                       class="clear font-semibold w-full whitespace-nowrap mt-2 lg:hover:text-blue-darker
+                                          lg:hover:underline underline-offset-0.75 active:!text-navy"
+                                    >
+                                        <?= $escaper->escapeHtml($subMenuChildItem['name'])?>
+                                    </a>
+                                <?php endforeach;?>
+                            </div>
+                        <?php endforeach;?>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

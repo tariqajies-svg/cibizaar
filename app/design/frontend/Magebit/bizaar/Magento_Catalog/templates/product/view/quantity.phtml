@@ -1,0 +1,190 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductStockItem;
+use Magebit\HyvaTheme\Block\Product\Listing\ProductQuantity;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+
+/** @var ProductQuantity $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Product $product */
+$product = $block->getProduct();
+
+if (!$product) {
+    return '';
+}
+
+/** @var ProductStockItem $stockItemViewModel */
+$stockItemViewModel = $viewModels->require(ProductStockItem::class);
+$minSalesQty        = $stockItemViewModel->getMinSaleQty($product);
+$maxSalesQty        = $stockItemViewModel->getMaxSaleQty($product);
+
+$maxSalesQtyLength  = ($maxSalesQty ? strlen((string) $maxSalesQty) : 4)
+    + (/* add one if decimal for separator */
+    (int) $stockItemViewModel->isQtyDecimal($product));
+
+$step = $stockItemViewModel->getQtyIncrements($product) ?: null;
+$defaultQty = $block->getProductDefaultQty() * 1;
+$maxSalesQtyWithStep = $maxSalesQty;
+
+if ($step && $step !== 1) {
+    if (fmod($defaultQty, $step) !== 0.0) {
+        $defaultQtyWithStep = $step;
+        while ($defaultQtyWithStep < $defaultQty) {
+            $defaultQtyWithStep += $step;
+        }
+        $defaultQty = $defaultQtyWithStep;
+    }
+
+    if (fmod($maxSalesQty, $step) !== 0) {
+        $maxSalesQtyWithStep = $step;
+        while ($maxSalesQtyWithStep <= $maxSalesQty) {
+            $maxSalesQtyWithStep += $step;
+        }
+        $maxSalesQtyWithStep = round($maxSalesQtyWithStep, 1);
+        if ($maxSalesQtyWithStep > $maxSalesQty) {
+            // One step less than maximum
+            $maxSalesQtyWithStep -= $step;
+        }
+    }
+}
+
+$inputIdPrefix = $block->getData('is_mobile') ? 'Mobile' : '';
+?>
+<?php if ($block->shouldRenderQuantity()): ?>
+
+    <script>
+        function initQtyField<?= (int)$product->getId() ?>() {
+            return {
+                qty: <?= $escaper->escapeJs((string)$defaultQty) ?>,
+                productId: '<?= (int)$product->getId() ?>',
+                updateQty(newVal, $dispatch) {
+                    <?php if ($stockItemViewModel->isQtyDecimal($product)): ?>
+                        newVal = parseFloat(newVal.toFixed(1));
+                    <?php endif; ?>
+                    const input = this.$refs['qty-<?= (int)$product->getId() ?>'];
+                    const min = parseFloat(input.min);
+                    const max = parseFloat(input.max);
+                    const maxLength = parseInt('<?= /** @noEscape */ (int)$maxSalesQtyLength ?>')
+
+                    if (((!!min && newVal >= min) || !min)
+                        && ((!!max && newVal <= max) || !max)
+                        <?php if (!$stockItemViewModel->isQtyDecimal($product)): ?>
+                            && ((!!maxLength && newVal.toString().length <= maxLength) || !maxLength)
+                        <?php endif; ?>
+                    ) {
+                        this.qty = newVal;
+                    if(document.getElementById("qtyMobile[<?= (int)$product->getId() ?>]").value != newVal) {
+                        document.getElementById("qtyMobile[<?= (int)$product->getId() ?>]").value = newVal;
+                    }
+                    if(document.getElementById("qty[<?= (int)$product->getId() ?>]").value != newVal) {
+                        document.getElementById("qty[<?= (int)$product->getId() ?>]").value = newVal;
+                    }
+                        $dispatch('update-qty-<?= (int)$product->getId() ?>', this.qty)
+                        $dispatch('update-qty-field-<?= (int)$product->getId() ?>', this.qty)
+                    }
+                },
+                validateQty($dispatch) {
+                    const input = this.$refs['qty-<?= (int)$product->getId() ?>'];
+                    const max = input.max;
+                    if (!this.qty || this.qty > max) {
+                        if (!this.qty) this.qty = <?= $escaper->escapeJs((string)$defaultQty) ?>;
+                        else if (this.qty > max) this.qty = max;
+                        $dispatch('update-qty-<?= (int)$product->getId() ?>', this.qty)
+                        $dispatch('update-qty-field-<?= (int)$product->getId() ?>', this.qty)
+                    }
+                },
+                eventListeners: {
+                    ['@update-qty-field-<?= (int)$product->getId() ?>.window'](event) {
+                        let qty = event.detail;
+                        if (qty !== this.qty) {
+                            this.qty = qty;
+                        }
+                    }
+                }
+            };
+        }
+    </script>
+    <div x-data="initQtyField<?= (int)$product->getId() ?>()"
+         x-spread="eventListeners"
+         @private-content-loaded.window="updateQty(qty, $dispatch)"
+         class="product-view-qty flex items-center mb-2 xl:mb-0 w-full xl:w-auto">
+            <div class="flex relative">
+                <label
+                    for="qty<?= $escaper->escapeHtmlAttr($inputIdPrefix) ?>[<?= (int)$product->getId() ?>]"
+                    class="sr-only"
+                >
+                    <?= $escaper->escapeHtml(__('Quantity')) ?>
+                </label>
+                <div class="flex flex-1 relative justify-center">
+                    <input
+                        id="qty<?= $escaper->escapeHtmlAttr($inputIdPrefix) ?>[<?= (int)$product->getId() ?>]"
+                        name="qty"
+                        x-ref="qty-<?= (int)$product->getId() ?>"
+                        form="product_addtocart_form"
+                        <?php if ($stockItemViewModel->isQtyDecimal($product)): ?>
+                            type="text"
+                            pattern="[0-9]{0,<?= /** @noEscape */ $maxSalesQtyLength ?>}(\.*[0-9])"
+                            inputmode="decimal"
+                        <?php else: ?>
+                            type="number"
+                            pattern="[0-9]{0,<?= /** @noEscape */ $maxSalesQtyLength ?>}"
+                            inputmode="numeric"
+                        <?php endif; ?>
+                        <?php if ($minSalesQty): ?>min="<?= /** @noEscape */ $defaultQty ?>"<?php endif; ?>
+                        <?php if ($maxSalesQty): ?>max="<?= /** @noEscape */ $maxSalesQtyWithStep ?>"<?php endif; ?>
+                        <?php if ($step): ?>step="<?= /** @noEscape */ $step ?>"<?php endif; ?>
+                        class="form-input px-10 py-2 max-w-32 w-full text-center border-0 invalid:border-error"
+                        x-model.number="qty"
+                        @change="$dispatch('update-qty-<?= (int)$product->getId() ?>', qty)"
+                        @input="updateQty(qty, $dispatch)"
+                        @blur="validateQty($dispatch)"
+                    />
+                </div>
+                <button type="button"
+                        class="btn btn-secondary p-1.25 lg:p-1.75 !border rounded text-gray absolute top-0.25
+                            left-0.25 before:block before:absolute before:w-2.5 before:h-0.5 before:bg-currentColor
+                            w-10 h-10"
+                        :disabled="qty == <?= /** @noEscape */ $defaultQty ?: 1 ?>"
+                        <?php if ($stockItemViewModel->isQtyDecimal($product)): ?>
+                            @click.prevent="updateQty(parseFloat(qty) - parseFloat(<?= /** @noEscape */ $step ?: 1 ?>), $dispatch)"
+                        <?php else: ?>
+                            @click.prevent="updateQty(qty - <?= /** @noEscape */ $step ?: 1 ?>, $dispatch)"
+                        <?php endif; ?>
+                        aria-label="<?= $escaper->escapeHtml(__('Minus')) ?>"
+                >
+                </button>
+                <button type="button"
+                        class="btn btn-secondary p-1.25 lg:p-1.75 !border rounded text-gray absolute top-0.25
+                            right-0.25 before:block before:absolute before:w-2.5 before:h-0.5 before:bg-currentColor
+                            after:block after:absolute after:w-2.5 after:h-0.5 after:bg-currentColor after:rotate-90
+                            w-10 h-10"
+                        :disabled="qty == <?= /** @noEscape */ $maxSalesQtyWithStep ?: 1 ?>"
+                        <?php if ($stockItemViewModel->isQtyDecimal($product)): ?>
+                            @click.prevent="updateQty(parseFloat(qty) + parseFloat(<?= /** @noEscape */ $step ?: 1 ?>), $dispatch)"
+                        <?php else: ?>
+                            @click.prevent="updateQty(qty + <?= /** @noEscape */ $step ?: 1 ?>, $dispatch)"
+                        <?php endif; ?>
+                        aria-label="<?= $escaper->escapeHtml(__('Plus')) ?>"
+                >
+                </button>
+            </div>
+    </div>
+<?php endif; ?>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_NetworkInternationalNGenius package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="ngeniusonline">
+                <field id="base_currency" translate="label" type="select" sortOrder="9.6" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Use base currency for payments</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If "Yes" selected, then on Ngenius payment provider page will be used BASE currency of
+                        current website. If "No selected, then selected currency on FE will be used."
+                    </comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

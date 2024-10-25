@@ -1,0 +1,46 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+?>
+
+<div class="block <?= $escaper->escapeHtmlAttr($block->getBlockCss()) ?> filter-option rounded bg-gray-f2 py-5 px-6 mb-3.25 lg:px-8"
+     x-data="{ open: true }">
+    <div class="title <?= $escaper->escapeHtmlAttr($block->getBlockCss()) ?>-title flex justify-between
+        items-center cursor-pointer hover:text-secondary-darker"
+         @click="open = !open"
+         :class="{ 'pb-4 lg:pb-2.5': open, 'pb-0': !open }"
+    >
+        <span class="text-sm title uppercase font-bold text-navy lg:text-base">
+            <?= $escaper->escapeHtml(__($block->getData('block_title'))) ?>
+        </span>
+        <i
+            class="icon text-gray"
+            :class="{'icon-minus': open, 'icon-plus': !open}"
+        ></i>
+    </div>
+    <div class="content <?= $escaper->escapeHtmlAttr($block->getBlockCss()) ?>-content block"
+         :class="{ 'hidden': !open , 'block': open }"
+         id="<?= $escaper->escapeHtmlAttr($block->getBlockCss()) ?>">
+        <?= $block->getChildHtml() ?>
+    </div>
+</div>

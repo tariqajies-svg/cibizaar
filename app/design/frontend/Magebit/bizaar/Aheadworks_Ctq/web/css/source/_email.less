@@ -1,0 +1,300 @@
+// /**
+//  * This file is part of the Magebit/bizaar design package.
+//  *
+//  * DISCLAIMER
+//  *
+//  * Do not edit or add to this file if you wish to upgrade this package
+//  * to newer versions in the future.
+//  *
+//  * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+//  * @author    Magebit <info@magebit.com>
+//  * @license   MIT
+//  */
+
+.aw-ctq__history-info {
+    padding: 15px;
+
+    .history-label {
+        margin-bottom: 5px;
+    }
+
+    .history-value {
+        .action-item {
+            margin-bottom: 5px;
+        }
+
+        .label-text {
+            margin-right: 5px;
+        }
+    }
+
+    .old-value {
+        display: inline-block;
+        vertical-align: middle;
+        text-decoration: line-through;
+    }
+
+    .aw-ctq__right-arrow {
+        background-image: url('data:image/svg+xml;base64,PHN2ZyBhcmlhLWhpZGRlbj0idHJ1ZSIgZm9jdXNhYmxlPSJmYWxzZSIgZGF0YS1wcmVmaXg9ImZhcyIgZGF0YS1pY29uPSJhcnJvdy1yaWdodCIgY2xhc3M9InN2Zy1pbmxpbmUtLWZhIGZhLWFycm93LXJpZ2h0IGZhLXctMTQiIHJvbGU9ImltZyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDQ4IDUxMiI+PHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMTkwLjUgNjYuOWwyMi4yLTIyLjJjOS40LTkuNCAyNC42LTkuNCAzMy45IDBMNDQxIDIzOWM5LjQgOS40IDkuNCAyNC42IDAgMzMuOUwyNDYuNiA0NjcuM2MtOS40IDkuNC0yNC42IDkuNC0zMy45IDBsLTIyLjItMjIuMmMtOS41LTkuNS05LjMtMjUgLjQtMzQuM0wzMTEuNCAyOTZIMjRjLTEzLjMgMC0yNC0xMC43LTI0LTI0di0zMmMwLTEzLjMgMTAuNy0yNCAyNC0yNGgyODcuNEwxOTAuOSAxMDEuMmMtOS44LTkuMy0xMC0yNC44LS40LTM0LjN6Ij48L3BhdGg+PC9zdmc+');
+        background-repeat: no-repeat;
+        background-position: 0 0;
+        display: inline-block;
+        width: 11px;
+        height: 13px;
+        vertical-align: middle;
+        margin: 0 25px;
+    }
+
+    .new-value {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .aw-ctq__history-row {
+        margin-bottom: 15px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.aw-ctq__history-title {
+    .aw-ctq-owner-name {
+        font-weight: bold;
+        display: inline-block;
+        margin-right: 15px;
+        vertical-align: middle;
+    }
+
+    .aw-ctq-created-date {
+        font-weight: bold;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .aw-ctq-status {
+        display: inline-block;
+        margin-right: 15px;
+        vertical-align: middle;
+    }
+}
+
+.aw-ctq__quote-id {
+    label {
+        font-weight: bold;
+        color: @color-navy;
+    }
+
+    padding-top: @email-content__padding__base;
+    padding-bottom: @email-content__padding__base;
+}
+
+.aw-ctq__email-quote-items {
+    width: @table__width;
+    border-collapse: collapse;
+    border-spacing: 0;
+    max-width: @table__width;
+    border: @table__border-width @table__border-style @table__border-color;
+    border-left: unset;
+    border-right: unset;
+
+    thead {
+        color: @color-navy;
+    }
+
+    tfoot {
+        > tr {
+            > th,
+            > td {
+                background-color: @email__background-color;
+            }
+        }
+    }
+
+    > tbody {
+        > tr {
+            > th,
+            > td {
+                border-top: @table__border-width @table__border-style @table__border-color;
+            }
+        }
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    .quote-totals {
+        > tr {
+            > th {
+                font-weight: @font-weight__regular;
+
+                & + td {
+                    text-align: right;
+                }
+            }
+
+            > th,
+            > td {
+                padding: 14px 24px 8px;
+            }
+
+            & + tr {
+                th,
+                td {
+                    padding-top: 0;
+                }
+            }
+        }
+
+        .price {
+            color: @color-navy;
+            font-weight: @font-weight__semibold;
+            white-space: nowrap;
+        }
+
+        .grand.totals {
+            th {
+                strong {
+                    font-weight: @font-weight__regular;
+                }
+            }
+
+            > th,
+            > td {
+                padding: 0 24px 16px;
+            }
+
+            .price {
+                color: @color-blue;
+            }
+        }
+    }
+
+
+    .product-name {
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .product-item-photo {
+        display: table-cell;
+        max-width: 100%;
+        position: static;
+        vertical-align: top;
+        width: 1%;
+        padding-right: @email-content__padding__base;
+    }
+
+    .product-item-details {
+        display: table-cell;
+        vertical-align: top;
+        white-space: normal;
+        width: 99%;
+    }
+
+    .has-extra .sku {
+        font-size: 12px;
+        line-height: 20px;
+        margin-bottom: @email-content__padding__base;
+
+        strong {
+            color: @color-navy;
+            font-weight: 600;
+        }
+    }
+
+    .col.name {
+        padding: 15px 12px 16px 24px;
+
+        dl {
+            font-size: 12px;
+            line-height: 20px;
+            margin-bottom: 0;
+            padding-left: @email-content__padding__m;
+
+            dt,
+            dd {
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            dt {
+                font-weight: @font-weight__semibold;
+                color: @color-navy;
+            }
+
+            dd {
+                padding-left: @email-content__padding__base;
+            }
+        }
+    }
+
+    .col.qty,
+    .col.price {
+        text-align: left;
+        padding: 15px 12px 16px 12px;
+    }
+
+    .col.qty {
+        color: @color-navy;
+        font-weight: @font-weight__semibold;
+        white-space: nowrap;
+        font-size: 16px;
+    }
+
+    .col.subtotal {
+        text-align: right;
+        padding: 15px 24px 16px 12px;
+    }
+
+    .col.price,
+    .col.subtotal {
+        .price-including-tax,
+        .price-excluding-tax {
+            display: block;
+            font-size: 1.8rem;
+            line-height: 1;
+
+            .price {
+                color: @color-navy;
+                font-weight: @font-weight__semibold;
+                white-space: nowrap;
+                font-size: 16px;
+            }
+        }
+
+        .price-including-tax + .price-excluding-tax,
+        .weee[data-label] {
+            display: block;
+            font-size: 1.8rem;
+
+            &:before {
+                content: attr(data-label) ': ';
+                font-size: 1.1rem;
+            }
+
+            .price {
+                font-size: 1.1rem;
+            }
+        }
+    }
+}
+
+.aw-ctq__email_status {
+    padding: 10px 0;
+}
+
+.aw-ctq__email_action {
+    & > div {
+        & > div {
+            display: inline-block;
+        }
+
+        & > div:first-child {
+            color: @color-navy;
+            font-weight: @font-weight__semibold;
+        }
+    }
+}

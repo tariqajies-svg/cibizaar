@@ -1,0 +1,19 @@
+<?php
+/**
+ * This file is part of the Magebit_Customer package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magebit\Customer\Block\Widget\CustomerTelephone;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+?>
+
+<?php $telephone = $block->getLayout()->createBlock(CustomerTelephone::class) ?>
+<?= $telephone->setTelephone($block->getFormData() ? $block->getFormData()->getTelephone() : '')->toHtml() ?>

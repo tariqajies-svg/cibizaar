@@ -1,0 +1,10 @@
+Code,Country,State,Zip/Post Code,Rate,Zip/Post is Range,Range From,Range To,default
+Jebel,AE,*,0001,0,,,,
+BH,BH,*,*,5,,,,
+KW,KW,*,*,5,,,,
+UAE,AE,*,*,5,,,,
+OM,OM,*,*,5,,,,
+SA,SA,*,*,5,,,,
+QA,QA,*,*,5,,,,
+[Additional Charge] All UAE,AE,*,*,1.5,,,,
+[Additional Charge] UAE Jebel Ali 0%,AE,*,0001,0,,,,

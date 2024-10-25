@@ -1,0 +1,73 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCa\ViewModel\CustomerData;
+use Magebit\HyvaRequisitionLists\ViewModel\Modal\CreateNewListModal;
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+
+/** @var Wrapper $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var CreateNewListModal $modalViewModel */
+
+$pageTitleBlock = $block->getLayout()->getBlock('page.main.title');
+
+$pageTitle = $pageTitleBlock ? $pageTitleBlock->getPageTitle() : '';
+$modalViewModel = $viewModels->require(CreateNewListModal::class);
+$modal = $modalViewModel->getModal($block->getUrl($block->getFormAction()), $block->getFormKey(), $block->getBlockHtml('loading'));
+/** @var CustomerData $customerData */
+$customerData = $viewModels->require(CustomerData::class);
+?>
+
+<script>
+    function initFormActions() {
+        return {
+            isLoading: false,
+            error: false,
+            submitForm (event) {
+                this.isLoading = true;
+                this.$refs.listName.required = true;
+
+                if (!this.$refs.listName.form.checkValidity()) {
+                    this.isLoading = false;
+                    this.error = true;
+                    event.preventDefault();
+                }
+            }
+        }
+    }
+</script>
+
+<div
+    class="aw-rl__create-list-wrapper"
+    id="create-list"
+>
+    <div class="dashboard-top-info-block lg:pt-6 lg:pb-6.5">
+        <h2 class="title"><?= $escaper->escapeHtml($pageTitle) ?></h2>
+        <div class="action-button lg-max:!mt-1.5" x-data="hyva.modal()">
+            <button
+                @click="<?= $escaper->escapeHtmlAttr($modal->getShowJs()) ?>"
+                type="button"
+                class="btn btn-secondary create-button"
+            >
+                <?= $escaper->escapeHtml(__('Create New Requisition list')) ?>
+            </button>
+            <?= /** @noEscape */ $modal->withAriaLabel('create-list') ?>
+        </div>
+    </div>
+</div>

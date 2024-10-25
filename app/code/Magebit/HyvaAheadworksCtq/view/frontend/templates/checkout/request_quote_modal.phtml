@@ -1,0 +1,74 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\Checkout\RequestQuoteLink;
+use Hyva\Theme\Model\Modal\ModalBuilder;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magebit\HyvaAheadworksCtq\Helper\Data;
+use Magebit\HyvaAheadworksCtq\ViewModel\CompanyUser;
+use Magebit\HyvaAheadworksCtq\ViewModel\PermissionChecker;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var RequestQuoteLink $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var ModalBuilder $quoteModal */
+
+$viewModel = $block->getViewModel();
+$companyUserViewModel = $viewModels->require(CompanyUser::class);
+$permissionCheckerViewModel = $viewModels->require(PermissionChecker::class);
+?>
+<?php if ($companyUserViewModel->getCurrentCompanyUser() && $viewModel->isRequestQuoteAvailable() && $permissionCheckerViewModel->isQuoteAllowed()): ?>
+    <?php if ($viewModel->isRequestQuoteButtonAvailable()): ?>
+        <?php
+        $quoteModal = $viewModels->require(Modal::class)->getModal()
+            ->withBlockName('aw.ctq.create.request.modal')
+            ->withTemplate('Magebit_HyvaAheadworksCtq::checkout/request_quote_modal_content.phtml');
+        ?>
+        <script>
+            function initRequestQuoteModal<?= $escaper->escapeJs($quoteModal->getDialogRefName()) ?>() {
+                return {
+                    ...hyva.modal(),
+                    ucFirst(s) {
+                        return s.substr(0, 1).toUpperCase() + s.substr(1);
+                    },
+                    isModalOpenedVar(dialogRefName) {
+                        return 'is' + this.ucFirst(dialogRefName) + 'Open';
+                    },
+                    isModalOpened(dialogRefName) {
+                        return this[this.isModalOpenedVar(dialogRefName)];
+                    },
+                    // On popup open/close we trigger event
+                    watchOpenState(dispatch) {
+                        this.$watch(
+                            this.isModalOpenedVar('<?= $escaper->escapeJs($quoteModal->getDialogRefName()) ?>'),
+                            isOpen => window.dispatchEvent(new CustomEvent(
+                                '<?= $escaper->escapeJs(Data::IS_OPENED_QUOTE_MODAL_EVENT) ?>',
+                                {
+                                    detail: {isOpen: isOpen},
+                                },
+                            )),
+                        );
+                    },
+                };
+            }
+        </script>
+        <div x-data="initRequestQuoteModal<?= $escaper->escapeJs($quoteModal->getDialogRefName()) ?>()"
+             x-init="watchOpenState()"
+             @<?= $escaper->escapeHtmlAttr(Data::TOGGLE_REQUEST_QUOTE_MODAL_EVENT) ?>.window="<?= $escaper->escapeHtmlAttr($quoteModal->getShowJs()) ?>">
+            <?= /** @noEscape */ $quoteModal ?>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>

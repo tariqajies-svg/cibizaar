@@ -1,0 +1,68 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magefan\Blog\Block\Sidebar\TagClaud;
+use Magento\Framework\Escaper;
+
+/**
+ * Blog tag claud sidebar template
+ *
+ * @var TagClaud $block
+ * @var Escaper $escaper
+ */
+
+$tags = $block->getTags();
+
+if (count($tags)): ?>
+<div class="widget block block-tags relative p-5 bg-gray-f2 lg:px-8">
+    <div class="block-title mb-5 uppercase">
+        <h5><?= $escaper->escapeHtml(__('Tags')) ?></h5>
+    </div>
+
+    <ol class="tags-list pl-0 list-none" x-data="initTagList()">
+        <?php $i = 1;
+        foreach ($tags as $tag):
+            $title = $tag->getTitle(); ?>
+            <li class="tag-item leading-6 lg:leading-7" :class="{ 'hidden': !showMore && <?= /* @noEscape */ $i ?> > showLimit }">
+                <a  class="clear flex items-center lg:hover:text-navy"
+                    href="<?= $escaper->escapeUrl($tag->getTagUrl()) ?>"
+                    title="<?= $escaper->escapeHtml($title) ?>">
+                    <?= $escaper->escapeHtml($title) ?>
+                    <span class="count inline-block text-xs text-gray font-extrabold leading-5 bg-gray-e6 rounded px-2 ml-2">
+                        <?= $escaper->escapeHtml($tag->getCount()) ?>
+                    </span>
+                </a>
+            </li>
+            <?php $i++;
+        endforeach; ?>
+        <li class="leading-6 lg:leading-7" x-show="count > showLimit">
+            <span class="link no-underline flex items-center font-bold cursor-pointer" @click="showMore = !showMore">
+                <i class="pr-2" :class="showMore ? 'icon-minus' : 'icon-plus'"></i>
+                <span x-html="showMore ? 'Show less' : 'Show more'"></span>
+            </span>
+        </li>
+    </ol>
+</div>
+<script>
+    function initTagList() {
+        return {
+            showLimit: 5,
+            showMore: false,
+            count: <?= (int) count($tags) ?>
+        }
+    }
+</script>
+<?php endif; ?>

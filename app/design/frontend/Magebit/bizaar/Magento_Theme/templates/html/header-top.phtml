@@ -1,0 +1,92 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+//use Hyva\Theme\Model\Modal\ModalBuilder;
+// use Hyva\Theme\Model\ViewModelRegistry;
+// use Hyva\Theme\ViewModel\Modal;
+// use Hyva\Theme\ViewModel\StoreSwitcher;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+//use Hyva\Theme\ViewModel\Currency;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ModalBuilder $modal */
+// $modal = $viewModels->require(Modal::class)->getModal();
+// $currency = $viewModels->require(Currency::class);
+// $storeSwitcher = $viewModels->require(StoreSwitcher::class);
+?>
+<script>
+    function initHeaderTop() {
+        return {
+            compareProducts: null,
+            itemCount: 0,
+            wishlistCount: 0,
+            receiveCompareData(data) {
+                if (data['compare-products']) {
+                    this.compareProducts = data['compare-products'];
+                    this.itemCount = this.compareProducts.count;
+                }
+            },
+            receiveWishlistData(data) {
+                if (data.wishlist?.counter) {
+                    this.wishlistCount = data.wishlist.counter.match(/\d+/g);
+                }
+            }
+        }
+    }
+</script>
+<div id="top-header" class="top-header-bg hidden lg:block">
+    <div class="container top-header-bg-inner flex justify-center lg:justify-between py-2">
+        <!--Currency-->
+        <div class="flex items-center justify-center">
+        <?php echo $this->getLayout()->createBlock("Magento\Framework\View\Element\Template")->setTemplate("Magento_Theme::html/switcher.phtml")->toHtml() ?>
+        <?= $block->getChildHtml('header-top-info') ?>
+        </div>
+        <div class="toplinks-right hidden lg:flex items-center justify-center" x-data="initHeaderTop()">
+            <?= $block->getChildHtml('header-top-links-block') ?>
+            <!--Quick order-->
+            <!-- <a id="quick-order-link" href="<//?= $escaper->escapeUrl($block->getUrl('aw_quick_order')) ?>"
+               class="!text-gray lg:hover:!text-blue-darker active:!text-navy text-sm font-bold">
+                <//?= $escaper->escapeHtml(__('Quick Order')) ?>
+            </a> -->
+
+            <!--Compare button-->
+            <ul class="flex">
+                <li class="" :class="{ 'hidden invisible': !(wishlistCount > 0) }">
+                    <!--Wishlist button-->
+                    <a id="wishlist-link"
+                    class="no-underline"
+                    href="<?= $escaper->escapeUrl($block->getUrl('wishlist')) ?>"
+                    title="<?= $escaper->escapeHtml(__('Wish List')) ?>"
+                    @private-content-loaded.window="receiveWishlistData($event.detail.data)"
+                    >
+                        <span class="relative">
+                            <i class="icon-heart text-inherit"></i>
+                            <span class="counter absolute -top-2.5 right-auto min-w-4 h-4 text-nine font-semibold px-1 text-center text-white uppercase transform rounded-full bg-red-600 flex items-center justify-center block min-w-[16px]"
+                                x-text="wishlistCount"></span>
+                        </span>
+                        <span class="text-sm underline-offset-0.75 group-hover:underline group-active:underline lg:hidden xl:inline-block">
+                        <?= $escaper->escapeHtml(__('Wish List')) ?>
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+*
+* Magedelight
+* Copyright (C) 2023 Magedelight <info@Magedelight.com>
+*
+* @category Magedelight
+* @package Magedelight_Ga4
+* @copyright Copyright (c) 2023 Mage Delight (http://www.Magedelight.com/)
+* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+* @author Magedelight <info@Magedelight.com>
+*/
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <uiComponent name="ga4_record_grid_list"/>
+        </referenceContainer>
+        <referenceContainer name="js">
+            <block class="Magedelight\Ga4\Block\Adminhtml\Selector" template="Magedelight_Ga4::view/js.phtml" name="ga4.view.model.js" />
+        </referenceContainer>
+        <move element="js" destination="content" before="-"/>
+    </body>
+</page>

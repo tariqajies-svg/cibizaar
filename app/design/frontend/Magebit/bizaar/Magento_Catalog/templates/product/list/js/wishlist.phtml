@@ -1,0 +1,93 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Wishlist;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\Customer;
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+/** @var Wishlist $wishlistViewModel */
+$wishlistViewModel = $viewModels->require(Wishlist::class);
+$customer = $viewModels->require(Customer::class);
+
+?>
+<?php  if ($wishlistViewModel->isEnabled()): ?>
+<script>
+    function initWishlist() {
+        return {
+            isLoading: false,
+            addToWishlist(productId) {
+                const formKey = hyva.getFormKey();
+                const postUrl = BASE_URL + '<?= /** @noEscape */ $customer->customerLoggedIn() ? 'wishlist/index/add/?isAjax=1' : 'wishlist/index/add'?>';
+                this.isLoading = true;
+                fetch(postUrl, {
+                    "headers": {
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    "body": "form_key=" + formKey + "&product=" + productId + "&uenc=" + hyva.getUenc(),
+                    "method": "POST",
+                    "mode": "cors",
+                    "credentials": "include"
+                }).then(function (response) {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        this.isLoading = false;
+                    } else if (response.ok) {
+                        return response.json();
+                    } else {
+                        typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                            [{
+                                type: "warning",
+                                text: "<?= $escaper->escapeHtml(__('Could not add item to wishlist.')) ?>"
+                            }], 5000
+                        );
+                        this.isLoading = false;
+                    }
+                }).then(function (response) {
+                    if (!response) { return }
+                    typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                        [{
+                            type: (response.success) ? "success" : "error",
+                            text: (response.success)
+                                ? "<?= $escaper->escapeHtml(__(
+                                    "%1 has been added to your Wish List.",
+                                    __("Product")
+                                )) ?>"
+                                : response.error_message
+                        }], 5000
+                    );
+                    const reloadCustomerDataEvent = new CustomEvent("reload-customer-section-data");
+                    window.dispatchEvent(reloadCustomerDataEvent);
+                    this.isLoading = false;
+                }).catch(function (error) {
+                    typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                        [{
+                            type: "error",
+                            text: error
+                        }], 5000
+                    );
+                    this.isLoading = false;
+                }).finally(() => {
+                    this.isLoading = false;
+                })
+            }
+        }
+    }
+</script>
+<?php  endif; ?>

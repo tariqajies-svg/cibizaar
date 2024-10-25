@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Hide Price (Call for Price) for Magento 2
+ */-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="amasty_hideprice_request" resource="default" engine="innodb" comment="Amasty Hide price Requests">
+        <column xsi:type="varchar" name="company" nullable="false" length="255" comment="Company"/>
+         <column xsi:type="int" name="quantity" padding="11" unsigned="false" nullable="false" identity="false" default="0" comment="Quantity"/>
+    </table>
+</schema>

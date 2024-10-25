@@ -1,0 +1,36 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+<div class="carousel-nav absolute w-full top-1/2 transform -translate-y-1/2 hidden lg:block">
+    <button
+        aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>"
+        class="glider-prev btn btn-round absolute top-1/2 left-0 transform -translate-y-1/2">
+        <i class="icon-arrow-left"></i>
+    </button>
+
+    <button
+        aria-label="<?= $escaper->escapeHtml(__('Next')) ?>"
+        class="glider-next btn btn-round absolute top-1/2 right-0 transform -translate-y-1/2">
+        <i class="icon-arrow-right"></i>
+    </button>
+</div>
+<div role="tablist" class="glider-dots select-none flex flex-wrap justify-center py-4 lg:py-3 focus:outline-none lg:hidden"></div>

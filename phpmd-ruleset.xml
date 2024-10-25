@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Hyvä Ruleset">
+    <description>Custom PHPMD Ruleset for Hyvä Theme</description>
+    <rule ref="cleancode"/>
+    <rule ref="codesize"/>
+    <rule ref="controversial"/>
+    <rule ref="design"/>
+    <rule ref="naming"/>
+</ruleset>
+

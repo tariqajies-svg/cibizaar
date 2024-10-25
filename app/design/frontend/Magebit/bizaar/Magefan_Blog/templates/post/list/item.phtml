@@ -1,0 +1,112 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\MagefanBlog\ViewModel\PlaceholderImage;
+use Magefan\Blog\Block\Post\PostList\Item;
+use Magento\Framework\Escaper;
+use Magebit\ImageResizer\ViewModel\ImageResizer;
+
+/**
+ * Blog post list item template
+ *
+ * @var Item $block
+ * @var Escaper $escaper
+ * @var ViewModelRegistry $viewModels
+ */
+
+$placeholderViewModel = $viewModels->require(PlaceholderImage::class);
+$imageResizer = $viewModels->require(ImageResizer::class);
+
+$_post = $block->getPost();
+$_postUrl = $escaper->escapeUrl($_post->getPostUrl());
+$_postName = $escaper->escapeHtml($_post->getTitle());
+$_isHighLighted = (bool)$block->getIsHighLighted();
+$_lazyLoad = (bool)$block->getLazyLoad();
+$mediaDir = $imageResizer->getMediaDirectoryAbsolutePath();
+?>
+<div class="post-holder post-holder-<?= /* @noEscape */ (int)$_post->getId() ?> border rounded-[5px] lg:hover:shadow-item">
+    <div class="post-image">
+        <?php $featuredImage = $_post->getData('featured_list_img') ?: $_post->getData('featured_img');
+
+        if (!$imageResizer->fileExists($mediaDir . $featuredImage)):
+            $featuredImage = $placeholderViewModel->getImageSrc();
+        endif;
+
+        $featuredImgAlt = $_post->getData('featured_list_img_alt') ?: $_post->getData('featured_img_alt');
+
+        if (!$featuredImgAlt):
+            $featuredImgAlt = $_postName;
+        endif;
+        ?>
+        <div class="post-ftimg-hld relative rounded-tl-[5px] rounded-tr-[5px] overflow-hidden before:block
+                    before:pt-[100%] before:w-full <?php if ($_isHighLighted): ?>
+                    max-h-[312px] lg:max-h-[573px]
+                    <?php else: ?>
+                    max-h-[168px] lg:max-h-[280px]
+                    <?php endif; ?>">
+            <a class="block mx-auto absolute w-full left-0 top-1/2 -translate-y-1/2 rounded-tl-[5px] rounded-tr-[5px]"
+               href="<?= $escaper->escapeUrl($_postUrl) ?>"
+               title="<?= $escaper->escapeHtml($_postName) ?>">
+                <img class="object-cover w-full lg:min-w-[335px] <?php if ($_isHighLighted): ?>max-h-[312px] lg:max-h-[573px]<?php else: ?>max-h-[168px] lg:max-h-[280px]<?php endif; ?>"
+                     <?php if ($_isHighLighted): ?>
+                            <?php // Same image sizes must be in preload template Magefan_Blog::page/head/list/preload.phtml?>
+                         srcset="<?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 370, 312, true)) ?> 370w,
+                                 <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 702, 312, true)) ?> 702w,
+                                 <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 969, 573, true)) ?> 969w,
+                                 <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 1144, 573, true)) ?> 1144w"
+                     <?php else: ?>
+                         srcset="<?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 370, 168, true)) ?> 370w,
+                                 <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 702, 168, true)) ?> 702w,
+                                 <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 471, 280, true)) ?> 969w,
+                                 <?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 559, 280, true)) ?> 1144w"
+                     <?php endif; ?>
+                         src="<?= $escaper->escapeUrl($imageResizer->resize($mediaDir . $featuredImage, 370, 168, true)) ?>"
+                         sizes="(max-width: 428px) 370px,
+                                (max-width: 1023px) 702px,
+                                (max-width: 1366px) 969px,
+                                (min-width: 1367px) 1144px"
+                     <?php if ($_lazyLoad): ?>
+                         loading="lazy"
+                     <?php endif; ?>
+                         alt="<?= $escaper->escapeHtml($featuredImgAlt) ?>"
+                />
+            </a>
+        </div>
+    </div>
+    <div class="post-content-wrapper p-5 lg:px-8">
+        <div class="post-header">
+            <?= /* @noEscape */ $block->getInfoHtml() ?>
+
+            <div class="post-title-holder pb-1 <?php if ($_isHighLighted): ?>lg:pb-0<?php else: ?>lg:pb-2<?php endif; ?>">
+                <h3 class="post-title <?php if ($_isHighLighted): ?>text-lg lg:text-3xl<?php else: ?>text-base lg:text-xl<?php endif; ?>">
+                    <a class="post-item-link <?php if ($_isHighLighted): ?>!text-navy<?php endif; ?>"
+                       href="<?= /* @noEscape */ $_postUrl ?>">
+                        <?= /* @noEscape */ $_postName ?>
+                    </a>
+                </h3>
+            </div>
+        </div>
+
+        <div class="post-content overflow-hidden h-[144px] lg:h-[112px] <?php if ($_isHighLighted): ?>lg:hidden<?php endif; ?>">
+            <div class="post-description clearfix">
+                <div class="post-text-hld clearfix">
+                    <?= /* @noEscape */ $block->getShortFilteredContentWithoutImages() ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

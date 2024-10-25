@@ -1,0 +1,84 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Block\Product\ListProduct;
+use Magento\Catalog\Block\Product\ReviewRendererInterface;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var ListProduct $block */
+/** @var ViewModelRegistry $viewModels */
+
+$productViewModel    = $viewModels->require(ProductPage::class);
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+?>
+<?php if ($block->getProductCollection() && $block->getProductCollection()->getSize()): ?>
+    <?php
+    $type = 'widget-product-carousel';
+    $mode = 'grid';
+    $image = 'new_products_content_widget_grid';
+    $items = $block->getProductCollection()->getItems();
+    $templateType = ReviewRendererInterface::SHORT_VIEW;
+    $description = false;
+    ?>
+    <div class="glider-contain product-items relative <?= /* @noEscape */ $type ?>" x-data="initProductSlider()" x-spread="eventListeners">
+        <div class="glider-border-left" x-ref="glider-border-left"></div>
+        <div data-role="glider-content"
+             data-count="<?= $escaper->escapeHtml(count($items)) ?>"
+             x-ref="slider-content"
+             class="mx-auto grid relative overflow-y-hidden overflow-x-scroll">
+            <?php foreach ($items as $item): ?>
+                <?= $productListItemViewModel->getItemHtml($item, $block, $mode, $templateType, $image, $description, [], 3) ?>
+            <?php endforeach ?>
+        </div>
+        <?php if (count($items) > 3): ?>
+            <?= $block->getBlockHtml('pagebuilder.product.carousel.nav') ?>
+        <?php endif; ?>
+        <div class="glider-border-right" x-ref="glider-border-right"></div>
+    </div>
+    <script>
+        function initProductSlider() {
+            return {
+                initialHeight: null,
+                eventListeners: {
+                    ['@product-item-mouseenter.window'](event) {
+                        const item = event.detail.querySelector('div.product-item-content');
+                        const slider = this.$refs['slider-content']
+                        const itemViewportOffset = item.getBoundingClientRect();
+                        const sliderViewportOffset = slider.getBoundingClientRect();
+
+                        if (itemViewportOffset.top > sliderViewportOffset.top && itemViewportOffset.bottom < sliderViewportOffset.bottom) {
+                            if (itemViewportOffset.left - 2 <=  sliderViewportOffset.left) {
+                                this.$refs['glider-border-left'].style.height = `${item.clientHeight}px`;
+                            }
+
+                            if (itemViewportOffset.right + 2 >=  sliderViewportOffset.right) {
+                                this.$refs['glider-border-right'].style.height = `${item.clientHeight}px`;
+                            }
+                        }
+                    },
+                    ['@product-item-mouseleave.window'](event) {
+                        this.$refs['glider-border-left'].style.height = 0;
+                        this.$refs['glider-border-right'].style.height = 0;
+                    },
+                }
+            }
+        }
+    </script>
+<?php endif ?>

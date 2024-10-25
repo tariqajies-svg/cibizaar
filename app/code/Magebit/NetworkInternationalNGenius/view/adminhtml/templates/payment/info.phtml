@@ -1,0 +1,38 @@
+<?php
+/**
+ * This file is part of the Magebit_NetworkInternationalNGenius package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\NetworkInternationalNGenius\Block\Info;
+use Magebit\NetworkInternationalNGenius\ViewModel\Payment\Info as PaymentInfoViewModel;
+use Magento\Framework\Escaper;
+use Magento\Sales\Model\Order;
+
+/** @var Info $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Order $order */
+
+$paymentInfoViewModel = $viewModels->require(PaymentInfoViewModel::class);
+
+$order = $block->getInfo()->getOrder();
+$ngeniusPaymentDetails = $paymentInfoViewModel->getNgeniusPaymentDetails($order);
+?>
+<dl class="payment-method">
+    <dt class="title"><?= $escaper->escapeHtml($block->getMethod()->getTitle()) ?></dt>
+    <?php if ($ngeniusPaymentDetails->getId()): ?>
+        <?php
+        $currencyCode = $ngeniusPaymentDetails->getCurrency();
+        $amount = $ngeniusPaymentDetails->getAmount();
+        $formatedPrice = $order->getBaseCurrency()->formatTxt($amount);
+        ?>
+        <dt><?= $escaper->escapeHtml(__('Paid in %1 currency.', $currencyCode)) ?></dt>
+        <dt><strong><?= $escaper->escapeHtml(__('Amount: %1', $formatedPrice)) ?></strong></dt>
+    <?php endif ?>
+</dl>

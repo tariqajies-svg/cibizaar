@@ -1,0 +1,46 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Block\History\Action\DefaultRenderer;
+use Aheadworks\Ctq\Model\Source\History\Action\Type;
+use Magento\Framework\Escaper;
+
+/** @var DefaultRenderer $block */
+/** @var Escaper $escaper */
+
+$action = $block->getAction();
+
+$oldValueClass = '';
+$newValuesClass = '';
+
+if ($action->getType() === Type::QUOTE_ATTRIBUTE_BASE_TOTAL_NEGOTIATED || $action->getType() === Type::QUOTE_ATTRIBUTE_BASE_TOTAL) {
+    $oldValueClass = 'font-bold text-navy';
+    $newValuesClass = 'font-bold text-navy';
+}
+?>
+<div>
+    <div class="text-xs text-navy font-bold mb-1.75 lg:text-sm">
+        <?= $escaper->escapeHtml($block->getHistoryViewModel()->getActionTypeFormatted($action->getType())) ?>
+    </div>
+    <div class="mb-4.25 lg:mb-5.25">
+        <?php if ($action->getOldValue()): ?>
+            <span class="whitespace-nowrap leading-7 mr-0.75 line-through <?= $escaper->escapeHtmlAttr($oldValueClass) ?>">
+                <?= $escaper->escapeHtml($block->getPreparedValue($action->getOldValue())) ?></span>
+            <i class="icon-arrow-right align-text-bottom text-blue mr-0.75"></i>
+        <?php endif; ?>
+        <span class="whitespace-nowrap leading-7 <?= $escaper->escapeHtmlAttr($newValuesClass) ?>">
+            <?= $escaper->escapeHtml($block->getPreparedValue($action->getValue())) ?>
+        </span>
+    </div>
+</div>

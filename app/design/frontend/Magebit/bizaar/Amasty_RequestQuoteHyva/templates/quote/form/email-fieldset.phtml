@@ -1,0 +1,157 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Quote\Details;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+
+/** @var Details $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$heroIcons = $viewModels->require(HeroiconsOutline::class);
+?>
+<fieldset x-cloak
+          x-show="!window.checkoutConfig.isCustomerLoggedIn"
+          x-data="initAmQuoteEmailFieldset()"
+          id="customer-email-fieldset"
+          class="fieldset amquote-email-fieldset border-b-2 pb-6 border-gray-300">
+    <div class="field required">
+        <input x-ref="context" name="context" type="hidden" value="checkout"/>
+        <label class="label text-sm font-normal leading-6 mb-1 clear" for="customer-email">
+            <span><?= $escaper->escapeHtml($block->getData('email_title')) ?></span>
+        </label>
+        <div class="control flex flex-row">
+            <input @input.debounce.1000ms="checkEmailAvailability(); $dispatch('persist-field-values')"
+                   x-ref="emailInput"
+                   :required="!window.checkoutConfig.isCustomerLoggedIn"
+                   class="form-input flex-grow w-full"
+                   type="email"
+                   name="email"
+                   id="customer-email"/>
+            <div class="flex justify-center items-center ml-4 cursor-pointer relative group">
+                <?= $heroIcons->questionMarkCircleHtml('h-7 w-7', 28, 28) ?>
+                <div
+                    class="invisible group-hover:visible text-sm card absolute p-3 bottom-3.5 w-max max-w-[200px] -translate-y-8 right-0"
+                    role="tooltip"
+                    aria-hidden="true">
+                    <?= $escaper->escapeHtml(__(
+                        'We\'ll send notifications about the quote to the inserted email address. '
+                        . 'Please note that if you want to track a quote status '
+                        . 'on the website you have to <a href="%1">register</a> before submitting the quote.',
+                        $block->getUrl('customer/account/create')
+                    ), ['a']) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <template x-if="isPasswordVisible">
+        <fieldset class="fieldset mt-3">
+            <div class="field required">
+                <label class="label text-sm font-normal leading-6 mb-1 clear" for="customer-password">
+                    <span><?= $escaper->escapeHtml(__('Password')) ?></span>
+                </label>
+                <div class="control">
+                    <input x-ref="password"
+                           class="form-input w-full mb-3"
+                           placeholder="<?= $escaper->escapeHtml(__('Password')) ?>"
+                           type="password"
+                           required
+                           name="password"
+                           id="customer-password"
+                           autocomplete="off"></input>
+                    <span class="note text-sm">
+                    <?= $escaper->escapeHtml(__('You already have an account with us. Please sign in.')) ?>
+                </span>
+                </div>
+            </div>
+            <?= $block->getChildHtml('cart.details.additional-login-form-fields') ?>
+            <div class="flex gap-3 mt-5">
+                <div class="primary">
+                    <button @click.prevent="loginRequest()"
+                            :disabled="isLoginProcessed"
+                            type="submit"
+                            class="btn btn-primary">
+                        <?= $escaper->escapeHtml(__('Login')) ?>
+                    </button>
+                </div>
+                <div class="secondary flex">
+                    <a class="action remind flex items-center text-blue-600 hover:underline hover:cursor-pointer"
+                       title="<?= $escaper->escapeHtmlAttr(__('Forgot Your Password?')) ?>"
+                       :href="window.checkoutConfig.forgotPasswordUrl">
+                        <?= $escaper->escapeHtml(__('Forgot Your Password?')) ?>
+                    </a>
+                </div>
+            </div>
+        </fieldset>
+    </template>
+</fieldset>
+
+<script>
+    function initAmQuoteEmailFieldset() {
+        return {
+            isPasswordVisible: false,
+            isLoginProcessed: false,
+            controller: new AbortController(),
+            checkEmailAvailability: function () {
+                if (!this.$refs.emailInput.reportValidity()) {
+                    this.isPasswordVisible = false;
+                    return;
+                }
+
+                this.abortCheckEmail();
+                fetch(
+                    `${BASE_URL}rest/${CURRENT_STORE_CODE}/V1/amasty_quote/isEmailAvailable/${encodeURIComponent(this.$refs.emailInput.value.trim())}`,
+                    { method: 'GET', signal: this.controller.signal }
+                ).then((response) => {
+                    return response.json();
+                }).then((response) => {
+                    this.isPasswordVisible = !response;
+                });
+            },
+            abortCheckEmail: function () {
+                this.controller.abort();
+                this.controller = new AbortController();
+            },
+            loginRequest: function () {
+                this.isLoginProcessed = true;
+                const loginData = {
+                    context: this.$refs.context.value,
+                    password: this.$refs.password.value,
+                    username: this.$refs.emailInput.value
+                };
+
+                fetch('<?= $escaper->escapeUrl($block->getUrl('customer/ajax/login')) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(loginData)
+                }).then(response => {
+                    return response.json()
+                }).then(data => {
+                    this.isLoginProcessed = false;
+                    if (data.errors) {
+                        typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                            [{
+                                type: 'error',
+                                text: data.message
+                            }],
+                            5000
+                        );
+                    } else {
+                        window.location.reload();
+                    }
+                }).finally(() => {
+                    this.isLoginProcessed = false;
+                });
+            }
+        };
+    }
+</script>

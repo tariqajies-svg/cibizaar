@@ -1,0 +1,76 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Sparsh\ProductAttachment\ViewModel\Product\View;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+/** @var Product $product */
+$product = $productViewModel->getProduct();
+
+    $viewModel = $viewModels->require(View::class);
+    $title = $viewModel->getConfigValue('productattachment/general/title');
+    $sortOrder = $viewModel->getConfigValue('productattachment/general/sort_order');
+    $block->setData('title', $title);
+    $block->setData('sort_order', $sortOrder);
+    $attachmentList = $viewModel->getAttachments();
+    $mediaPath = $viewModel->getAttachmentMediaPath()."sparsh/product_attachment/";
+    $count =  $attachmentList->getSize();
+
+if (!$product->getDescription()) {
+    return;
+}
+?>
+<div class="prose product-description-wrapper">
+    <?= $productViewModel->productAttributeHtml($product, $product->getDescription(), 'description') ?>
+</div>
+<!-- <div id="downloadpdf" class="mt-8">
+    <h4 class="font-semibold"><?php echo __('Technical Specs / Datasheet') ?></h4>
+    <div class="lg:flex gap-4 mt-4 text-center text-sm">
+        <a href="#" class="bg-gray-100 border rounded p-3 lg:w-1/3 mb-3 md:mb-0 flex md:justify-center text-black clear"><img class="mr-2"
+                src="<?php echo $block->getBaseUrl().'media/wysiwyg/pdp/pdf.svg' ?>"
+                alt=""><?php echo __('Technical Specs / Datasheet - MikroTik hAP ax2') ?></a>
+        <a href="#" class="bg-gray-100 border rounded p-3 lg:w-1/3 mb-3 md:mb-0 flex md:justify-center text-black clear"><img class="mr-2"
+                src="<?php echo $block->getBaseUrl().'media/wysiwyg/pdp/pdf.svg' ?>"
+                alt=""><?php echo __('Quick Start Guide - MikroTik hAP ax2') ?></a>
+        <a href="#" class="bg-gray-100 border rounded p-3 lg:w-1/3 mb-3 md:mb-0 flex md:justify-center text-black clear"><img class="mr-2"
+                src="<?php echo $block->getBaseUrl().'media/wysiwyg/pdp/pdf.svg' ?>"
+                alt=""><?php echo __('User Manual - MikroTik hAP ax2') ?></a>                
+    </div>    
+</div> -->
+<div id="downloadpdf" class="mt-8">
+    <div class="lg:flex gap-4 mt-4 text-center text-sm">
+        <?php foreach ($attachmentList->getData() as $attachment): ?>
+            <?php if (!empty($attachment['title']) && (!empty($attachment['attach_file']))): ?>
+                <?php $fileurl = $mediaPath . $attachment['attach_file'] ?>
+                <a href="<?= /* @noEscape */
+                    __($fileurl); ?>" target="_blank" class="bg-gray-100 border rounded p-3 lg:w-1/3 mb-3 md:mb-0 flex md:justify-center text-black clear"><img class="mr-2"
+                src="<?php echo $block->getBaseUrl().'media/wysiwyg/pdp/pdf.svg' ?>"
+                alt=""><?= /* @noEscape */
+                        __($attachment['title']); ?></a>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </ul>
+</div>

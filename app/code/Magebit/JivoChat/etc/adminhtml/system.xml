@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_JivoChat package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_JivoChat
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit<info@magebit.com>
+ * @license   MIT
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="jivochat" sortOrder="10" translate="label" showInWebsite="1" showInStore="1" showInDefault="1">
+            <label>Jivo Chat</label>
+            <tab>magebit</tab>
+            <resource>Magebit_JivoChat::config_magebit_jivochat</resource>
+            <group id="general" sortOrder="10" showInWebsite="1" showInStore="1" showInDefault="1" translate="label">
+                <label>Jivo Chat</label>
+                <field id="enable" type="select" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Jivo Chat</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="source" type="text" translate="label" sortOrder="20" showInWebsite="1" showInStore="1" showInDefault="1">
+                    <label>Jivo Chat Source URL</label>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

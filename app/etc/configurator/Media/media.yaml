@@ -1,0 +1,188 @@
+wysiwyg:
+  -
+    name: footer-payments.png
+    location: app/etc/configurator/Media/content/footer/payments.png
+  -
+    name: footer-payments_2x.png
+    location: app/etc/configurator/Media/content/footer/payments_2x.png
+  -
+    name: footer-payments-mobile.png
+    location: app/etc/configurator/Media/content/footer/payments-mobile.png
+  -
+    name: footer-payments-mobile_2x.png
+    location: app/etc/configurator/Media/content/footer/payments-mobile_2x.png
+  -
+    name: footer-logo_bizaar-2x.png
+    location: app/etc/configurator/Media/content/footer/logo_bizaar-2x.png
+  -
+    name: bg_slider-mikrotik.jpg
+    location: app/etc/configurator/Media/content/home/bg_slider-mikrotik.jpg
+  -
+    name: bg_slider-mikrotik-mobile.jpg
+    location: app/etc/configurator/Media/content/home/bg_slider-mikrotik-mobile.jpg
+  -
+    name: logo_mikrotik.png
+    location: app/etc/configurator/Media/content/home/logo_mikrotik.png
+  -
+    name: logo_mikrotik-mobile-1.png
+    location: app/etc/configurator/Media/content/home/logo_mikrotik-mobile-1.png
+  -
+    name: banner-1.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-1.jpg
+  -
+    name: banner-1-mobile.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-1-mobile.jpg
+  -
+    name: banner-2.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-2.jpg
+  -
+    name: banner-2-mobile.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-2-mobile.jpg
+  -
+    name: banner-3.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-3.jpg
+  -
+    name: banner-3-mobile.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-3-mobile.jpg
+  -
+    name: banner-4.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-4.jpg
+  -
+    name: banner-4-mobile.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-4-mobile.jpg
+  -
+    name: banner-5.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-5.jpg
+  -
+    name: banner-5-mobile.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-5-mobile.jpg
+  -
+    name: banner-1_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-1_1x.jpg
+  -
+    name: banner-1-mobile_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-1-mobile_1x.jpg
+  -
+    name: banner-2_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-2_1x.jpg
+  -
+    name: banner-2-mobile_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-2-mobile_1x.jpg
+  -
+    name: banner-3_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-3_1x.jpg
+  -
+    name: banner-3-mobile_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-3-mobile_1x.jpg
+  -
+    name: banner-4_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-4_1x.jpg
+  -
+    name: banner-4-mobile_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-4-mobile_1x.jpg
+  -
+    name: banner-5_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-5_1x.jpg
+  -
+    name: banner-5-mobile_1x.jpg
+    location: app/etc/configurator/Media/content/home/promo/banner-5-mobile_1x.jpg
+  -
+    name: Epson_4.jpg
+    location: app/etc/configurator/Media/content/home/Epson_4.jpg
+  -
+    name: Epson_5.jpg
+    location: app/etc/configurator/Media/content/home/Epson_5.jpg
+  -
+    name: Aduba_9.jpg
+    location: app/etc/configurator/Media/content/home/Aduba_9.jpg
+  -
+    name: Epson_2.jpg
+    location: app/etc/configurator/Media/content/home/Epson_2.jpg
+  -
+    name: Aduba_7.jpg
+    location: app/etc/configurator/Media/content/home/Aduba_7.jpg
+  -
+    name: logo_mikrotik-mobile.jpg
+    location: app/etc/configurator/Media/content/home/logo_mikrotik-mobile.jpg
+  -
+    name: bg_slider-mikrotik-mobile2.jpeg
+    location: app/etc/configurator/Media/content/home/bg_slider-mikrotik-mobile2.jpeg
+  -
+    name: bizaar_desktop_PNG.png
+    location: app/etc/configurator/Media/content/aboutus/bizaar_desktop_PNG.png
+  -
+    name: bizaar_mobile_PNG.png
+    location: app/etc/configurator/Media/content/aboutus/bizaar_mobile_PNG.png
+  -
+    name: Banner.jpg
+    location: app/etc/configurator/Media/content/aboutus/Banner.jpg
+  -
+    name: Value_1.png
+    location: app/etc/configurator/Media/content/aboutus/Value_1.png
+  -
+    name: Value_2.png
+    location: app/etc/configurator/Media/content/aboutus/Value_2.png
+  -
+    name: Value_3.png
+    location: app/etc/configurator/Media/content/aboutus/Value_3.png
+  -
+    name: Value_4.png
+    location: app/etc/configurator/Media/content/aboutus/Value_4.png
+  -
+    name: our_vision_cat.png
+    location: app/etc/configurator/Media/content/aboutus/our_vision_cat.png
+  -
+    name: our_mission_cat.png
+    location: app/etc/configurator/Media/content/aboutus/our_mission_cat.png
+  -
+    name: our_products_cat.png
+    location: app/etc/configurator/Media/content/aboutus/our_products_cat.png
+  -
+    name: quote.png
+    location: app/etc/configurator/Media/content/aboutus/quote.png
+  -
+    name: team_1.png
+    location: app/etc/configurator/Media/content/aboutus/team_1.png
+logo:
+  default:
+    -
+      name: logo_bizaar.png
+      location: app/etc/configurator/Media/content/header/logo_bizaar.png
+    -
+      name: logo_bizaar-2x.png
+      location: app/etc/configurator/Media/content/header/logo_bizaar-2x.png
+sales:
+  store:
+    logo:
+      default:
+        - name: logo_bizaar.png
+          location: app/etc/configurator/Media/content/header/logo_bizaar.png
+    logo_html:
+        default:
+          - name: logo_bizaar.png
+            location: app/etc/configurator/Media/content/header/logo_bizaar.png
+email:
+  logo:
+    default:
+      - name: logo_bizaar.png
+        location: app/etc/configurator/Media/content/email/logo_bizaar.png
+favicon:
+  default:
+    - name: bizaar_favicon_128.png
+      location: app/etc/configurator/Media/content/header/bizaar_favicon_128.png
+magefan_blog:
+  -
+    name: image_bizaar-cat-1_1.png
+    location: app/etc/configurator/Media/content/magefan_blog/image_bizaar-cat-1_1.png
+catalog:
+  category:
+    brand_logo:
+      -
+        name: logo_epson.jpg
+        location: app/etc/configurator/Media/content/home/logo_epson.jpg
+      -
+        name: logo_aruba_1.jpg
+        location: app/etc/configurator/Media/content/home/logo_aruba_1.jpg
+      -
+        name: logo_aruba.jpg
+        location: app/etc/configurator/Media/content/home/logo_aruba.jpg

@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/view.xsd">
+    <media>
+        <images module="Magento_Catalog">
+            <image id="mini_cart_product_thumbnail" type="thumbnail">
+                <width>70</width>
+                <height>70</height>
+            </image>
+            <image id="cart_cross_sell_products" type="small_image">
+                <width>319</width>
+                <height>192</height>
+            </image>
+            <image id="new_products_content_widget_grid" type="small_image">
+                <width>343</width>
+                <height>192</height>
+            </image>
+            <image id="swatch_image" type="swatch_image">
+                <width>120</width>
+                <height>24</height>
+            </image>
+            <image id="aw_qo_small_image" type="thumbnail">
+                <width>80</width>
+                <height>80</height>
+            </image>
+            <image id="smile_elasticsuite_autocomplete_product_image" type="thumbnail">
+                <width>78</width>
+                <height>78</height>
+            </image>
+
+            <!-- Used on PDP -->
+            <!--  max-width: 411px -->
+            <image id="product_page_main_image_small_mobile" type="image">
+                <width>318</width>
+                <height>318</height>
+            </image>
+            <!--  max-width: 767px -->
+            <image id="product_page_main_image_mobile" type="image">
+                <width>370</width>
+                <height>370</height>
+            </image>
+            <!--  max-width: 1023px -->
+            <image id="product_page_main_image_tablet" type="image">
+                <width>340</width>
+                <height>340</height>
+            </image>
+            <!--  max-width: 1279px -->
+            <image id="product_page_main_image_large_tablet" type="image">
+                <width>466</width>
+                <height>466</height>
+            </image>
+            <!--  max-width: 1535 -->
+            <image id="product_page_image_small_desktop" type="image">
+                <width>391</width>
+                <height>391</height>
+            </image>
+            <!--  min-width: 1536 -->
+            <image id="product_page_image_medium" type="image">
+                <width>473</width>
+                <height>473</height>
+            </image>
+
+            <!-- Used on PLP -->
+            <!--  max-width: 411px -->
+            <image id="category_page_grid_small_mobile" type="image">
+                <width>148</width>
+                <height>89</height>
+            </image>
+            <!--  max-width: 767px -->
+            <image id="category_page_grid_mobile" type="image">
+                <width>166</width>
+                <height>100</height>
+            </image>
+            <!--  max-width: 1023px -->
+            <image id="category_page_grid_tablet" type="image">
+                <width>167</width>
+                <height>100</height>
+            </image>
+            <!--  max-width: 1279px -->
+            <image id="category_page_grid_large_tablet" type="image">
+                <width>172</width>
+                <height>103</height>
+            </image>
+            <!--  max-width: 1535 -->
+            <image id="category_page_grid_small_desktop" type="image">
+                <width>258</width>
+                <height>156</height>
+            </image>
+            <!--  min-width: 1536 -->
+            <image id="category_page_grid" type="small_image">
+                <width>318</width>
+                <height>192</height>
+            </image>
+        </images>
+    </media>
+</view>

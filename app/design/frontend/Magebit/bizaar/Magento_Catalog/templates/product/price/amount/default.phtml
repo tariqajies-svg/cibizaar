@@ -1,0 +1,43 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Pricing\Render\Amount;
+use Magento\Framework\Escaper;
+
+/** @var Amount $block */
+/** @var Escaper $escaper */
+?>
+<span class="price-container <?= $escaper->escapeHtmlAttr($block->getAdjustmentCssClasses()) ?>"
+        <?= $block->getSchema() ? ' itemprop="offers" itemscope itemtype="http://schema.org/Offer"' : '' ?>>
+    <?php if ($block->getDisplayLabel()): ?>
+        <span class="price-label"><?= $escaper->escapeHtml($block->getDisplayLabel()) ?></span>
+    <?php endif; ?>
+    <span <?php if ($block->getPriceId()): ?> id="<?= $escaper->escapeHtmlAttr($block->getPriceId()) ?>"<?php endif;?>
+        <?= ($block->getPriceDisplayLabel()) ? 'data-label="' . $escaper->escapeHtmlAttr($block->getPriceDisplayLabel() . $block->getPriceDisplayInclExclTaxes()) . '"' : '' ?>
+        data-price-amount="<?= $escaper->escapeHtmlAttr((string)$block->getDisplayValue()) ?>"
+        data-price-type="<?= $escaper->escapeHtmlAttr($block->getPriceType()) ?>"
+        class="price-wrapper <?= $escaper->escapeHtmlAttr($block->getPriceWrapperCss()) ?>"
+    >
+        <span class="price block" x-html="hyva.formatPrice(<?= (float)$block->getDisplayValue() ?>)"></span>
+    </span>
+    <?php if ($block->hasAdjustmentsHtml()): ?>
+        <?= $block->getAdjustmentsHtml() ?>
+    <?php endif; ?>
+    <?php if ($block->getSchema()): ?>
+        <meta itemprop="price" content="<?= $escaper->escapeHtmlAttr((string)$block->getDisplayValue()) ?>" />
+        <meta itemprop="priceCurrency" content="<?= $escaper->escapeHtmlAttr($block->getDisplayCurrencyCode()) ?>" />
+    <?php endif; ?>
+</span>

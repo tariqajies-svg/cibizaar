@@ -1,0 +1,51 @@
+<?php
+/** @var \Magento\Catalog\Model\Product $product */
+$product = $block->getProduct(); // Assuming you pass the product object to the block
+?>
+
+<?php $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+//$product = $objectManager->create('\Magento\Catalog\Model\Product')->load($productId);
+
+$imageHelper = $objectManager->get('\Magento\Catalog\Helper\Image');
+$imageUrl = $imageHelper->init($product, 'product_base_image')->getUrl();?>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "<?php echo $product->getName(); ?>",
+    "image":"<?php echo $imageUrl; ?>",
+    "description": "<?php echo $product->getDescription(); ?>",
+    "sku": "<?php echo $product->getSku(); ?>",
+    "mpn": "",
+    "brand": {
+        "@type": "Brand",
+        "name": "<?php echo $product->getAttributeText('manufacturer'); ?>"
+    },
+    "review": {
+        "@type": "Review",
+        "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "",
+        "bestRating": ""
+        },
+        "author": {
+        "@type": "Person",
+        "name": ""
+        }
+    },
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "",
+        "reviewCount": ""
+    },
+    "offers": {
+        "@type": "Offer",
+        "url": "",
+        "priceCurrency": "<?php echo $block->getCurrencyCode(); ?>",
+        "price": "<?php echo $product->getFinalPrice(); ?>",
+        "priceValidUntil": "",
+        "itemCondition": "https://schema.org/UsedCondition",
+        "availability": "https://schema.org/<?php echo $product->isAvailable() ? 'InStock' : 'OutOfStock'; ?>"
+    }
+}
+</script>

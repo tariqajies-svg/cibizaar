@@ -1,0 +1,49 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCreditLimit package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\CreditLimit\Block\Customer\TotalList;
+use Magebit\HyvaAheadworksCreditLimit\ViewModel\Pricing;
+use Magento\Framework\Escaper;
+
+/** @var TotalList $block */
+/** @var Pricing $viewModel */
+/** @var Escaper $escaper */
+
+$viewModel = $block->getData('view_model');
+
+$jsonData = json_decode($block->getJsLayout());
+$totals = $jsonData->components->aw_cl_top_totals_data_provider->data->aw_credit_limit->totals;
+?>
+
+<div class="mb-7.25 lg:mb-8">
+<h2 class="lg-max:mt-4 mb-4.75 lg:mb-8"><?= $escaper->escapeHtml(__('Credit Details')) ?></h2>
+<div class="flex flex-col gap-y-2 lg:flex-row lg:justify-between lg:gap-x-6">
+    <div class="border border-gray-e6 p-5 rounded pb-4.5 w-full lg:p-7.75 lg:pb-7.5">
+        <span class="text-sm text-navy font-bold block mb-1 lg:text-base lg:mb-2.25"><?= $escaper->escapeHtml(__('Approved Credit Limit')) ?>:</span>
+        <span class="text-lg font-bold text-blue lg:text-xl"><?= $escaper->escapeHtml($viewModel->getFormattedPrice($totals->credit_balance)) ?></span>
+    </div>
+
+    <div class="border border-gray-e6 p-5 rounded pb-4.5 w-full lg:p-7.75 lg:pb-7.5">
+        <span class="text-sm text-navy font-bold block mb-1 lg:text-base lg:mb-2.25"><?= $escaper->escapeHtml(__('Current Outstanding Balance')) ?>:</span>
+        <span class="text-lg font-bold text-blue lg:text-xl"><?= $escaper->escapeHtml($viewModel->getFormattedPrice($totals->credit_available)) ?></span>
+    </div>
+
+    <div class="border border-gray-e6 p-5 rounded pb-4.5 w-full lg:p-7.75 lg:pb-7.5">
+        <span class="text-sm text-navy font-bold block mb-1 lg:text-base lg:mb-2.25"><?= $escaper->escapeHtml(__('Available Balance Credit')) ?>:</span>
+        <span class="text-lg font-bold text-blue lg:text-xl"><?= $escaper->escapeHtml($viewModel->getFormattedPrice($totals->credit_limit)) ?></span>
+    </div>
+</div>
+</div>

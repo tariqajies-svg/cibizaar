@@ -1,0 +1,19 @@
+<!-- ko if: isVisible() -->
+<form class="order-po-number form">
+    <fieldset class="fieldset">
+        <div class="field">
+            <label class="label">
+                <span data-bind="i18n: label"></span>
+                <span style="font-weight: 300">
+                    (<span data-bind="i18n: 'max length'"></span>
+                    <span>32</span>)
+                </span>
+            </label>
+            <input class="input-text"
+                   name="po_number"
+                   type="text"
+                   maxlength="32">
+        </div>
+    </fieldset>
+</form>
+<!-- /ko -->

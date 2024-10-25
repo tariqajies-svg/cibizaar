@@ -1,0 +1,61 @@
+.pdp-pro-name h1,
+.product-description {
+    @apply overflow-hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+}
+.pdp-right-section {
+    @apply md:max-w-[205px];
+    img.mx-auto.mb-5 {
+        @apply max-w-[163px];
+    }
+}
+.pro-middle .pro-label {
+    @apply static inline-block w-fit lg:rounded-tl-none lg:rounded-bl-none mb-4;
+}
+.pdp-brand-logo img {
+    @apply max-w-[128px];
+}
+.border-round-30 {
+    @apply rounded-[30px];
+}
+.roundedonefour {
+    @apply rounded-[14px];
+}
+.pdp-phone-number p:before {
+    @apply content-[""] bg-[#008700] w-2 h-2 inline-block rounded-full;
+}
+.product-view-qty .form-input {
+    max-width: 130px;
+}
+.price-container .vat {
+    line-height: 0;
+}
+.pdp-sku-container {
+    @apply text-[#737373];
+}
+.pdp-option-radio .radio-field .form-radio {
+    @apply ml-[-6px];
+}
+.pdp-option-radio.radio-field-container {
+    @apply gap-2.5 xl:grid xl:grid-cols-2;
+}
+.pdp-option-radio .radio-field .label {
+    @apply -mt-2.5 pl-12 mb-2.5 xl:mb-0 text-black;
+}
+.pdp-option-radio .radio-field .label span {
+    @apply pl-0;
+}
+.amasty-hide-price-container:not(.btn, .clear) {
+    @apply inline-block bg-[#EDF7EB] border px-8 py-2 w-full text-center rounded-md border-solid border-[#008700] text-[#008700] hover:text-white font-bold hover:bg-blue-darker hover:!no-underline active:text-white visited:text-white hover:border-blue-darker;
+}
+.product-description-wrapper .pagebuilder-column-line {
+    @apply md:gap-x-10 md:gap-x-14 xl:gap-x-20;
+}
+.pdp-price-container {
+    .flex-row-reverse {
+        flex-direction: row-reverse;
+    }
+}

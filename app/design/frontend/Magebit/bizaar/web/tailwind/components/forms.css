@@ -1,0 +1,285 @@
+/**
+ * different styles can be found at https://tailwindcss-forms.vercel.app/
+ **/
+.form-input,
+.form-email,
+.form-select,
+.form-multiselect,
+.form-textarea {
+    @apply block bg-white border border-gray-e6 py-2.75 lg:py-3.25 px-4.75 lg:px-5.75 pr-10 w-full rounded text-sm
+        lg:text-base lg:leading-6 font-normal;
+
+    &::placeholder {
+        @apply text-gray;
+    }
+
+    &.hover,
+    &:hover:not(:disabled, :focus) {
+        &::placeholder {
+            @apply lg:text-navy;
+        }
+    }
+
+    &.focus,
+    &:focus {
+        @apply border-blue outline-none ring-0;
+
+        &::placeholder {
+            @apply text-navy;
+        }
+    }
+
+    &:disabled {
+        @apply bg-gray-f2;
+
+        &::placeholder {
+            @apply text-gray;
+        }
+    }
+
+    &.invalid\:error:invalid,
+    &.error {
+        @apply border-error;
+    }
+
+    &-sm {
+        @apply py-1.75 lg:py-2.25 px-4.75;
+    }
+}
+
+.form-select-sm {
+    @apply pr-11.75;
+}
+
+select,
+.phone-code-selector {
+    @apply cursor-pointer bg-no-repeat appearance-none;
+
+    background-image: url('../images/ic_dropdown-gray.svg');
+    background-position: right 23px center;
+    background-size: 14px;
+
+    &:disabled {
+        @apply opacity-100;
+    }
+
+    option {
+        @apply whitespace-normal font-semibold;
+    }
+}
+
+label:not(.inline-label, .clear) {
+    @apply block text-navy text-xs font-bold mb-2;
+}
+
+.required label,
+label.required {
+    @apply whitespace-nowrap;
+
+    &::after {
+        @apply text-xs leading-none text-error;
+
+        content: ' *';
+    }
+}
+
+textarea {
+    @apply h-auto;
+}
+
+.inline-label {
+    @apply inline-flex items-center w-max;
+
+    &:hover {
+        input:not(:disabled) {
+            @apply md:border-blue;
+        }
+    }
+
+    & > span {
+        @apply font-normal pl-2.5;
+    }
+}
+
+[type='radio'] {
+    transform: translate(20px, 26px);
+
+    @screen lg {
+        transform: translate(24px, 28px);
+    }
+
+    @apply flex justify-center items-center h-5 w-5 text-white border border-gray-e6 rounded-full -mt-2 appearance-none;
+
+    & + label {
+        @apply text-gray border rounded pl-9.75 lg:pl-10.75 pr-5.75 py-3.75 cursor-pointer w-full -mt-3;
+
+        & > span {
+            @apply pl-4;
+        }
+    }
+
+    &:hover:not(:disabled) {
+        & + label {
+            @screen lg {
+                @apply text-navy border-blue;
+            }
+        }
+    }
+
+    &:focus {
+        @apply ring-0 ring-offset-0 outline-none border-blue;
+
+        & + label {
+            @apply text-navy border-blue;
+        }
+    }
+
+    &:checked {
+        &::before {
+            content: '';
+
+            @apply block w-2 h-2 bg-white rounded-full;
+        }
+
+        &:not(:disabled) {
+            @apply bg-blue border-blue;
+
+            & + label {
+                @apply border-blue text-navy;
+            }
+        }
+    }
+
+    &:disabled {
+        &::before {
+            @apply bg-gray;
+        }
+
+        & + label {
+            @apply bg-gray-f2;
+        }
+    }
+}
+
+[type='checkbox'] {
+    @apply flex justify-center items-center h-[0.9rem] w-[0.9rem] text-white border border-[#BDBDBD] rounded-sm relative appearance-none;
+
+    & + span {
+        @apply text-black;
+    }
+
+    &:hover:not(:disabled) {
+        @apply md:border-blue cursor-pointer;
+
+        & + span {
+            @apply cursor-pointer text-black;
+        }
+    }
+
+    &:focus {
+        @apply ring-0 ring-offset-0 outline-none border-[#4A40F6];
+    }
+
+    &:checked {
+        &::before {
+            content: '\e919';
+
+            @apply absolute font-icomoon text-xs text-center leading-none;
+        }
+
+        &:not(:disabled) {
+            @apply bg-[#4A40F6] border-[#4A40F6];
+
+            & + span {
+                @apply text-black;
+            }
+        }
+    }
+
+    &:disabled {
+        @apply bg-gray-f2 hover:bg-gray-f2 text-gray pointer-events-none; 
+    }
+}
+
+[type='search'] {
+    @apply border rounded w-full;
+
+    &:hover:not(:disabled, :focus) {
+        &::placeholder {
+            @apply text-navy;
+        }
+    }
+
+    &:focus {
+        @apply border-blue ring-0;
+
+        &::placeholder {
+            @apply text-navy;
+        }
+    }
+
+    &::-webkit-search-decoration,
+    &::-webkit-search-cancel-button {
+        display: none;
+    }
+}
+
+[type='number'] {
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        @apply appearance-none m-0;
+    }
+}
+
+form,
+fieldset {
+    .field.field-preserved,
+    .field.field-reserved {
+        ul {
+            @apply pl-0 list-none;
+
+            li::before {
+                @apply hidden;
+            }
+        }
+
+        &.field-error {
+            input,
+            .form-input,
+            .form-email,
+            .form-select,
+            .form-multiselect,
+            .form-textarea {
+                @apply border-error;
+            }
+        }
+    }
+
+    .field.field-error .messages {
+        @apply text-error text-2xs lg:text-xs font-bold;
+    }
+
+    .field-pagebuilder {
+        .inline-label {
+            @apply w-auto;
+        }
+
+        [data-content-type='row'] {
+            @apply px-4 m-0;
+
+            div {
+                @apply p-0 m-0;
+            }
+
+            p {
+                @apply text-gray;
+            }
+        }
+
+        .messages {
+            @apply text-error text-2xs lg:text-xs font-bold absolute -mt-2;
+        }
+    }
+}

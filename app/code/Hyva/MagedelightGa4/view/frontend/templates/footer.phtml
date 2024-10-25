@@ -1,0 +1,42 @@
+<?php
+/**
+ * Magedelight
+ * Copyright (C) 2022 Magedelight <info@Magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_Ga4
+ * @copyright Copyright (c) 2022 Mage Delight (http://www.Magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@Magedelight.com>
+ */
+?>
+<?php $_helper = $block->dataHelper();
+$cookieConcent = $_helper->getCookie();
+$accessible = 1;
+if ($_helper->getGDPRStatus()) {
+    if (isset($cookieConcent)) {
+        $accessible = 1;
+    } else {
+        $accessible = 0;
+    }
+}
+?>
+<?php if ($_helper->isGTMStatus() && $accessible == 1): ?>
+    <!-- Start of MageDelight GA4 Extension -->
+    <?= $_helper->getGTMNonJsCode(); ?>
+    <script>
+      window.addEventListener('private-content-loaded', event => setupAjaxListener(event.detail.data));
+      function setupAjaxListener(data) {
+          var dataLayerData = data.ga4.datalayer;
+          if(dataLayerData.length > 0){
+              var dataLayerData = JSON.parse(dataLayerData);
+              for (index in dataLayerData) {
+                console.log(dataLayerData[index]);
+                window.dataLayer.push(dataLayerData[index]);
+               }
+               data.ga4.datalayer = [];
+        }
+      }
+    </script>
+<!-- End of MageDelight GA4 Extension -->
+<?php endif; ?>

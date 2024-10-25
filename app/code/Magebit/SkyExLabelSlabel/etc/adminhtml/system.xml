@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_SkyExLabelSlabel package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="skyex_label_config">
+            <group id="skyex_label_general">
+                <field id="skyex_key">
+                    <validate>required-entry</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

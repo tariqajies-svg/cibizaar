@@ -1,0 +1,61 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+?>
+<script>
+    'use strict';
+
+    function initAmQuoteButton(addUrl, isProductListing, isLoggedIn) {
+        return {
+            addUrl: addUrl,
+            isProductListing: isProductListing,
+            isLoggedIn: isLoggedIn,
+            initButton: function ($el) {
+                if (!this.isProductListing) {
+                    $el.parentNode.classList.add('flex-wrap');
+                }
+            },
+            submitQuote: function ($el) {
+                const originalForm = this.getFormNode($el);
+                if (!originalForm || !originalForm.checkValidity()) {
+                    originalForm?.reportValidity();
+                    return;
+                }
+
+                const formToSubmit = this.cloneForm(originalForm);
+                formToSubmit.action = this.isProductListing
+                    ? formToSubmit.action.replace('checkout', 'amasty_quote')
+                    : this.addUrl;
+                formToSubmit.classList.add('hidden');
+                document.body.appendChild(formToSubmit);
+                formToSubmit.requestSubmit();
+            },
+            getFormNode: function ($el) {
+                if (this.isProductListing) {
+                    return $el.closest('form');
+                }
+
+                return $el.form;
+            },
+            cloneForm: function(originalForm) {
+                const clonedForm = originalForm.cloneNode();
+                Array.from(originalForm.elements).forEach((element) => {
+                    const clonedElement = element.cloneNode(true);
+                    this.removeAlpineAttributes(clonedElement.attributes);
+                    clonedElement.removeAttribute('form');
+                    clonedForm.appendChild(clonedElement);
+                });
+
+                return clonedForm;
+            },
+            removeAlpineAttributes: function (AttrNodeMap) {
+                Array.from(AttrNodeMap)
+                    .filter((attribute) => /^(:|x-|@)\S*/.test(attribute.name))
+                    .forEach((attribute) => AttrNodeMap.removeNamedItem(attribute.name));
+            }
+        };
+    }
+</script>

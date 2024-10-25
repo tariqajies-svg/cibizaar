@@ -1,0 +1,11 @@
+attribute_sets:
+-
+  name: Default
+  inherit: Default
+  groups:
+    -
+      name: Product Details
+      code: product_details
+      attributes:
+        - manufacturer
+        - back_in_stock

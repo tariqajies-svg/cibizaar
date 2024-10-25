@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Aheadworks\RequisitionLists\Controller\RList\Add">
+        <plugin name="add_product_requisition_list" type="Magebit\HyvaRequisitionLists\Plugin\Controller\Add"
+                sortOrder="1" disabled="false"/>
+    </type>
+    <preference for="Aheadworks\RequisitionLists\Controller\RList\AddToCart"
+                type="Magebit\HyvaRequisitionLists\Plugin\Controller\AddToCart"/>
+    <preference for="Aheadworks\RequisitionLists\Controller\RList\UpdateItemQty"
+                type="Magebit\HyvaRequisitionLists\Plugin\Controller\UpdateItemQty"/>
+    <type name="Aheadworks\RequisitionLists\Controller\RList\Delete">
+        <plugin name="requisition_list_local_storage" type="Magebit\HyvaRequisitionLists\Plugin\LocalStoragePlugin"
+                sortOrder="1" disabled="false"/>
+    </type>
+    <preference for="Aheadworks\RequisitionLists\Controller\RList\Configure"
+                type="Magebit\HyvaRequisitionLists\Plugin\Controller\Configure"/>
+    <preference for="Aheadworks\RequisitionLists\Ui\Component\RequisitionList\Item\Listing\Column\Price"
+                type="Magebit\HyvaRequisitionLists\Plugin\Item\Listing\Column\Price"/>
+    <preference for="Aheadworks\RequisitionLists\Model\Product\DetailProvider\Pool"
+                type="Magebit\HyvaRequisitionLists\Plugin\Model\Product\DetailProvider\Pool"/>
+    <preference for="Aheadworks\RequisitionLists\Model\Product\DetailProvider\BundleProvider"
+                type="Magebit\HyvaRequisitionLists\Plugin\Model\Product\DetailProvider\BundleProvider"/>
+    <preference for="Aheadworks\RequisitionLists\Model\Product\DetailProvider\ConfigurableProvider"
+                type="Magebit\HyvaRequisitionLists\Plugin\Model\Product\DetailProvider\ConfigurableProvider"/>
+    <preference for="Aheadworks\RequisitionLists\Model\Product\DetailProvider\GroupedProvider"
+                type="Magebit\HyvaRequisitionLists\Plugin\Model\Product\DetailProvider\GroupedProvider"/>
+    <preference for="Aheadworks\RequisitionLists\Model\Product\DetailProvider\SimpleProvider"
+                type="Magebit\HyvaRequisitionLists\Plugin\Model\Product\DetailProvider\SimpleProvider"/>
+    <preference for="Aheadworks\RequisitionLists\Ui\Component\RequisitionList\Item\Listing\Column\Name"
+                type="Magebit\HyvaRequisitionLists\Plugin\Item\Listing\Column\Name"/>
+    <preference for="Aheadworks\RequisitionLists\Block\Customer\MyAccountLink" type="Magebit\Aheadworks\Block\MyAccountLinks\MyAccountLink" />
+</config>

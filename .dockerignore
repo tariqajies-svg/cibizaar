@@ -1,0 +1,12 @@
+.git/
+.gitignore
+.idea/
+
+vendor/
+!vendor/.htaccess
+var/
+!var/.htaccess
+!var/.regenerate
+!var/.maintenance.flag
+generated/
+!generated/.htaccess

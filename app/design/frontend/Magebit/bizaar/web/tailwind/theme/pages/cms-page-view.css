@@ -1,0 +1,69 @@
+.cms-page-view {
+
+    /* Text */
+    [data-content-type='text'] {
+        img {
+            @apply inline-block;
+        }
+
+        table {
+            @apply w-full text-left;
+
+            td {
+                @apply font-semibold text-sm;
+            }
+
+            .table-actions {
+                a,
+                button {
+                    @apply inline-flex text-gray lg:hover:text-blue-darker active:text-navy lg:active:text-navy;
+                }
+            }
+
+            tbody {
+                @apply border-t;
+
+                tr {
+                    @apply border-b;
+                }
+            }
+
+            th,
+            td {
+                @apply px-0;
+
+                &:not(:last-child) {
+                    @apply pr-5;
+                }
+            }
+
+            th[scope='row'],
+            td:not(.table-actions) {
+                @apply py-7.25;
+            }
+
+            td.table-actions {
+                @apply align-middle space-x-2 whitespace-nowrap;
+            }
+        }
+    }
+
+    /* Buttons */
+    a,
+    button,
+    div {
+        &.pagebuilder-button-primary {
+            @screen lg {
+                &.hover,
+                &:hover {
+                    @apply text-white;
+                }
+            }
+
+            &.active,
+            &:active {
+                @apply text-white;
+            }
+        }
+    }
+}

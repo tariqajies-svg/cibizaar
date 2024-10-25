@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="ajax_actions"/>
+    <body>
+        <referenceBlock name="preload">
+            <block class="Magento\Catalog\Block\Product\View\Gallery"
+                   name="product.info.media.image.preload"
+                   template="Magento_Catalog::page/head/view/preload.phtml">
+                <arguments>
+                    <argument name="gallery_options" xsi:type="object">Magento\Catalog\Block\Product\View\GalleryOptions</argument>
+                    <argument name="imageHelper" xsi:type="object">Magento\Catalog\Helper\Image</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+
+        <referenceBlock name="page.main.title">
+            <arguments>
+                <argument name="css_class" xsi:type="string">mb-5 md:hidden</argument>
+            </arguments>
+        </referenceBlock>
+        <!-- <referenceContainer name="top.container">
+            <block name="product.info.purchase_option"
+                   template="Magento_Catalog::product/view/purchase-option.phtml" />
+        </referenceContainer> -->
+        <referenceBlock name="product.info">
+            <block name="product.item.discount"
+                   template="Magento_Catalog::product/list/price/discount-label.phtml"/>
+            <block class="Magebit\Catalog\Block\Product\View\BackInStock"
+                    name="product.info.back_in_stock"
+                    template="Magento_Catalog::product/view/back-in-stock.phtml"/>
+        </referenceBlock>
+        <move element="alert.urdesls" destination="product.info.additional" as="alert.urls"/>
+
+
+        <referenceBlock name="upsell">
+            <arguments>
+                <argument name="title" xsi:type="string" translate="true">Buy with this product</argument>
+                <argument name="subtitle" xsi:type="string" translate="true">Explore what you can buy with this product</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="related">
+            <arguments>
+                <argument name="title" xsi:type="string" translate="true">Related Products</argument>
+                <!-- <argument name="subtitle" xsi:type="string" translate="true">Explore products the customers also bought</argument> -->
+            </arguments>            
+        </referenceBlock>
+
+        <referenceBlock name="product.attributes" class="Magebit\Catalog\Product\View\Attributes">
+            <arguments>
+                <argument name="title" xsi:type="string" translate="true">Specification</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="product.info.stockstatus" remove="true"/>
+        <referenceBlock name="attachment.tab" remove="true"/>
+    </body>
+</page>

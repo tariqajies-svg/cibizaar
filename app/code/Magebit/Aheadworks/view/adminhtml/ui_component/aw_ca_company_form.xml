@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+      component="Aheadworks_Ca/js/ui/form/company_form">
+    <fieldset name="extended" sortOrder="15">
+        <settings>
+            <collapsible>false</collapsible>
+            <label>Company Extended</label>
+            <dataScope>company_extend</dataScope>
+        </settings>
+        <field name="description" sortOrder="40" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Company Description</label>
+                <dataScope>description</dataScope>
+            </settings>
+        </field>
+        <field name="website" sortOrder="45" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Company Website</label>
+                <dataScope>website</dataScope>
+            </settings>
+        </field>
+        <field name="tln" sortOrder="20" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Trade License Number</label>
+                <dataScope>tln</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+</form>

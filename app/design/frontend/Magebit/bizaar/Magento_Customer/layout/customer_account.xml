@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="phone-code-component"/>
+    <body>
+        <referenceBlock name="page.main.title" template="Magento_Customer::account/title.phtml"/>
+        <referenceBlock name="sidebar.main.account_nav" template="Magento_Customer::account/collapsible.phtml">
+            <referenceBlock name="customer-account-navigation-quick-order-link" remove="true"/>
+            <referenceBlock name="customer-account-navigation-stock-subscriptions-link" remove="true"/>
+            <referenceBlock name="customer-account-navigation-delimiter-1" remove="true"/>
+            <referenceBlock name="customer.account.navigation.aw.ca.delimiter.top" remove="true"/>
+            <referenceBlock name="customer-account-navigation-downloadable-products-link" remove="true"/>
+            <referenceBlock name="customer-account-navigation-my-credit-cards-link" remove="true"/>
+
+            <referenceBlock name="customer.account.navigation.aw.requisition.lists"
+                            class="Magebit\Aheadworks\Block\MyAccountLinks\Requisition">
+                <arguments>
+                    <argument name="sortOrder" xsi:type="number">90</argument>
+                </arguments>
+            </referenceBlock>
+            <referenceBlock name="aw-ctq-customer-account-navigation-quotes-link"
+                            class="Magebit\Aheadworks\Block\MyAccountLinks\MyQuotes">
+                <arguments>
+                    <argument name="sortOrder" xsi:type="number">70</argument>
+                </arguments>
+            </referenceBlock>
+            <referenceBlock name="customer.account.navigation.aw.ca.company"
+                            class="Magento\Customer\Block\Account\SortLinkInterface">
+                <arguments>
+                    <argument name="sortOrder" xsi:type="number">60</argument>
+                </arguments>
+            </referenceBlock>
+            <referenceBlock name="customer.account.navigation.aw.ca.user"
+                            class="Magento\Customer\Block\Account\SortLinkInterface">
+                <arguments>
+                    <argument name="sortOrder" xsi:type="number">50</argument>
+                </arguments>
+            </referenceBlock>
+            <referenceBlock name="customer.account.navigation.aw.ca.role"
+                            class="Magento\Customer\Block\Account\SortLinkInterface">
+                <arguments>
+                    <argument name="sortOrder" xsi:type="number">45</argument>
+                </arguments>
+            </referenceBlock>
+            <referenceBlock name="customer-account-navigation-credit-limit-link"
+                            class="Magebit\Aheadworks\Block\MyAccountLinks\CreditLimit">
+                <arguments>
+                    <argument name="sortOrder" xsi:type="number">44</argument>
+                </arguments>
+            </referenceBlock>
+        </referenceBlock>
+        <referenceBlock name="aw-ctq-customer-account-navigation-quotes-link" remove="true"/>
+    </body>
+</page>

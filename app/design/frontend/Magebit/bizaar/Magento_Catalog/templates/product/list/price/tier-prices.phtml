@@ -1,0 +1,89 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Magebit\Catalog\ViewModel\TierPrices;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Pricing\Price\TierPrice;
+use Magento\Framework\Escaper;
+use Magento\Framework\Pricing\Amount\Base;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Product $product */
+$product = $block->getProduct();
+
+/** @var ProductPrice $productPriceViewModel */
+$productPriceViewModel = $viewModels->require(ProductPrice::class);
+
+/** @var TierPrice $tierPrices */
+$tierPrices = $productPriceViewModel->getTierPrices(TierPrice::PRICE_CODE, $product);
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+$tierPricesViewModel = $viewModels->require(TierPrices::class);
+
+$productId = $product->getId();
+$showTierPrice = $tierPricesViewModel->isTierPriceAllowed();
+$hidePriceHelper = $this->helper('\Amasty\HidePrice\Helper\Data');
+
+if (!$hidePriceHelper->isNeedHideProduct($product)) {
+?>
+<?php if (count($tierPrices)): ?>
+    <div x-data="{tooltip: false}" class="contents">
+        <button type="button" @click="tooltip = true" class="link hidden lg:block">
+            <?= $escaper->escapeHtml(__('Bulk Prices')) ?>
+        </button>
+        <div class="absolute right-0 z-30 bubble-bottom bottom-left -top-2 transform -translate-y-full"
+             x-cloak
+             x-show="tooltip"
+             @click.away="tooltip = false"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-90"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-90">
+            <?php if (!$showTierPrice): ?>
+                <div class="text-sm font-semibold text-black text-center mb-2"><?= /** @noEscape  */ $tierPricesViewModel->getBulkPriceMessage() ?></div>
+            <?php endif; ?>
+            <div class="flex flex-col text-sm font-bold" :class="{'opacity-50': <?= /** @noEscape */ $showTierPrice ? 0 : 1 ?>}">
+                <div class="flex justify-between gap-6 mb-2 pb-1.75 border-b">
+                    <span><?= $escaper->escapeHtml(__('Quantity')) ?></span>
+                    <span><?= $escaper->escapeHtml(__('Price')) ?></span>
+                </div>
+                <?php foreach ($tierPrices as $key => $tierPrice): ?>
+                    <div class="flex justify-between<?= /** @noEscape */ $key != 0 ? ' mt-1' : '' ?>">
+                        <?php
+                        /** @var Base $price */
+                        $price = $tierPrice['price'];
+                        ?>
+                        <span><?= $escaper->escapeHtml($tierPrice['price_qty']) ?>+</span>
+                        <span class="text-navy <?= $escaper->escapeHtmlAttr(!$showTierPrice ? 'blurred' : '') ?>"
+                              x-text="hyva.formatPrice('<?= $escaper->escapeJs($showTierPrice ? $price->getValue() : 123.4) ?>')">
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+<?php } ?>

@@ -1,0 +1,193 @@
+<?php
+/**
+ * This file is part of the Magebit_TwoFa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_TwoFa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+/** @var Template $block */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magebit\TwoFa\ViewModel\TwoFa;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+$modalViewModel = $viewModels->require(Modal::class);
+$twoFaViewModel = $viewModels->require(TwoFa::class);
+?>
+<div x-data="TwoFaInit()" x-spread="eventListeners" x-init="init()">
+    <?= /** @noEscape  */$modalViewModel->getModal()
+            ->withTemplate('Magebit_TwoFa::modal/form.phtml')
+            ->withDialogRefName('two-fa-modal') ?>
+</div>
+<script>
+    function TwoFaInit() {
+        return {
+            ...hyva.modal(),
+            methods: JSON.parse('<?= /** @noEscape */ json_encode($twoFaViewModel->getMethods()) ?>'),
+            activeMethods: null,
+            message: null,
+            customerEmail: null,
+            isSelecting: true,
+            selectedMethodCode: null,
+            selectedMethod: null,
+            timeLeftInterval: null,
+            endsIn: null,
+            isLoading: false,
+            timeLeftString: '',
+            hasTimeLeft: true,
+            redirectOnSuccess: null,
+            code: null,
+            init() {
+                Object.assign(this, hyva.formValidation(this.$refs.form));
+            },
+            selectMethod() {
+                this.selectedMethod = this.methods.find(method => method.value === this.selectedMethodCode);
+                this.isLoading = true;
+                if (this.selectedMethod) {
+                    this.message = null;
+                    const body = new URLSearchParams({
+                        form_key: hyva.getFormKey(),
+                        email: this.customerEmail,
+                        method: this.selectedMethodCode
+                    });
+                    fetch('<?= $escaper->escapeUrl($block->getUrl('twofa/auth/selectmethod')) ?>', {
+                        method: "POST",
+                        mode: "cors",
+                        credentials: "include",
+                        headers: {
+                            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                        },
+                        body: body
+                    }).then((response) => {
+                        this.isLoading = false;
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    }).then(data => {
+                        if (data && data.success) {
+                            this.isSelecting = false;
+                            this.endsIn = Date.parse(new Date()) + (this.selectedMethod.expiresIn * 1000) - 1000;
+                            this.startTimeLeft();
+                            this.$nextTick(() => this.$refs.codeInput.focus());
+                        } else if (data && data.message) {
+                            this.message = {
+                                text: data.message,
+                                success: false
+                            };
+                        } else {
+                            this.message = {
+                                text: '<?= $escaper->escapeJs(__('Something went wrong. Please try different method.')) ?>',
+                                success: false
+                            }
+                        }
+                    }).catch(error => {
+                        this.message = {
+                            text: error,
+                            success: false
+                        };
+                    });
+                }
+            },
+            formatTimeLeft() {
+                const total = this.endsIn - Date.parse(new Date());
+                if (total < 1000) {
+                    this.endTimeLeft()
+                }
+                const seconds = Math.floor( ( total / 1000) % 60 );
+                const minutes = Math.floor( ( total / 1000 / 60) % 60 );
+                this.timeLeftString = `${this.padWithLeadingZeros(minutes, 2)}:${this.padWithLeadingZeros(seconds, 2)}`;
+            },
+            padWithLeadingZeros(num, totalLength) {
+                return String(num).padStart(totalLength, '0');
+            },
+            startTimeLeft() {
+                if (this.timeLeftInterval) {
+                    clearInterval(this.timeLeftInterval);
+                }
+                this.hasTimeLeft = true;
+                this.formatTimeLeft();
+                this.timeLeftInterval = setInterval(this.formatTimeLeft.bind(this), 1000);
+            },
+            endTimeLeft() {
+                clearInterval(this.timeLeftInterval);
+                this.hasTimeLeft = false;
+            },
+            onMethodChange() {
+                this.isSelecting = true;
+            },
+            onFormSubmit() {
+                this.isLoading = true;
+                this.validate().then(() => {
+                    const params = {
+                        form_key: hyva.getFormKey(),
+                        code: this.code,
+                        email: this.customerEmail,
+                        method: this.selectedMethodCode
+                    }
+                    if (this.redirectOnSuccess) {
+                        params.redirectOnSuccess = this.redirectOnSuccess;
+                    }
+                    const body = new URLSearchParams(params);
+                    fetch('<?= $escaper->escapeUrl($block->getUrl('twofa/auth/submitcode')) ?>', {
+                        method: "POST",
+                        mode: "cors",
+                        credentials: "include",
+                        headers: {
+                            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                        },
+                        body: body
+                    }).then((response) => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else if (response.ok) {
+                            this.isLoading = false;
+                            return response.json();
+                        }
+                    }).then(data => {
+                        if (data.message) {
+                            this.message = {
+                                text: data.message,
+                                success: false
+                            };
+                        }
+                    });
+                }).catch((invalid) => {
+                    this.isLoading = false;
+                    if (invalid.length > 0) {
+                        invalid[0].focus();
+                    }
+                });
+            },
+            initModal(data) {
+                this.activeMethods = this.methods.filter(method => data.allowedMethods.includes(method.value));
+                this.isSelecting = true;
+                this.selectedMethodCode = this.activeMethods.length ? this.activeMethods[0].value : null;
+                this.customerEmail = data.email;
+                this.redirectOnSuccess = data.redirectOnSuccess;
+                this.isLoading = false;
+                this.code = null;
+                this.show('two-fa-modal');
+            },
+            eventListeners: {
+                ['@show-two-fa.window'](event) {
+                    if (event.detail.email) {
+                        this.initModal(event.detail);
+                    }
+                }
+            }
+        }
+    }
+</script>

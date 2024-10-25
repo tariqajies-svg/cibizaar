@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Bizaar
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp/etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="sibautomation" type="host">sibautomation.com</value>
+                <value id="jivo" type="host">*.jivosite.com</value>
+                <value id="cloudflare" type="host">*.cloudflare.com</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="sibautomation" type="host">sibautomation.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="sendinblue" type="host">*.sendinblue.com</value>
+                <value id="sendinblue" type="host">*.brevo.com</value>
+                <value id="jivo" type="host">*.jivosite.com</value>
+                <value id="wssjivo" type="host">wss://*.jivosite.com</value>
+                <value id="whatsappwidget" type="host">*.amazonaws.com</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="jivo" type="host">*.jivosite.com</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="jivo" type="host">*.jivosite.com</value>
+                <value id="whatsappwidget" type="host">*.amazonaws.com</value>
+                <value id="blob" type="host">blob:</value>
+            </values>
+        </policy>
+        <policy id="media-src">
+            <values>
+                <value id="jivo" type="host">*.jivosite.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

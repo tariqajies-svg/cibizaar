@@ -1,0 +1,21 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaTheme package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+
+use Magebit\HyvaTheme\Controller\Menu\Index;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+?>
+<div id="<?= /** @noEscape */ $block->getData(Index::AJAX_MENU_UNIQUE_ID)?>">
+    <?= $block->getChildHtml('topmenu') ?>
+</div>

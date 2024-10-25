@@ -1,0 +1,45 @@
+.aw_ctq__quote-links {
+    @apply bg-transparent grid grid-cols-3 mb-4.75 lg:block lg:mb-5;
+
+    @screen lg {
+        /* stylelint-disable */
+        background: linear-gradient(theme('colors.gray.e6'), theme('colors.gray.e6')) 0 calc(100%)/100% 1px no-repeat,
+            transparent;
+        /* stylelint-enable */
+    }
+
+    .nav.item {
+        @apply p-0 !pb-0 flex-grow-0 text-sm border border-0 border-b lg:border-b-0 lg:text-base;
+
+        a {
+            @apply text-navy no-underline font-bold text-sm block pt-3 pb-2.75 text-center
+                lg:text-base lg:pl-10 lg:pr-10.25;
+
+            &.active,
+            &:active {
+                @apply text-blue-darker underline cursor-pointer;
+            }
+
+            @screen lg {
+                &.hover,
+                &:hover {
+                    @apply text-blue-darker;
+                }
+
+                &.active,
+                &:active {
+                    @apply text-blue;
+                }
+            }
+        }
+
+        &.current {
+            @apply border border-0 border-b-2 border-blue;
+
+            strong {
+                @apply cursor-default pointer-events-none text-blue block text-sm pt-3 pb-2.5 text-center
+                    lg:text-base lg:pl-10 lg:pr-10.25;
+            }
+        }
+    }
+}

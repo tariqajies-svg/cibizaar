@@ -1,0 +1,62 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\Modal\ModalBuilder;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Currency;
+use Hyva\Theme\ViewModel\Footer;
+use Hyva\Theme\ViewModel\Modal;
+use Hyva\Theme\ViewModel\StoreSwitcher;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ModalBuilder $modal */
+$modal = $viewModels->require(Modal::class)->getModal();
+$footer = $viewModels->require(Footer::class);
+$currency = $viewModels->require(Currency::class);
+$storeSwitcher = $viewModels->require(StoreSwitcher::class);
+?>
+
+<div class="newsletter-bg">
+    <?= $block->getChildHtml('subscribe') ?>
+</div>
+<div class="bg-navy main">
+    <div class="container py-7 lg:py-15">
+        
+        <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('footer-content-main')->toHtml();?>
+    </div>
+</div>
+<div class="bg-navy-darker">
+    <div class="container py-4 lg:py-3 grid grid-cols-1 md:grid-cols-3 gap-x-6 xl:items-center">
+        <span class="order-2 md:order-1 text-2xs lg:text-xs text-white mt-2 md:mt-0 leading-4 lg:leading-6">
+            <?= $escaper->escapeHtml($footer->getFooterCopyright()) ?>
+        </span>
+        <div class="flex flex-col xl:flex-row order-1 md:order-2 col-span-2 md:items-end xl:items-center md:justify-end">
+            <?= /** @noEscape */ $block->getChildHtml('footer-bottom-links') ?>
+            <?= /** @noEscape */ $block->getChildHtml('footer-bottom-payments') ?>
+        </div>
+    </div>
+</div>
+
+<style>
+footer .main li a:hover {
+    color: #0165ff;
+}
+</style>

@@ -1,0 +1,73 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentProduct;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Hyva\Theme\ViewModel\ProductAlert;
+use Magebit\Catalog\ViewModel\OutOfStockTooltip;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var ProductAlert $productAlertViewModel */
+$productAlertViewModel = $viewModels->require(ProductAlert::class);
+/** @var CurrentProduct $currentProduct */
+$currentProduct = $viewModels->require(CurrentProduct::class);
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+/** @var Product $product */
+$product = $currentProduct->get();
+
+if (!$product->getId() || !$productAlertViewModel->showStockAlert($product)) {
+    return;
+}
+
+$tooltipViewModel = $viewModels->require(OutOfStockTooltip::class);
+$tooltipText = $tooltipViewModel->getTooltipText();
+
+$signupLabel = __('Notify About Arrival');
+?>
+<div class="product relative alert stock text-right mt-2 lg:mt-3 lg:first:mt-0" x-data="{ tooltip: false, bottom: 0 }">
+    <?php if ($tooltipText): ?>
+        <div class="absolute w-full z-50 bubble-bottom"
+             x-cloak
+             x-show="tooltip"
+             :style="'bottom:' + (bottom + 8) + 'px'"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-90"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-90">
+            <?= $escaper->escapeHtml($tooltipText) ?>
+        </div>
+    <?php endif; ?>
+    <a href="<?= $escaper->escapeUrl($productAlertViewModel->getSaveUrl($currentProduct->get(), 'stock')) ?>"
+       title="<?= $escaper->escapeHtml($signupLabel) ?>"
+       class="btn btn-primary">
+        <span>
+            <?= $escaper->escapeHtml($signupLabel) ?>
+        </span>
+        <?php if ($tooltipText): ?>
+            <i class="icon icon-info relative bottom-px lg-max:hidden"
+               x-on:mouseover=" bottom = $el.getBoundingClientRect().height; tooltip = true;"
+               x-on:mouseleave="tooltip = false"></i>
+        <?php endif; ?>
+    </a>
+</div>

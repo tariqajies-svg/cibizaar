@@ -1,0 +1,64 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+/* @var $block Quote */
+/* @var $escaper Escaper */
+
+use Aheadworks\Ctq\Block\Customer\Quote;
+use Aheadworks\Ctq\Model\Source\Quote\Negotiation\DiscountType;
+use Magento\Framework\Escaper;
+
+$block->getDataProviderViewModel()->setMethodToLocateQuote($block->getMethodToLocateQuote());
+$quote = $block->getDataProviderViewModel()->getQuote();
+$cart = $block->getDataProviderViewModel()->getCart();
+$items = $cart->getAllVisibleItems();
+$quoteHasNegotiatedAmount = $quote->getNegotiatedDiscountValue() > 0;
+$showDiscountedPriceCol = $quoteHasNegotiatedAmount && $quote->getNegotiatedDiscountType() === DiscountType::PROPOSED_PRICE
+?>
+<div class="order-details-items aw-ctq__products-tab">
+    <form
+        x-data="{}"
+        @trigger-quote-submit.window="$el.action = $event.detail.detail; $el.submit()"
+        id="quoteDataForm"
+        action="<?= $escaper->escapeUrl($block->getUrl('aw_ctq/quote/save', ['quote_id' => $quote->getId()])) ?>"
+        method="post"
+        class="form">
+        <?= $block->getBlockHtml('formkey') ?>
+        <div class="table-wrapper">
+            <table class="data table abs-table-striped">
+                <thead>
+                    <tr>
+                        <th class="col name"><?= $escaper->escapeHtml(__('Product Name')) ?></th>
+                        <th class="col price"><?= $escaper->escapeHtml(__('Price')) ?></th>
+                        <?php if ($showDiscountedPriceCol): ?>
+                            <th class="col negotiated-price"><?= $escaper->escapeHtml(__('Negotiated Price')) ?></th>
+                        <?php endif; ?>
+                        <th class="col qty">
+                            <?= $escaper->escapeHtml(__('Qty')) ?>
+                        </th>
+                        <th class="col subtotal"><?= $escaper->escapeHtml(__('Subtotal')) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($items as $item): ?>
+                        <?= /* @noEscape */ $block->getItemHtml($item) ?>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <?= /* @noEscape */ $block->getChildHtml('totals') ?>
+</div>

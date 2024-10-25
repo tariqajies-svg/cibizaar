@@ -1,0 +1,49 @@
+bank-transfer-block:
+  block:
+    -
+      source: app/etc/configurator/Blocks/content/bank-transfer-block.html
+      title: Bank Transfer Block
+      is_active: 1
+      version: 1
+header-top-links-block:
+  block:
+    -
+      source: app/etc/configurator/Blocks/content/header-top-links-block.html
+      title: Header Top Links Block
+      is_active: 1
+footer-bottom-links-block:
+  block:
+    -
+      source: app/etc/configurator/Blocks/content/footer-bottom-links-block.html
+      title: Footer Bottom Links Block
+      is_active: 1
+footer-branding-block:
+  block:
+    -
+      source: app/etc/configurator/Blocks/content/footer-branding-block.html
+      title: Footer Branding Block
+      is_active: 1
+footer-customer-service-block:
+  block:
+    -
+      source: app/etc/configurator/Blocks/content/footer-customer-service-block.html
+      title: Footer Customer Service Block
+      is_active: 1
+footer-bottom-payments-block:
+  block:
+    -
+      source: app/etc/configurator/Blocks/content/footer-bottom-payments-block.html
+      title: Footer Bottom Payments Block
+      is_active: 1
+contact-us-info:
+  block:
+    -
+      source: app/etc/configurator/Blocks/content/contact-us-info.html
+      title: Contact us info
+      is_active: 1
+terms-and-conditions-notice:
+  block:
+    -
+      source: app/etc/configurator/Blocks/content/terms-and-conditions-notice.html
+      title: Terms and conditions notice
+      is_active: 1

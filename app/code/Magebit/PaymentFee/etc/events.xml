@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_PaymentFee package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_model_service_quote_submit_before">
+        <observer
+                name="magebit_paymentfee_observer_sales_modelservicequotesubmitbefore_sales_model_service_quote_submit_before"
+                instance="Magebit\PaymentFee\Observer\Sales\ModelServiceQuoteSubmitBefore"/>
+    </event>
+</config>

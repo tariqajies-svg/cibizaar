@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Block\Product\View\Gallery">
+        <arguments>
+            <argument name="galleryImagesConfig" xsi:type="array">
+                <item name="small_image" xsi:type="array">
+                    <item name="image_id" xsi:type="string">product_page_image_small</item>
+                    <item name="data_object_key" xsi:type="string">small_image_url</item>
+                    <item name="json_object_key" xsi:type="string">thumb</item>
+                </item>
+                <item name="small_mobile_image" xsi:type="array">
+                    <item name="image_id" xsi:type="string">product_page_main_image_small_mobile</item>
+                    <item name="data_object_key" xsi:type="string">small_mobile_image_url</item>
+                    <item name="json_object_key" xsi:type="string">small_mobile_img</item>
+                </item>
+                <item name="mobile_image" xsi:type="array">
+                    <item name="image_id" xsi:type="string">product_page_main_image_mobile</item>
+                    <item name="data_object_key" xsi:type="string">mobile_image_url</item>
+                    <item name="json_object_key" xsi:type="string">mobile_img</item>
+                </item>
+                <item name="tablet_image" xsi:type="array">
+                    <item name="image_id" xsi:type="string">product_page_main_image_tablet</item>
+                    <item name="data_object_key" xsi:type="string">tablet_image_url</item>
+                    <item name="json_object_key" xsi:type="string">tablet_img</item>
+                </item>
+                <item name="large_tablet_image" xsi:type="array">
+                    <item name="image_id" xsi:type="string">product_page_main_image_large_tablet</item>
+                    <item name="data_object_key" xsi:type="string">large_tablet_image_url</item>
+                    <item name="json_object_key" xsi:type="string">large_tablet_img</item>
+                </item>
+                <item name="small_desktop_image" xsi:type="array">
+                    <item name="image_id" xsi:type="string">product_page_image_small_desktop</item>
+                    <item name="data_object_key" xsi:type="string">small_desktop_image_url</item>
+                    <item name="json_object_key" xsi:type="string">small_desktop_img</item>
+                </item>
+                <item name="medium_image" xsi:type="array">
+                    <item name="image_id" xsi:type="string">product_page_image_medium</item>
+                    <item name="data_object_key" xsi:type="string">medium_image_url</item>
+                    <item name="json_object_key" xsi:type="string">img</item>
+                </item>
+                <item name="large_image" xsi:type="array">
+                    <item name="image_id" xsi:type="string">product_page_image_large</item>
+                    <item name="data_object_key" xsi:type="string">large_image_url</item>
+                    <item name="json_object_key" xsi:type="string">full</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

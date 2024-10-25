@@ -1,0 +1,292 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductStockItem;
+use Magento\Checkout\Block\Cart\Item\Renderer;
+use Magento\Framework\Escaper;
+
+/** @var Renderer $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$item = $block->getItem();
+$product = $item->getProduct();
+$isVisibleProduct = $product->isVisibleInSiteVisibility();
+
+/** @var ProductStockItem $stockItemViewModel */
+$stockItemViewModel = $viewModels->require(ProductStockItem::class);
+$minSalesQty = $stockItemViewModel->getMinSaleQty($product);
+$maxSalesQty = $stockItemViewModel->getMaxSaleQty($product);
+$isQtyDecimal = $stockItemViewModel->isQtyDecimal($product);
+
+$maxSalesQtyLength = ($maxSalesQty ? strlen((string)$maxSalesQty) : 4)
+    + (/* add one if decimal for separator */
+    (int)$isQtyDecimal
+    );
+
+$step = $stockItemViewModel->getQtyIncrements($product) ?: null;
+$defaultQty = $minSalesQty * 1;
+$maxSalesQtyWithStep = $maxSalesQty;
+
+if ($step && $step !== 1) {
+    if (fmod($defaultQty, $step) !== 0.0) {
+        $defaultQtyWithStep = $step;
+        while ($defaultQtyWithStep < $defaultQty) {
+            $defaultQtyWithStep += $step;
+        }
+        $defaultQty = $defaultQtyWithStep;
+    }
+
+    if (fmod($maxSalesQty, $step) !== 0) {
+        $maxSalesQtyWithStep = $step;
+        while ($maxSalesQtyWithStep <= $maxSalesQty) {
+            $maxSalesQtyWithStep += $step;
+        }
+        $maxSalesQtyWithStep = round($maxSalesQtyWithStep, 1);
+        if ($maxSalesQtyWithStep > $maxSalesQty) {
+            // One step less than maximum
+            $maxSalesQtyWithStep -= $step;
+        }
+    }
+}
+?>
+<tbody class="cart item bg-white">
+<tr class="item-info align-top flex flex-wrap lg:table-row">
+    <td data-th="<?= $escaper->escapeHtml(__('Item')) ?>"
+        class="col item flex gap-4 text-left w-full lg:w-auto lg:pt-6 lg:px-4 lg:gap-6 xl:flex-row">
+    <?php if ($block->hasProductUrl()): ?>
+        <a href="<?= $escaper->escapeUrl($block->getProductUrl()) ?>"
+           title="<?= $escaper->escapeHtmlAttr($block->getProductName()) ?>"
+           tabindex="-1"
+           class="product-item-photo flex-shrink-0">
+            <?php else: ?>
+            <span class="product-item-photo flex-shrink-0">
+            <?php endif; ?>
+            <?= $block->getImage($block->getProductForThumbnail(), 'cart_page_product_thumbnail')
+                ->setTemplate('Magento_Catalog::product/image.phtml')
+                ->toHtml() ?>
+            <?php if ($block->hasProductUrl()): ?>
+        </a>
+    <?php else: ?>
+        </span>
+    <?php endif; ?>
+        <div class="product-item-details flex-grow lg:flex lg:flex-col lg:max-w-md testcart">
+            <strong class="product-item-name text-sm mb-2">
+                <?php if ($block->hasProductUrl()): ?>
+                    <a
+                        class="!text-black !font-normal"
+                        href="<?= $escaper->escapeUrl($block->getProductUrl()) ?>">
+                        <?= $escaper->escapeHtml($block->getProductName()) ?>
+                    </a>
+                <?php else: ?>
+                    <?= $escaper->escapeHtml($block->getProductName()) ?>
+                <?php endif; ?>
+            </strong>
+            <?php if ($options = $block->getOptionList()): ?>
+                <?php foreach ($options as $option): ?>
+                    <?php $formatedOptionValue = $block->getFormatedOptionValue($option) ?>
+                    <div class="item-options w-full break-all mt-1 pb-0.5 text-xs font-normal">
+                        <span class="mr-0.5 mb-0.75 text-[#737373]">
+                            <?= $escaper->escapeHtml($option['label']) ?>:
+                        </span>
+                        <span class="text-black">
+                            <?php if (isset($formatedOptionValue['full_view'])): ?>
+                                <?= $escaper->escapeHtml($formatedOptionValue['full_view']) ?>
+                            <?php else: ?>
+                                <?= $escaper->escapeHtml($formatedOptionValue['value'], ['span', 'a']) ?>
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+
+            <?php if ($messages = $block->getMessages()): ?>
+                <?php foreach ($messages as $message): ?>
+                    <div class="cart item message text-2xs lg:text-sm
+                    lg:mt-1 text-<?= $escaper->escapeHtmlAttr($message['type']) ?>">
+                        <div><?= $escaper->escapeHtml($message['text']) ?></div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+            <?php if ($addInfoBlock): ?>
+                <?= $addInfoBlock->setItem($item)->toHtml() ?>
+            <?php endif; ?>
+            <div class="lg:hidden text-navy font-bold mt-0.5">
+                <?= $block->getUnitPriceHtml($item) ?>
+            </div>
+        </div>
+    </td>
+
+    <td class="col price block w-full lg:w-auto text-navy lg:table-cell lg-max:!hidden lg:pt-6 lg:px-4 lg:align-middle lg:!text-base !font-normal">
+        <?= $block->getUnitPriceHtml($item) ?>
+    </td>
+
+    <td class="col qty lg:pt-6 lg:px-4 block w-full lg:w-auto lg:table-cell lg-max:gap-1 lg-max:flex
+                    lg-max:justify-between lg-max:items-center flex-wrap lg:align-middle">
+        <div class="field !mt-0 field-qty flex gap-x-4">
+            <div x-data="initQtyField<?= (int)$product->getId() ?>()" class="control flex"
+                 id="product-qty">
+                <label for="qty[<?= (int)$product->getId() ?>]"
+                       class="sr-only"
+                >
+                    <?= $escaper->escapeHtml(__('Quantity')) ?>
+                </label>
+                <button class="btn btn-secondary bg-[#F9F9F9] px-4 w-8 h-8 lg:w-9 lg:h-9
+                                   before:block before:absolute before:w-3 before:h-0.5
+                                   before:bg-gray"
+                        :disabled="qty == <?= /** @noEscape */ $defaultQty ?: 1 ?>"
+                        type="button"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Decrease')) ?>"
+                        @click.prevent="updateQtyToClosest(false)">
+                </button>
+                <input id="cart-<?= $escaper->escapeHtmlAttr($item->getId()) ?>-qty"
+                       name="cart[<?= $escaper->escapeHtmlAttr($item->getId()) ?>][qty]"
+                       x-ref="qty-<?= $escaper->escapeHtmlAttr((int)$product->getId()) ?>"
+                       <?php if ($isQtyDecimal): ?>
+                           type="text"
+                           pattern="[0-9]{0,<?= /** @noEscape */ $maxSalesQtyLength ?>}(\.*[0-9])"
+                           inputmode="decimal"
+                       <?php else: ?>
+                           type="number"
+                           pattern="[0-9]{0,<?= /** @noEscape */ $maxSalesQtyLength ?>}"
+                           inputmode="numeric"
+                       <?php endif; ?>
+                       <?php if ($minSalesQty): ?>min="<?= /** @noEscape */ $defaultQty ?>"<?php endif; ?>
+                       <?php if ($maxSalesQty): ?>max="<?= /** @noEscape */ $maxSalesQtyWithStep ?>"<?php endif; ?>
+                       <?php if ($step): ?>step="<?= /** @noEscape */ $step ?>"<?php endif; ?>
+                       x-model.number="qty"
+                       title="<?= $escaper->escapeHtmlAttr(__('Qty')) ?>"
+                       class="form-input form-input-qty px-2 py-2 h-9 w-14 text-center border-none"
+                       required="required"
+                       data-role="cart-item-qty"/>
+                <button class="btn btn-secondary bg-[#F9F9F9] px-4 w-8 h-8 lg:w-9 lg:h-9 before:block before:absolute
+                                   before:w-3 before:h-0.5 before:bg-gray after:block after:absolute
+                                   after:w-3 after:h-0.5 after:bg-gray after:rotate-90"
+                        :disabled="qty == <?= /** @noEscape */ $maxSalesQtyWithStep ?: 1 ?>"
+                        type="button"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Increase')) ?>"
+                        @click.prevent="updateQtyToClosest(true)">
+                </button>
+            </div>
+        </div>
+
+        <div class="lg:hidden flex justify-end gap-1 action-block">
+            <div class="subtotal flex lg-max:gap-x-4 justify-end">
+                <div class="flex lg-max:gap-x-1 lg:text-base">
+                    <span class="lg:hidden">
+                        <?= $escaper->escapeHtml(__('Subtotal:')) ?>
+                    </span>
+                    <span class="font-medium text-navy">
+                        <?= $block->getRowTotalHtml($item) ?>
+                    </span>
+                </div>
+            </div>
+            <?= /* @noEscape */ $block->getActions($item) ?>
+        </div>
+    </td>
+    <td class="item-actions lg-max:!hidden lg:align-middle relative">
+        <div class="subtotal flex lg-max:gap-x-4 justify-end">
+            <div class="flex lg-max:gap-x-1 lg:text-base">
+                <span class="lg:hidden">
+                    <?= $escaper->escapeHtml(__('Subtotal:')) ?>
+                </span>
+                <span class="font-medium text-navy">
+                    <?= $block->getRowTotalHtml($item) ?>
+                </span>
+            </div>
+        </div>
+        <div class="flex justify-end gap-2">
+            <div class="edit-remove absolute bottom-5"><?= /* @noEscape */ $block->getActions($item) ?></div>
+        </div>
+
+    </td>
+</tr>
+
+</tbody>
+
+<script defer>
+    function initQtyField<?= (int)$product->getId() ?>() {
+        return {
+            qty: <?= /* @noEscape */ $block->getQty() * 1 ?>,
+            updateQty(newVal) {
+                <?php if ($isQtyDecimal): ?>
+                    newVal = parseFloat(newVal.toFixed(1));
+                <?php endif; ?>
+                const input = this.$refs['qty-<?= (int)$product->getId() ?>'];
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+                const maxLength = parseInt('<?= /** @noEscape */ $maxSalesQtyLength ?>');
+
+                if (((!!min && newVal >= min) || !min)
+                    && ((!!max && newVal <= max) || !max)
+                    <?php if (!$isQtyDecimal): ?>
+                        && ((!!maxLength && newVal.toString().length <= maxLength) || !maxLength)
+                    <?php endif; ?>
+                ) {
+                    this.qty = newVal;
+                }
+            },
+            updateQtyToClosest(plus = true) {
+                const input = this.$refs['qty-<?= (int)$product->getId() ?>'];
+                const min = parseFloat(input.min);
+                const max = parseFloat(input.max);
+                if (this.qty < min) {
+                    this.updateQty(min);
+                    return;
+                } else if (this.qty > max) {
+                    this.updateQty(max);
+                    return;
+                }
+
+                let newVal = 0;
+
+                if (plus) {
+                    <?php if ($isQtyDecimal): ?>
+                        newVal = parseFloat(this.qty) + parseFloat(<?= /** @noEscape */ $step ?: 1 ?>);
+                    <?php else: ?>
+                        newVal = this.qty + <?= /** @noEscape */ $step ?: 1 ?>;
+                    <?php endif; ?>
+                } else {
+                    <?php if ($isQtyDecimal): ?>
+                        newVal = parseFloat(this.qty) - parseFloat(<?= /** @noEscape */ $step ?: 1 ?>);
+                    <?php else: ?>
+                        newVal = this.qty - <?= /** @noEscape */ $step ?: 1 ?>;
+                    <?php endif; ?>
+                }
+
+                while (newVal % <?= /** @noEscape */ $step ?: 1 ?> !== 0) {
+                    if (plus) {
+                        <?php if ($isQtyDecimal): ?>
+                            newVal -= 0.1;
+                        <?php else: ?>
+                            newVal--;
+                        <?php endif; ?>
+                    } else {
+                        <?php if ($isQtyDecimal): ?>
+                            newVal += 0.1;
+                        <?php else: ?>
+                            newVal++;
+                        <?php endif; ?>
+                    }
+                }
+
+                this.updateQty(newVal);
+            }
+        };
+    }
+</script>

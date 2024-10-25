@@ -1,0 +1,41 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Wishlist\Block\Customer\Wishlist\Item\Column\Info;
+use Magento\Wishlist\Model\Item;
+use Magento\Wishlist\Block\Customer\Wishlist\Item\Column\Cart;
+
+/** @var Info $block */
+/** @var Escaper $escaper */
+/** @var Cart $cart */
+
+/** @var Item $item */
+$item = $block->getItem();
+$product = $item->getProduct();
+
+?>
+<div class="product-item-name mt-1.5 mb-0.75 lg:mt-6 lg:mb-1.5">
+    <div class="block">
+        <?php if ($brandSwatchBlock = $block->getChildBlock('product.item.brand_swatch')): ?>
+            <?= $brandSwatchBlock->setProduct($product)->toHtml() ?>
+        <?php endif; ?>
+    </div>
+    <span class="text-sm lg:text-base block">
+        <a href="<?= $escaper->escapeUrl($block->getProductUrl($item)) ?>"
+           title="<?= $escaper->escapeHtmlAttr($product->getName()) ?>" class="product-item-link !text-gray !font-semibold">
+            <?= $escaper->escapeHtml($product->getName()) ?>
+        </a>
+    </span>
+</div>

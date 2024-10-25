@@ -1,0 +1,39 @@
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceContainer name="content">
+            <block name="aw.ca.company.information"
+                   cacheable="false"
+                   template="Magebit_HyvaAheadworksCa::company/information.phtml">
+                <arguments>
+                    <argument name="company_view_model" xsi:type="object">Aheadworks\Ca\ViewModel\Company\Company</argument>
+                    <argument name="customer_view_model" xsi:type="object">Aheadworks\Ca\ViewModel\Company\Customer</argument>
+                    <argument name="formatter_view_model" xsi:type="object">Aheadworks\Ca\ViewModel\Company\Formatter</argument>
+                </arguments>
+                <block class="Aheadworks\Ca\Block\ButtonWithCheckAcl" name="aw.ca.company.edit_link">
+                    <arguments>
+                        <argument name="label" xsi:type="string" translate="true">Edit</argument>
+                        <argument name="link" xsi:type="string">aw_ca/company/edit</argument>
+                    </arguments>
+                </block>
+            </block>
+            <referenceBlock name="aw.ca.company.domain" remove="true"/>
+        </referenceContainer>
+    </body>
+</page>
+

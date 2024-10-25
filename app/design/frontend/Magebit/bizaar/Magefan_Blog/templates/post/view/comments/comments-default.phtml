@@ -1,0 +1,194 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magefan\Blog\Block\Post\View\Comments;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\ReCaptcha;
+
+/**
+ * Blog post comments template
+ *
+ * @var Comments $block
+ * @var Escaper $escaper
+ */
+
+$comments = $block->getCommentsCollection();
+$numberOfCommentsToDisplay = $block->getNumberOfComments();
+$fullCommentsCount = $block->getPost()->getCommentsCount();
+$session = $block->getCustomerSession();
+
+$canPost = $block->canPost();
+?>
+<div class="post-comments">
+    <div class="c-count pb-4 border-b mb-5">
+        <h3>
+            <?= $escaper->escapeHtml(__('%1 Comment(s)', $fullCommentsCount)) ?>
+        </h3>
+    </div>
+    <div class="comment-form-wrapper">
+        <form class="comment-form"
+              x-data="{...initCommentForm(), ...hyva.formValidation($el)}"
+              x-ref="commentForm"
+              action="<?= $escaper->escapeUrl($block->getFormUrl()) ?>"
+              method="post"
+              id="blogcomment"
+              @submit.prevent="submitForm()">
+
+            <?= /* @noEscape */ $block->getBlockHtml('formkey') ?>
+            <?= /* @noEscape */ $block->getBlockHtml(ReCaptcha::RECAPTCHA_INPUT_FIELD_BLOCK) ?>
+
+            <input type="hidden"
+                   name="post_id"
+                   value="<?= /* @noEscape */ (int)($block->getPost()->getId()) ?>"/>
+
+            <?php if ($canPost && !$session->getCustomerGroupId()): ?>
+                <div class="lr-hld flex flex-col lg:flex-row lg:gap-x-6">
+                    <div class="field field-reserved name lg:w-1/2">
+                        <label class="label" for="comment-form-name">
+                            <span><?= $escaper->escapeHtml(__('Full Name')) ?></span>
+                        </label>
+                        <div class="control">
+                            <input name="author_nickname"
+                                   class="form-input"
+                                   value=""
+                                   id="comment-form-name"
+                                   type="text"
+                                   data-validate='{"required": true}'
+                                   title="<?= $escaper->escapeHtmlAttr(__('Full Name')) ?>"/>
+                        </div>
+                    </div>
+                    <div class="field field-reserved email lg:w-1/2">
+                        <label class="label" for="comment-form-email">
+                            <span><?= $escaper->escapeHtml(__('E-mail')) ?></span>
+                        </label>
+                        <div class="control">
+                            <input name="author_email"
+                                   class="form-input"
+                                   value=""
+                                   id="comment-form-email"
+                                   type="email"
+                                   data-validate='{"required": true, "email": true}'
+                                   title="<?= $escaper->escapeHtmlAttr(__('E-mail')) ?>"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="field field-reserved comment">
+                    <label class="label" for="comment-form-comment">
+                        <span><?= $escaper->escapeHtml(__('Comment')) ?></span>
+                    </label>
+                    <div class="control">
+                        <textarea name="text"
+                                  id="comment-form-comment"
+                                  title="<?= $escaper->escapeHtmlAttr(__('Comment')) ?>"
+                                  class="form-textarea w-full"
+                                  cols="5"
+                                  rows="5"
+                                  data-validate='{"required":true}'
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="form-actions flex flex-col gap-y-3 lg:flex-row lg:gap-x-6 lg:gap-y-0">
+                    <?php if ($canPost): ?>
+                        <button type="submit" class="action submit primary btn btn-primary w-full lg:w-auto"
+                                title="<?= $escaper->escapeHtmlAttr(__('Submit')) ?>">
+                            <span><?= $escaper->escapeHtml(__('Submit')) ?></span>
+                        </button>
+                    <?php else: ?>
+                        <button type="button"
+                                class="primary btn btn-primary w-full lg:w-auto"
+                                @click="window.location.replace('<?= $escaper->escapeUrl($block->getCustomerUrl()->getLoginUrl()) ?>')"
+                            <span><?= $escaper->escapeHtml(__('Sign In')) ?></span>
+                        </button>
+                    <?php endif; ?>
+                    <button type="button"
+                            class="link font-bold text-center py-[11px] px-6 w-full lg:w-auto"
+                            @click="$refs.commentForm.reset()">
+                        <?= $escaper->escapeHtml(__('Cancel')) ?>
+                    </button>
+                </div>
+            <?php endif; ?>
+        </form>
+    </div>
+    <?= /* @noEscape */ $block->getChildHtml('blog.post.comments.hyva.list') ?>
+</div>
+<script>
+    function initCommentForm() {
+        return {
+            isLoading: false,
+            showActions: false,
+            errors: 0,
+            submitForm: function () {
+                this.isLoading = true;
+
+                const $form = this.$refs.commentForm;
+                const formKey = $form.querySelector('input[name=form_key]').value;
+                const formUrl = $form.action;
+                const dataForm = new FormData($form);
+                let data = {};
+                let request_data = '';
+
+                this.validate().then(() => {
+                    <?= $block->getChildHtml('comment_recaptcha_validation'); ?>
+
+                    if (this.errors === 0) {
+                        for (let [name, value] of dataForm) {
+                            data[name] = value;
+                        }
+
+                        for (let fieldName in data) {
+                            if (request_data) {
+                                request_data += '&'
+                            }
+                            request_data += fieldName + '=' + encodeURIComponent(data[fieldName]);
+                        }
+
+                        request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                        fetch(formUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: request_data
+                            }
+                        ).then(response => {
+                                return  response.text()
+                            }
+                        ).then((text) => {
+                            this.isLoading = false;
+                            $form.reset();
+
+                            let message = JSON.parse(text);
+
+                            window.dispatchMessages !== "undefined" && window.dispatchMessages([
+                                {
+                                    type: message.success ? 'success' : 'error',
+                                    text: message.message
+                                }
+                            ], 5000);
+                        });
+                    }
+                }).catch((invalid) => {
+                    this.isLoading = false;
+                    if (invalid.length > 0) {
+                        invalid[0].focus();
+                    }
+                });
+            }
+        }
+    }
+</script>

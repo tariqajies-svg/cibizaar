@@ -1,0 +1,72 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ctq\Block\Customer\Quote\Edit\Item;
+use Aheadworks\Ctq\ViewModel\Email\Quote\Item\DefaultRenderer;
+use Magento\Framework\Escaper;
+
+/** @var $block Item */
+/** @var $viewModel DefaultRenderer */
+/** @var $escaper Escaper */
+
+$viewModel = $block->getViewModel();
+$item = $block->getItem();
+$itemProduct = $item->getProduct();
+$itemOptions = $viewModel->getOptionList($item);
+$itemId = $item->getId();
+?>
+<tr>
+    <td class="col name <?= /** @noEscape */ (empty($itemOptions) ? '' : ' has-extra') ?>"
+        data-th="<?= $escaper->escapeHtmlAttr(__('Product Name')) ?>">
+        <div class="product-item-details">
+            <p class="product-name"><?= $escaper->escapeHtml($itemProduct->getName()) ?></p>
+            <p class="sku"><?= $escaper->escapeHtml(__('SKU')) ?>:
+                <strong><?= $escaper->escapeHtml($itemProduct->getSku()) ?></strong>
+            </p>
+            <?php if ($itemOptions): ?>
+                <dl class="item-options">
+                    <?php foreach ($itemOptions as $itemOption): ?>
+                        <?php $formattedOptionValue = $viewModel->getFormattedOptionValue($itemOption) ?>
+                        <dt><?= $escaper->escapeHtml($itemOption['label']) ?></dt>
+                        <dd>
+                            <?php if (isset($formattedOptionValue['full_view'])): ?>
+                                <?= $escaper->escapeHtml($formattedOptionValue['full_view']) ?>
+                            <?php else: ?>
+                                <?= $escaper->escapeHtml($formattedOptionValue['value'], ['span']) ?>
+                            <?php endif; ?>
+                        </dd>
+                    <?php endforeach; ?>
+                </dl>
+            <?php endif; ?>
+            <?php if ($messages = $viewModel->getMessages($item)): ?>
+                <?php foreach ($messages as $message): ?>
+                    <div class="item message <?= /* @noEscape */ $message['type'] ?>">
+                        <div><?= $escaper->escapeHtml($message['text']) ?></div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </td>
+    <td class="col price" data-th="<?= $escaper->escapeHtml(__('Price')) ?>">
+        <?= /** @noEscape */ $block->getUnitPriceHtml($item) ?>
+    </td>
+    <td class="col qty" data-th="<?= $escaper->escapeHtml(__('Qty')) ?>">
+        <?= /** @noEscape */ $block->getQty() ?>
+    </td>
+    <td class="col subtotal" data-th="<?= $escaper->escapeHtml(__('Subtotal')) ?>">
+        <?= /** @noEscape */ $block->getRowTotalHtml($item) ?>
+    </td>
+</tr>

@@ -1,0 +1,114 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Currency;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Hyva\Theme\ViewModel\StoreSwitcher;
+use Magebit\HyvaTheme\ViewModel\CurrencySymbol;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$storeSwitcher = $viewModels->require(StoreSwitcher::class);
+$currencySymbol = $viewModels->require(CurrencySymbol::class);
+$currency = $viewModels->require(Currency::class);
+$storeConfig = $viewModels->require(StoreConfig::class);
+$currentStore = $storeSwitcher->getStore();
+?>
+<script>
+    function initSwitcher() {
+        return {
+            stores: JSON.parse('<?= /** @noEscape */ json_encode($storeSwitcher->getRawStoresArray()) ?>'),
+            storeId: '<?= /** @noEscape */ $currentStore->getId() ?>',
+            groupId: '<?= /** @noEscape */ $storeSwitcher->getCurrentGroupId() ?>',
+            localeCode: '<?= /** @noEscape */ $storeConfig->getStoreConfig('general/locale/code') ?>',
+            currencyCode: '<?= /** @noEscape */ $currency->getCurrentCurrencyCode() ?>',
+            changeGroup(el) {
+                this.groupId = el.value;
+            },
+            switchAction() {
+                const toStore = this.$refs.store.value;
+                const toCurrency = this.$refs.currency.value;
+
+                if (this.currencyCode != toCurrency) {
+                    fetch(BASE_URL + 'directory/currency/switch/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: new URLSearchParams({currency: toCurrency})
+                    }).then(response => {
+                        return window.location.replace(this.stores[this.groupId][toStore].redirect);
+                    });
+                } else {
+                    return window.location.replace(this.stores[this.groupId][toStore].redirect);
+                }
+
+                document.body.click();
+            }
+        };
+    }
+</script>
+<div x-data="initSwitcher()">
+    <div class="pop-up-header">
+        <h3><?= $escaper->escapeHtml(__('Site settings'))?></h3>
+        <p><?= $escaper->escapeHtml(__('Please choose your region and preferable currency.'))?></p>
+    </div>
+    <div class="grid">
+        <?php $groups = $storeSwitcher->getGroups(); ?>
+        <div class="field mb-6 lg:mb-7"
+            :class="{'hidden': '<?= count($groups) === 1 ?>'}"
+        >
+            <label class="label" for="countryField"><?= $escaper->escapeHtml(__('Country'))?></label>
+            <select class="form-select" id="countryField" @change="changeGroup($event.target)">
+                <?php foreach ($groups as $group): ?>
+                    <option value="<?= $escaper->escapeHtmlAttr($group->getId()) ?>"
+                            <?= $group->getId() == $storeSwitcher->getCurrentGroupId() ? $escaper->escapeHtmlAttr('selected') : '' ?>>
+                        <?= $escaper->escapeHtml($group->getName()) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="field mb-6 lg:mb-7">
+            <label class="label" for="languageField"><?= $escaper->escapeHtml(__('Language'))?></label>
+            <select class="form-select" x-ref="store" id="languageField">
+                <template x-for="{id, locale, name} in Object.values(stores[groupId])">
+                    <option :value="id" x-text="name" :selected="(storeId == id || localeCode == locale) && 'selected'"></option>
+                </template>
+            </select>
+        </div>
+        <div class="field mb-6 lg:mb-7">
+            <label class="label" for="currencyField"><?= $escaper->escapeHtml(__('Currency'))?></label>
+            <select class="form-select" x-ref="currency" id="currencyField">
+                <?php foreach ($currency->getCurrencies() as $code => $name): ?>
+                    <option value="<?= $escaper->escapeHtml($code) ?>"
+                            <?= $currency->getCurrentCurrencyCode() === $code ? $escaper->escapeHtmlAttr('selected') : '' ?>>
+                        <span class="font-bold">
+                            <?= $escaper->escapeHtml($currencySymbol->getCurrencySymbol($code)) ?>
+                        </span>
+                        <?= $escaper->escapeHtml($code) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <button type="button" @click="switchAction" class="btn btn-primary">
+            <?= $escaper->escapeHtml(__('Continue'))?>
+        </button>
+    </div>
+</div>

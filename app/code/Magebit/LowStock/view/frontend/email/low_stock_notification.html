@@ -1,0 +1,23 @@
+<!--
+/**
+ * This file is part of the Magebit_LowStock package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_LowStock
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<!--@subject {{trans "Low Stock Product Notification"}} @-->
+<!--@vars {
+"var items":"Low Stock Items"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+<p>Following products have gone below their low stock threshold</p>
+{{layout handle="low_stock_notification_email" items=$items}}
+{{template config_path="design/email/footer_template"}}

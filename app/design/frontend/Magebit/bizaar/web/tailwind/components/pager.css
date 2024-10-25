@@ -1,0 +1,96 @@
+@layer components {
+    .modes {
+        .mode-list {
+            @apply text-[20px];
+        }
+        .modes-mode {
+            @apply flex justify-center items-center;
+        }
+    }
+    .products.wrapper {
+        &.mode-grid,
+        &.mode-list {
+            + .plp-toolbar {
+                @apply m-0 p-0 border-0;
+                .field.limiter {
+                    @apply hidden;
+                }
+            }
+        }
+    }
+    .pager {
+        @apply grid items-center grid-flow-row grid-cols-4 gap-3.25 sm:grid-cols-8 md:grid-cols-4 lg:grid-cols-8;
+    }
+
+    .toolbar-amount {
+        @apply flex text-gray font-semibold order-3 col-span-2 text-sm leading-5 sm:order-2 md:order-3 lg:order-2
+            gap-x-1 lg:text-base;
+
+        label {
+            @apply inline-flex w-max items-center;
+        }
+    }
+
+    .pages-wrapper {
+        @apply flex justify-center order-2 col-span-4;
+
+        .pages {
+            @apply inline-flex items-center md-max:w-full;
+
+            &-items {
+                @apply relative z-0 inline-flex space-x-1 md-max:w-full lg:space-x-2;
+
+                .pages-item-previous,
+                .pages-item-next {
+                    @apply md-max:w-full;
+                }
+
+                .previous.btn:not(.jump),
+                .next.btn:not(.jump) {
+                    @apply md-max:w-full md-only:w-14;
+                }
+
+                .previous:not(.action, .jump),
+                .next:not(.action, .jump) {
+                    @apply text-gray pointer-events-none;
+                }
+            }
+        }
+    }
+
+    .limiter {
+        @apply flex items-center justify-end order-3 col-span-2 sm:order-2 md:order-3 lg:order-2;
+
+        label {
+            span {
+                @apply pl-0 pr-2;
+            }
+        }
+    }
+
+    @screen lg-max {
+        .sorter,
+        .limiter {
+            &-options {
+                background-position: right 19px center;
+            }
+        }
+    }
+
+    .toolbar {
+        .toolbar-amount {
+            @apply order-1 col-span-3 lg:col-start-1 lg:col-span-1;
+        }
+
+        .sorter {
+            @apply order-2 justify-start col-span-1 col-start-1 xss-max:col-span-3
+                lg:order-3 lg:col-start-3;
+        }
+
+        .limiter {
+            @apply order-3 justify-end col-span-1 col-start-3
+                xxs-max:col-span-3 xxs-max:col-start-1 xxs-max:justify-start
+                lg:order-2 lg:col-start-2 lg:w-[5.71rem] lg:pl-5.75;
+        }
+    }
+}

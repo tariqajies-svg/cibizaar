@@ -1,0 +1,195 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ca\Block\Form;
+
+/** @var Form $block */
+?>
+<script>
+    function initEditForm() {
+        return {
+            placeholder: [],
+            userName: '',
+            compareItems: [],
+            sentData: {},
+            actionTitle: '',
+            saveUrl: '',
+            isEdit: true,
+            editTitle: String('<?= $escaper->escapeHtml(__('Edit user')); ?>'),
+            createTitle: String('<?= $escaper->escapeHtml(__('New user')); ?>'),
+            isLoading: false,
+            getComponentData: function () {
+                const JsLayout = JSON.parse('<?= $block->getJsLayout() ?>');
+                const general = JsLayout.components.awCaForm.children.general.children;
+                this.saveUrl = JsLayout.components.awCaUserProvider.clientConfig.urls.save;
+                this.actionTitle = JsLayout.components.awCaForm.children.save.title;
+                if (JsLayout.components.awCaUserProvider.data) {
+                    this.sentData = JsLayout.components.awCaUserProvider.data;
+                } else {
+                    this.isEdit = false;
+                }
+                for (let i in general) {
+                    let dataScope = general[i].dataScope.split('.'),
+                        val = '';
+                    if (this.isEdit) {
+                        val = this.sentData;
+                    }
+                    general[i].name = '';
+                    dataScope.forEach((slug, k) => {
+                        general[i].name += k === 0 ? slug : '[' + slug + ']';
+                        if (this.isEdit) {
+                            val = val[slug];
+                        }
+                    });
+                    general[i].val = val;
+                }
+                this.compareItems = Object.values(general);
+            },
+            submitForm: function () {
+                this.isLoading = true;
+                const formKey = document.querySelector('input[name=form_key]').value;
+                const $form = document.getElementById('editform');
+                const dataForm = new FormData($form);
+                let request_data = '';
+                if (this.isEdit) {
+                    for (let i in this.sentData) {
+                        if (typeof this.sentData[i] === 'string' || typeof this.sentData[i] === 'number' || typeof this.sentData[i] === 'boolean') {
+                            if (request_data) {
+                                request_data += '&'
+                            }
+                            request_data += i + '=' + encodeURIComponent(this.sentData[i]);
+                        }
+                    }
+                }
+                for (let [name, value] of dataForm) {
+                    request_data += '&' + name + '=' + encodeURIComponent(value);
+                }
+                request_data += '&formKey=' + encodeURIComponent(formKey);
+                fetch(this.saveUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: request_data
+                    }
+                ).then(response => {
+                        return response
+                    }
+                ).then(data => {
+                    this.isLoading = false;
+                    if (data.errors) {
+                        dispatchMessages([{
+                            type: 'error',
+                            text: data.message
+                        }], 5000);
+                    } else {
+                        window.location.href = data.url
+                    }
+                });
+            },
+            getOptionSelected: function (optionValue, fieldDefault, fieldVal) {
+                if (fieldVal) {
+                    if (optionValue === fieldVal) {
+                        return true;
+                    }
+                } else {
+                    if (optionValue === fieldDefault) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+    }
+</script>
+
+<section x-data="initEditForm()" x-init="getComponentData()">
+    <div class="inline-flex">
+        <a class="flex items-center no-underline pr-3.5"
+           href="javascript:history.back()"
+           title="<?= $escaper->escapeHtml(__('Return to previous page')) ?>">
+            <i class="icon icon-arrow-left text-blue text-xxs"></i>
+        </a>
+        <a class="-translate-y-px md:-translate-y-0.5" href="javascript:history.back()">
+            <span class="text-sm md:text-base"><?= $escaper->escapeHtml(__('Return to previous page')) ?></span>
+        </a>
+    </div>
+    <h2 class="text-black pb-3 md:pb-10 pt-3" x-html="isEdit ? editTitle + ' ' + userName : createTitle"></h2>
+    <div class="block form">
+        <form id="editform"
+              method="post"
+              @submit.prevent="submitForm();"
+        >
+            <div class="fieldset-wrapper">
+                <fieldset class="fieldset border-t-0 md:border-t border-b pt-5 md:pt-10 pb-8">
+                    <div class="fieldset-wrapper grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <template x-for="[key, field] of Object.entries(compareItems)">
+                            <div :class="{'field-' + field.name,
+                                          'hidden': field.elementTmpl === 'ui/form/element/hidden' }">
+                                <label x-html="field.label" :for="field.name"></label>
+                                <div class="control relative">
+                                    <template x-if="field.elementTmpl === 'ui/form/element/select'">
+                                        <select class="select w-full" :id="field.name" :name="field.name"
+                                                x-bind:required="field.validation">
+                                            <template x-for="[k, option] of Object.entries(field.options)">
+                                                <option
+                                                    :title="option.label"
+                                                    :key="option.value"
+                                                    x-bind:selected="getOptionSelected(option.value, field.default, field.val)"
+                                                    :value="option.value"
+                                                    x-html="option.label"
+                                                    :placeholder="field.label"
+                                                ></option>
+                                            </template>
+                                        </select>
+                                    </template>
+                                    <template x-if="field.elementTmpl === 'Aheadworks_Ca/form/element/validated-email'">
+                                        <input :placeholder="field.label" class="form-input input-text w-full"
+                                               :id="field.name" :value="field.val" :name="field.name" type="email"
+                                               x-bind:required="field.validation"/>
+                                    </template>
+                                    <template x-if="field.elementTmpl === 'ui/form/element/hidden'">
+                                        <input type="hidden"
+                                               :id="field.name" :value="field.val" :name="field.name"/>
+                                    </template>
+                                    <template x-if="!field.elementTmpl">
+                                        <input :placeholder="field.label" class="form-input input-text w-full"
+                                               :id="field.name" :value="field.val" :name="field.name" type="text"
+                                               x-bind:required="field.validation"/>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </fieldset>
+                <template x-if="actionTitle">
+                    <div class="flex w-full justify-center">
+                        <div class="primary w-full md:w-fit">
+                            <button type="submit"
+                                    class="action save btn btn-primary px-10 py-3.5 w-full md:w-fit mt-0 md:mt-10"
+                                    data-action="save-address"
+                                    title="<?= $escaper->escapeHtmlAttr(__('Save Address')) ?>">
+                                <span><?= $escaper->escapeHtml(__('Save Address')) ?></span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </form>
+    </div>
+    <?= $block->getChildHtml() ?>
+</section>

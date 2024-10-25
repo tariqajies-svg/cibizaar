@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Flurrybox PatchAssist package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Flurrybox PatchAssist
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2018 Flurrybox, Ltd. (https://flurrybox.com/)
+ * @license   GNU General Public License ("GPL") v3.0
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Flurrybox\PatchAssist\Api\PatchContextInterface" type="Flurrybox\PatchAssist\Api\PatchContext"/>
+
+    <type name="Flurrybox\PatchAssist\Model\ServiceRegistry">
+        <arguments>
+            <argument name="services" xsi:type="array">
+                <item name="attribute" xsi:type="object">Flurrybox\PatchAssist\Model\Service\Attribute</item>
+                <item name="template" xsi:type="object">Flurrybox\PatchAssist\Model\Service\Template</item>
+                <item name="config" xsi:type="object">Flurrybox\PatchAssist\Model\Service\Config</item>
+                <item name="media" xsi:type="object">Flurrybox\PatchAssist\Model\Service\Media</item>
+                <item name="cms" xsi:type="object">Flurrybox\PatchAssist\Model\Service\Cms</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

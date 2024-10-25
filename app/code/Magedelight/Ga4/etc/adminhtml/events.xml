@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+*
+* Magedelight
+* Copyright (C) 2023 Magedelight <info@Magedelight.com>
+*
+* @category Magedelight
+* @package Magedelight_Ga4
+* @copyright Copyright (c) 2023 Mage Delight (http://www.Magedelight.com/)
+* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+* @author Magedelight <info@Magedelight.com>
+*/
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="admin_system_config_changed_section_web">
+        <observer name="custom_admin_system_config_changed_section_general" instance="Magedelight\Ga4\Observer\ConfigObserver"/>
+    </event>
+    <event name="core_layout_render_element">
+        <observer name="magedelight_ga4" instance="Magedelight\Ga4\Observer\DefaultLoadingObserver" />
+    </event>
+</config>

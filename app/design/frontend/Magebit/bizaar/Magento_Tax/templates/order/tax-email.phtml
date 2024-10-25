@@ -1,0 +1,56 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Tax\Block\Sales\Order\Tax;
+use Magento\Tax\Helper\Data;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var Tax $block */
+/** @var Escaper $escaper */
+
+$order    = $block->getOrder();
+$source   = $block->getSource();
+$fullInfo = $this->helper(Data::class)->getCalculatedTaxes($source);
+?>
+<?php if ($fullInfo && $block->displayFullSummary()): ?>
+    <?php foreach ($fullInfo as $info): ?>
+        <?php
+        $percent = $info['percent'];
+        $amount = $info['tax_amount'];
+        $title = $info['title'];
+        ?>
+        <tr class="<?= $escaper->escapeHtmlAttr($block->getNameInLayout()) ?>">
+            <th <?= /* @noEscape */ $block->getLabelProperties() ?> scope="row">
+                <?= $escaper->escapeHtml($title) ?>
+                <?php if ($percent !== null): ?>
+                    (<?= (float)$percent ?>%)
+                <?php endif; ?>
+            </th>
+            <td <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $escaper->escapeHtmlAttr($block->getNameInLayout()) ?>">
+                <?= /* @noEscape */ $order->formatPrice($amount) ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+<?php else: ?>
+    <tr class="<?= $escaper->escapeHtmlAttr($block->getNameInLayout()) ?>">
+        <th <?= /* @noEscape */ $block->getLabelProperties() ?> scope="row">
+            <?= $escaper->escapeHtml(__('Tax')) ?>
+        </th>
+        <td <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $escaper->escapeHtmlAttr($block->getNameInLayout()) ?>">
+            <?= /* @noEscape */ $order->formatPrice($source->getTaxAmount()) ?>
+        </td>
+    </tr>
+<?php endif; ?>

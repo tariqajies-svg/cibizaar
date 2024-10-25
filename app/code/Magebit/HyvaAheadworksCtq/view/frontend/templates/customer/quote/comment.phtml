@@ -1,0 +1,111 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ctq\Api\Data\CommentInterface;
+use Aheadworks\Ctq\Block\Customer\Quote\Comment;
+use Aheadworks\Ctq\Model\Source\Owner;
+use Aheadworks\Ctq\ViewModel\Customer\Quote\Locator;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCtq\ViewModel\Customer\Quote;
+use Magento\Framework\Escaper;
+
+/** @var Comment $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$method = $block->getMethodToLocateQuote();
+$block->getDataProviderViewModel()->setMethodToLocateQuote($method);
+$quote = $block->getDataProviderViewModel()->getQuote();
+$quoteViewModel = $viewModels->require(Quote::class);
+$quoteId = $quote->getId();
+?>
+<div>
+    <ul class="clear border border-0 border-b mb-4.75 lg:mb-5">
+        <?php /** @var CommentInterface $comment */ ?>
+        <?php foreach ($block->getCommentListViewModel()->getCommentList($quoteId) as $comment): ?>
+            <?php if ($comment->getOwnerType() == Owner::BUYER) {
+                $commentClasses = 'bg-blue ml-auto rounded-br-none text-white';
+                $commentTitleClasses = '';
+                $linkClasses = 'light !text-white';
+            } else {
+                $commentClasses = 'bg-gray-f2 mr-auto rounded-bl-none';
+                $commentTitleClasses = 'text-navy';
+                $linkClasses = '!text-gray font-normal';
+            } ?>
+            <li class="<?= $escaper->escapeHtmlAttr($commentClasses) ?> rounded w-[calc(70%+0.5px)] text-xs py-3 px-5.25 mb-5 lg:max-w-[496px] lg:text-sm">
+                <div class="lg:flex gap-1">
+                    <div class="<?= $escaper->escapeHtmlAttr($commentTitleClasses) ?> leading-[16px] mb-px font-bold">
+                        <?= $escaper->escapeHtml($block->getCommentViewModel()->getOwnerName($comment)) ?>,
+                    </div>
+                    <div class="<?= $escaper->escapeHtmlAttr($commentTitleClasses) ?> leading-[16px] mb-1.75 font-bold uppercase">
+                        <?= $escaper->escapeHtml($quoteViewModel->getCreatedAtFormatted($comment->getCreatedAt())) ?>
+                    </div>
+                </div>
+                <div><?= $escaper->escapeHtml($comment->getComment()) ?></div>
+
+                <?php if ($comment->getAttachments()): ?>
+                    <?php foreach ($comment->getAttachments() as $attachment): ?>
+                        <div class="mt-1.75">
+                            <a target="_blank" class="<?= $escaper->escapeHtmlAttr($linkClasses) ?> no-underline"
+                               href="<?= $escaper->escapeUrl($block->getCommentViewModel()->getDownloadUrl($attachment->getFileName(), $quoteId, $comment->getId())) ?>">
+                                <i class="icon-file align-text-bottom mr-1"></i>
+                                <span class="link <?= $escaper->escapeHtmlAttr($linkClasses) ?>">
+                                    <?= $escaper->escapeHtml($attachment->getName()) ?>
+                                </span>
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+    <div>
+        <form action="<?= $escaper->escapeUrl($block->getCommentViewModel()->getAddCommentUrl()) ?>"
+              method="post"
+              x-data="hyva.formValidation($el)"
+              @submit="onSubmit"
+        >
+            <?= /** @noEscape */ $block->getBlockHtml('formkey') ?>
+            <?php if ($method == Locator::LOCATE_BY_HASH): ?>
+                <input type="hidden" name="hash" value="<?= /** @noEscape */ $quote->getHash() ?>">
+            <?php else: ?>
+                <input type="hidden" name="quote_id" value="<?= /** @noEscape */ $quoteId ?>">
+            <?php endif; ?>
+            <fieldset class="fieldset">
+                <div class="field field-reserved lg:!mb-7">
+                    <label class="label" for="message"><?= $escaper->escapeHtml(__('Comment')) ?></label>
+                    <textarea
+                        data-validate='{"required": true}'
+                        placeholder="<?= $escaper->escapeHtmlAttr(__('Enter your comment here...')) ?>"
+                        class="form-textarea"
+                        id="message"
+                        name="comment"
+                        type="text"
+                        rows="4"></textarea>
+                </div>
+                <div class="field field-reserved">
+                    <?= $block->getChildBlock('aw_ctq.customer.quote.comment.file_uploader')
+                        ->setLoaderName('aw_ctq.customer.quote.comment.file_uploader.loading')
+                        ->toHtml() ?>
+                </div>
+            </fieldset>
+            <div class="lg:border lg:border-0 lg:border-t lg:flex lg:justify-between lg:mt-4.5 lg:pt-12">
+                <button class="btn btn-primary w-full mb-5 lg:mb-0 lg:w-auto" type="submit">
+                    <?= $escaper->escapeHtml(__('Submit')) ?>
+                </button>
+                <?= $block->getChildHtml('aw_ctq.customer.quote.comment.back') ?>
+            </div>
+        </form>
+    </div>
+</div>

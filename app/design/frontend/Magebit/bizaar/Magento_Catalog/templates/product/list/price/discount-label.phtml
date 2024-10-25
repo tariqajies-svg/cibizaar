@@ -1,0 +1,66 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\ProductPage;
+use Hyva\Theme\ViewModel\ProductPrice;
+use Magento\Catalog\Model\Product;
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Catalog\Pricing\Price\RegularPrice;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Product $product */
+$product = $block->getProduct();
+
+/** @var ProductPrice $productPriceViewModel */
+$productPriceViewModel = $viewModels->require(ProductPrice::class);
+
+$regularPrice = $productPriceViewModel->getPriceValue(RegularPrice::PRICE_CODE, $product);
+$finalPrice = $productPriceViewModel->getPriceValue(FinalPrice::PRICE_CODE, $product);
+
+/** @var ProductPage $productViewModel */
+$productViewModel = $viewModels->require(ProductPage::class);
+
+?>
+
+<?php 
+if ($finalPrice < $regularPrice) { 
+    $saleEnd = '';
+    if($product->getSpecialToDate()) {
+        $now = new DateTime();
+        $specialToDate = new DateTime($product->getSpecialToDate());
+
+        $interval = $specialToDate->diff($now);
+
+        $saleEnd = '| ENDS In '.$interval->format("%a")." DAYS";
+        if($interval->format("%a") == 0 ) {
+            $saleEnd =  '| ENDS In '.$interval->format("%h HOURS");
+        }
+        if($interval->format("%h") == 0 ) {
+            $saleEnd =  '| ENDS In '.$interval->format("%i MINUTES");
+        }
+    }
+?>
+    <div class="bg-[rgba(251,214,4,0.5)] rounded-br-[10px] rounded-bl-[10px] text-center">
+        <span class="text-black text-[12px] font-bold"><?= $escaper->escapeHtml((round(100 - ($finalPrice / $regularPrice) * 100))."% OFF  ".$saleEnd)?></span>
+    </div>
+<?php } ?>
+

@@ -1,0 +1,48 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Theme\Block\Html\Pager;
+
+/** @var Escaper $escaper */
+/** @var Pager $block */
+
+$availableLimitOptions = $block->getAvailableLimit();
+?>
+
+<div class="field limiter">
+    <?php if (count($availableLimitOptions) > 1): ?>
+        <label class="inline-label"><?= $escaper->escapeHtml((string)__('Show')) ?>:</label>
+        <select data-role="limiter" class="px-5 bg-inherit bg-right focus:outline-0"
+            @change="changeUrl(
+            'product_list_limit',
+            $event.currentTarget.options[$event.currentTarget.selectedIndex].value,
+            options.limitDefault
+        )">
+        <?php foreach ($block->getAvailableLimit() as $key => $limit): ?>
+            <option value="<?= $escaper->escapeHtmlAttr($key) ?>"
+                <?php if ($block->isLimitCurrent($key)): ?>
+                    selected="selected"
+                <?php endif ?>>
+                <?= $escaper->escapeHtml($limit) ?>
+            </option>
+        <?php endforeach; ?>
+        </select>
+        <span class="sr-only limiter-text">
+        <?= $escaper->escapeHtml(__('per page')) ?>
+        </span>
+    <?php endif ?>
+</div>

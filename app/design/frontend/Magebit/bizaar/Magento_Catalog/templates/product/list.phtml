@@ -1,0 +1,135 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\CurrentCategory;
+use Hyva\Theme\ViewModel\ProductListItem;
+use Hyva\Theme\ViewModel\ProductPage;
+use Magebit\Catalog\Block\Product\ListProduct;
+use Magento\Framework\Escaper;
+
+/** @var ListProduct $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var ProductPage $productViewModel */
+/** @var CurrentCategory $currentCategoryViewModel */
+
+$productViewModel         = $viewModels->require(ProductPage::class);
+$productListItemViewModel = $viewModels->require(ProductListItem::class);
+$currentCategoryViewModel = $viewModels->require(CurrentCategory::class);
+
+$hideRatingSummary = (bool) $block->getData('hide_rating_summary');
+$hideDetails       = (bool) $block->getData('hideDetails');
+
+$productCollection = $block->getLoadedProductCollection();
+$counter = 0;
+?>
+<?php if (!$productCollection->count()): ?>
+    <div class="message info empty">
+        <div>
+            <?= $escaper->escapeHtml(__('We can\'t find products matching the selection.')) ?>
+        </div>
+    </div>
+<?php else: ?>
+    <section>
+        <?= $block->getToolbarHtml() ?>
+
+        <?= $block->getAdditionalHtml() ?>
+        <?php
+        if ($block->getMode() == 'grid') {
+            $viewMode         = 'grid';
+            // phpcs:ignore
+            $imageDisplayArea = 'category_page_grid_small_mobile,category_page_grid_mobile,category_page_grid_tablet,category_page_grid_large_tablet,category_page_grid_small_desktop,category_page_grid';
+            $showDescription  = false;
+            $templateType     = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+        } else {
+            $viewMode         = 'list';
+            $imageDisplayArea = 'category_page_list';
+            $showDescription  = true;
+            $templateType     = \Magento\Catalog\Block\Product\ReviewRendererInterface::FULL_VIEW;
+        }
+        /**
+         * Position for actions regarding image size changing in vde if needed
+         */
+        $pos = $block->getPositioned();
+        ?>
+        <div class="next-level-category">
+            <?php $category='';
+            if ($this->getRequest()->getFullActionName() == 'catalog_category_view') {
+               $customBlock = $block->getLayout()->createBlock('Magento\Catalog\Block\Category\View');
+                $category = $customBlock->getCurrentCategory();
+                if($category) {
+                    $subcategories = $category->getChildrenCategories();
+
+                    foreach($subcategories as $childSubcategory) {
+                        echo '<div class="cat-link"><a href="'.$childSubcategory->getUrl().'" class="clear">'.$childSubcategory->getName().'</a></div>';
+                    }
+        }
+    }
+    ?>
+            <!-- <div class="cat-link"><a href="#" class="clear">Access Points</a></div>
+            <div class="cat-link"><a href="#" class="clear">Antennas</a></div>
+            <div class="cat-link"><a href="#" class="clear">Fiber Networks</a></div>
+            <div class="cat-link"><a href="#" class="clear">Fleet Management CID</a></div>
+            <div class="cat-link"><a href="#" class="clear">IOT & LORa</a></div>
+            <div class="cat-link"><a href="#" class="clear">ISP Wireless Systems</a></div> -->
+        </div>
+        <?php if($category) { ?>
+        <div class="category-banner-img">
+            <?php
+            $categoryImage = $category->getImageUrl();
+
+            if($categoryImage) {
+            ?>
+           <img src="<?php echo$block->getBaseUrl().''.$categoryImage; ?>" alt="<?= $category->getName(); ?>" />
+       <?php } ?>
+        </div>
+    <?php } ?>
+        <div class="products wrapper mode-<?= /* @noEscape */$viewMode ?> products-<?= /* @noEscape */$viewMode ?>">
+            <div class="mx-auto pt-4 pb-12 grid gap-4 grid-cols-1 <?= /* @noEscape */$viewMode === 'grid'
+                    ? 'sm:grid-cols-2 xl:grid-cols-3'
+                    : '' ?>">
+                <?php /** @var \Magento\Catalog\Model\Product $product */ ?>
+                <?php $i=1;?>
+                <?php foreach ($productCollection as $product): ?>
+                    <?php $data[]=array("@type"=>"ListItem","position"=>$i,"name"=>$product->getName(),"url"=>$block->escapeUrl($product->getProductUrl()));?>
+                    <?php $counter++; ?>
+                    <?= $productListItemViewModel->getItemHtml(
+                        $product,
+                        $block,
+                        $viewMode,
+                        $templateType,
+                        $imageDisplayArea,
+                        $showDescription,
+                        [],
+                        $counter
+                    ) ?>
+                    <?php $i++;?>
+                <?php endforeach; ?>
+                <?php if (isset($data)) : ?>
+                    <script type="application/ld+json">
+                        {
+                        "@context":"https://schema.org",
+                        "@type":"ItemList",
+                        "itemListElement":<?php echo json_encode($data);?>
+                        }
+                    </script>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?= $block->getPagerHtml() ?>
+    </section>
+<?php endif; ?>

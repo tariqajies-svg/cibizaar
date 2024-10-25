@@ -1,0 +1,43 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Checkout\Block\Onepage\Success;
+use Magento\Framework\Escaper;
+
+/** @var Success $block */
+/** @var Escaper $escaper */
+?>
+<?php if ($block->getCanViewOrder() && $block->getCanPrintOrder()): ?>
+    <a href="<?= $escaper->escapeUrl($block->getPrintUrl()) ?>"
+       class="btn border bg-[#F3F2FF] text-[#4A40F6] font-bold text-base border-solid border-[#4A40F6] rounded-md mb-4 print-btn hover:bg-[#0073ED] hover:text-white"
+       target="_blank"
+       rel="noopener">
+       <svg class="mr-2.5" width="24" height="20" viewBox="0 0 24 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g clip-path="url(#clip0_4166_54)">
+                            <path d="M22.3069 4.89062H19.6182V1.12284C19.6182 0.779033 19.2931 0.5 18.8925 0.5H5.10651C4.70596 0.5 4.38088 0.779033 4.38088 1.12284V4.89062H1.69314C0.759494 4.89062 0 5.54253 0 6.34392V14.3346C0 15.136 0.759494 15.7879 1.69314 15.7879H4.38088V18.8772C4.38088 19.221 4.70596 19.5 5.10651 19.5H18.8925C19.2931 19.5 19.6182 19.221 19.6182 18.8772V15.7879H22.3069C23.2405 15.7879 24 15.136 24 14.3346V6.34392C24 5.54253 23.2405 4.89062 22.3069 4.89062ZM5.83214 1.74568H18.1669V4.89062H5.83214V1.74568ZM18.1669 18.2543H5.83214V12.0757H18.1669V18.2543ZM22.5487 14.3346C22.5487 14.4467 22.4375 14.5422 22.3069 14.5422H19.6182V11.4529C19.6182 11.1091 19.2931 10.83 18.8925 10.83H5.10651C4.70596 10.83 4.38088 11.1091 4.38088 11.4529V14.5422H1.69314C1.56253 14.5422 1.45126 14.4467 1.45126 14.3346V6.34309C1.45126 6.23015 1.56253 6.13547 1.69314 6.13547H22.3069C22.4375 6.13547 22.5487 6.23015 22.5487 6.34309V14.3346Z" fill="#4A40F6"></path>
+                            <path d="M18.8917 9.36936C19.4618 9.36936 19.924 8.97264 19.924 8.48326C19.924 7.99389 19.4618 7.59717 18.8917 7.59717C18.3216 7.59717 17.8594 7.99389 17.8594 8.48326C17.8594 8.97264 18.3216 9.36936 18.8917 9.36936Z" fill="#4A40F6"></path>
+                            <path d="M15.3006 13.3047H8.69829C8.29774 13.3047 7.97266 13.5837 7.97266 13.9275C7.97266 14.2713 8.29774 14.5504 8.69829 14.5504H15.3006C15.7011 14.5504 16.0262 14.2713 16.0262 13.9275C16.0262 13.5837 15.7011 13.3047 15.3006 13.3047Z" fill="#4A40F6"></path>
+                            <path d="M15.3006 15.7795H8.69829C8.29774 15.7795 7.97266 16.0586 7.97266 16.4024C7.97266 16.7462 8.29774 17.0252 8.69829 17.0252H15.3006C15.7011 17.0252 16.0262 16.7462 16.0262 16.4024C16.0262 16.0586 15.7011 15.7795 15.3006 15.7795Z" fill="#4A40F6"></path>
+                            </g>
+                            <defs>
+                            <clipPath id="clip0_4166_54">
+                            <rect width="24" height="19" fill="white" transform="translate(0 0.5)"></rect>
+                            </clipPath>
+                            </defs>
+                            </svg><?= $escaper->escapeHtml(__('Save Receipt')) ?>
+    </a>
+    <?= $block->getChildHtml() ?>
+<?php endif;?>

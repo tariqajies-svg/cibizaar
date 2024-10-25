@@ -1,0 +1,54 @@
+.aw-rl__create-list-wrapper {
+    /* @apply mt-3.75 mb-5 lg:mt-0 lg:mb-7.75; */
+    @apply mt-3.75 mb-5 lg:mt-0;
+
+    .dashboard-top-info-block {
+        @apply flex flex-col lg:items-center lg:flex-row lg:justify-between gap-y-4.75 lg:py-0;
+
+        .action-button {
+            @apply !mt-0;
+
+            .create-button {
+                @apply w-full py-1.75;
+            }
+        }
+    }
+}
+
+.aw-rl__list-table {
+    .requisition-list-main-table {
+        .table-actions {
+            @apply text-right;
+
+            a .edit-text {
+                @apply hidden;
+            }
+        }
+    }
+}
+
+.requisition-list-modal-content {
+    @apply pt-3.75 pb-2.75 lg:!pb-2.5;
+
+    .list-description {
+        @apply mt-6;
+    }
+
+    .save-button {
+        @apply mt-6 lg:mt-7;
+    }
+
+    .cancel-button {
+        @apply mt-4.25 lg:mt-5.25;
+    }
+}
+
+.requisition-list-modal-header {
+    @apply border-b border-gray-e6 pb-2.75 lg:pb-3.25;
+}
+
+.aw_requisition_list-rlist-edit {
+    .price-box {
+        @apply flex flex-col;
+    }
+}

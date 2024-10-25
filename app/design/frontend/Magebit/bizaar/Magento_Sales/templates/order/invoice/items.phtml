@@ -1,0 +1,69 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Framework\Escaper;
+use Magento\Sales\Block\Order\Invoice\Items;
+
+/** @var Escaper $escaper */
+/** @var Items $block */
+
+$order = $block->getOrder();
+?>
+<?php foreach ($order->getInvoiceCollection() as $invoice): ?>
+    <h3 class="order-title py-8">
+        <?= $escaper->escapeHtml(__('Invoice #')) ?><?= $escaper->escapeHtml($invoice->getIncrementId()) ?>
+        <a href="<?= $escaper->escapeUrl($block->getPrintInvoiceUrl($invoice)) ?>"
+           class="text-primary inline-block ml-2 pl-2 border-l text-sm no-underline"
+           target="_blank"
+           rel="noopener">
+            <i class="icon-printer inline-block mr-1"></i>
+            <span class="inline-block ml-1"><?= $escaper->escapeHtml(__('Print Invoice')) ?></span>
+        </a>
+    </h3>
+    <?= $block->getInvoiceCommentsHtml($invoice) ?>
+    <div class="order-items invoice">
+        <div class="hidden lg:grid grid-cols-5 text-sm text-navy py-5 border-t border-b font-bold">
+            <div class="col-span-2"><?= $escaper->escapeHtml(__('Product Name')) ?></div>
+            <div><?= $escaper->escapeHtml(__('Price')) ?></div>
+            <div><?= $escaper->escapeHtml(__('Qty Invoiced')) ?></div>
+            <div class="text-right"><?= $escaper->escapeHtml(__('Subtotal')) ?></div>
+        </div>
+        <?php $items = $invoice->getAllItems(); ?>
+        <?php foreach ($items as $item): ?>
+            <?php
+            $orderItem = $item->getOrderItem();
+            $parentItem = $orderItem->getParentItem();
+            if ($parentItem && $parentItem->getData('product_type') === Configurable::TYPE_CODE) {
+                continue;
+            }
+            ?>
+            <div class="order-item-row <?= ($parentItem) ?
+                'child-item ml-2 px-4 border-l-4 border-container text-sm' :
+                'parent-item'
+            ?>">
+                <?= $block->getItemHtml($item) ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <div class="order-totals flex justify-end border-t border-b border-container mt-2 p-5 lg:p-8 lg-max:rounded lg-max:border-0">
+        <div class="w-full lg:w-1/3">
+            <div class="totals-grid grid grid-cols-2 text-right p-2 gap-1">
+                <?= $block->getInvoiceTotalsHtml($invoice) ?>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>

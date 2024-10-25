@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu> 
+    	<add id="Magento_Catalog::attachment_settings" title="Product Attachment" translate="title" module="Sparsh_ProductAttachment" sortOrder="40" parent="Magento_Catalog::catalog" resource="Magento_Catalog::attachment_settings"/>
+    	<add id="Sparsh_ProductAttachment::productattachment" title="Manage Product Attachment" translate="title" module="Sparsh_ProductAttachment" sortOrder="60" parent="Magento_Catalog::attachment_settings" action="productattachment/attachgrid" resource="Sparsh_ProductAttachment::productattachment"/>
+    </menu>
+</config>

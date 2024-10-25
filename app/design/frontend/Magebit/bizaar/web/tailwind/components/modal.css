@@ -1,0 +1,19 @@
+.backdrop {
+    @apply fixed inset-0 flex bg-navy bg-opacity-50;
+}
+
+.pop-up {
+    @apply my-8 mx-5 lg:mx-8 top-0 left-0 right-0 bottom-0 items-start sm:items-center rounded-none;
+
+    &-dialog {
+        @apply w-full max-h-dialog sm:max-w-[496px] rounded-[5px] px-6 py-8 lg:p-15;
+    }
+
+    &-menu {
+        @apply w-full h-menu max-h-[720px] max-w-[1276px] rounded-[5px];
+    }
+
+    &-header {
+        @apply grid gap-3 lg:gap-4 pb-[11px] lg:pb-[15px] mb-4 lg:mb-6 border-b;
+    }
+}

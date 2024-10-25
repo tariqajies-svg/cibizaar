@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_NetworkInternationalNGenius package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="NetworkInternational\NGenius\Controller\NGeniusOnline\Payment"
+                type="Magebit\NetworkInternationalNGenius\Rewrite\NetworkInternational\NGenius\Controller\NGeniusOnline\Payment"/>
+    <preference for="NetworkInternational\NGenius\Gateway\Request\RefundRequest"
+                type="Magebit\NetworkInternationalNGenius\Rewrite\NetworkInternational\NGenius\Gateway\Request\RefundRequest"/>
+
+    <type name="NetworkInternational\NGenius\Gateway\Request\PaymentRequest">
+        <plugin name="Magebit_NetworkInternationalNGenius_Plugin_NetworkInternational_NGenius_Gateway_Request_PaymentRequest"
+                type="Magebit\NetworkInternationalNGenius\Plugin\NetworkInternational\NGenius\Gateway\Request\PaymentRequest"
+                sortOrder="10" disabled="false"/>
+    </type>
+
+    <!-- Payment Method Facade configuration -->
+    <virtualType name="NGeniusFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="infoBlockType" xsi:type="string">Magebit\NetworkInternationalNGenius\Block\Info</argument>
+        </arguments>
+    </virtualType>
+</config>

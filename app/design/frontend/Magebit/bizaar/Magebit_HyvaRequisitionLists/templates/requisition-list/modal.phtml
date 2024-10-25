@@ -1,0 +1,96 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+
+/* Hyva compatability Aheadworks Requisition List modal */
+/* This template should be in scope of  */
+?>
+<script defer>
+    function initRequisitionListModal() {
+        return {
+            isLoading: false,
+            error: false,
+            submitRequisitionList () {
+                this.isLoading = true;
+
+                if (!this.$refs.listName.value) {
+                    this.isLoading = false;
+                    this.error = true;
+                } else {
+                    fetch('<?= $escaper->escapeJs($block->getUrl('aw_rl/rlist/save')) ?>', {
+                        "headers": {
+                            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                        },
+                        "body": "form_key=" + hyva.getFormKey()
+                            + "&name=" + this.$refs.listName.value
+                            + "&description=" + this.$refs.description.value,
+                        "method": "POST",
+                        "mode": "cors",
+                        "credentials": "include"
+                    }).then(function (response) {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else if (response.ok) {
+                            return response.json();
+                        } else {
+                            typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                                [{
+                                    type: "warning",
+                                    text: "<?= $escaper->escapeHtml(__('Could not add item to wishlist.')) ?>"
+                                }], 5000
+                            );
+                        }
+                    }).catch(function (error) {
+                        typeof window.dispatchMessages !== "undefined" && window.dispatchMessages(
+                            [{
+                                type: "error",
+                                text: error
+                            }], 5000
+                        );
+                    })
+                }
+            }
+        }
+    }
+</script>
+<div class="pop-up-header">
+    <h3><?= $escaper->escapeHtml(__('Create Requisition List')) ?></h3>
+</div>
+<div x-data="initRequisitionListModal()"
+     class="requisition-list-modal-content">
+    <div class="requisition-list-new" id="list-validate-detail">
+        <div class="list-name field required">
+            <label class="label" for="name"><?= $escaper->escapeHtml(__('Requisition List Name')) ?></label>
+            <input class="form-input" :class="{'error': error}" type="text" name="name" x-ref="listName">
+            <span x-show="error" class="block text-2xs lg:text-xs text-error font-bold">
+                <?= $escaper->escapeHtml(__('Field is required')) ?>
+            </span>
+        </div>
+        <div class="list-description mt-3.5 lg:mt-3">
+            <label class="label" for="description"><?= $escaper->escapeHtml(__('Description')) ?></label>
+            <textarea class="form-input" x-ref="description" type="text" name="description" rows="4"></textarea>
+        </div>
+        <button @click.prevent="submitRequisitionList()" class="save-button btn btn-primary w-full mt-4 lg:mt-6">
+            <?= $escaper->escapeHtml(__('Save')) ?>
+        </button>
+    </div>
+    <button type="button" @click="$dispatch('hide-requisition-list-modal')" class="cancel-button link text-center w-full mt-4 lg:mt-6">
+        <?= $escaper->escapeHtml(__('Cancel')) ?>
+    </button>
+</div>

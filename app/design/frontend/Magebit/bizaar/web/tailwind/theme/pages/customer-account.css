@@ -1,0 +1,135 @@
+.login-card {
+    @apply border border-gray-e6 rounded shadow-none p-5;
+    @apply lg:p-15;
+}
+
+.account {
+    .actions-toolbar {
+        @apply border-none;
+    }
+}
+
+.actions-toolbar {
+    @apply border-none;
+}
+
+.customer-account-login {
+    .field-preserved:not(.field-error) {
+        @apply lg-max:mb-5.25;
+    }
+
+    .actions-toolbar {
+        @apply flex-row mt-0 pt-3;
+        @apply lg:mt-1 lg:pt-4;
+
+        .btn {
+            @apply w-full lg:w-auto;
+        }
+
+        .link {
+            @apply text-center w-full;
+            @apply lg:w-auto;
+        }
+    }
+
+    .block-title {
+        @apply mb-1.75;
+    }
+
+    .aw-ca-creat-wrapper {
+        @apply lg:w-1/2;
+
+        .actions-toolbar {
+            @apply mt-2;
+            @apply lg:mt-3;
+
+            .btn {
+                @apply mt-0;
+            }
+        }
+    }
+}
+
+.customer-account-create {
+    .field-preserved:not(.field-error) {
+        @apply mb-4;
+        @apply lg:mb-9;
+    }
+
+    .block-new-company {
+        @apply mt-3 lg:w-[calc(50%-theme(space.3))] lg:mt-0;
+
+        .block-title {
+            @apply mb-2;
+        }
+
+        .actions-toolbar {
+            @apply flex-row pt-4.75;
+            @apply lg:pt-7;
+
+            a {
+                @apply lg-max:w-full;
+            }
+        }
+    }
+
+    .form-create-account {
+        .actions-toolbar {
+            @apply lg:pt-0 mt-12;
+        }
+    }
+
+    .checkbox-container .checkbox-required {
+        .field-error,
+        .field-success {
+            .messages {
+                @apply hidden;
+            }
+        }
+    }
+}
+
+.customer-account-forgotpassword {
+    .actions-toolbar {
+        @apply flex-wrap mt-0 pt-1;
+        @apply lg:pt-5;
+
+        .primary {
+            @apply w-full order-1;
+            @apply lg:order-2 lg:w-auto;
+        }
+
+        .secondary {
+            @apply w-full order-2 text-center pt-5;
+            @apply lg:order-1 lg:w-auto lg:pt-0;
+        }
+    }
+}
+
+.aw_ca-company-create {
+    .fieldset-wrapper-title {
+        @apply mb-5 lg:mb-7;
+    }
+
+    .columns {
+        @apply lg:mt-12;
+    }
+
+    .field-preserved:not(.field-error) {
+        @apply lg-max:mb-5;
+    }
+}
+
+.aw_credit_limit-balance-index {
+    .price-two-rows br {
+        @apply lg-max:hidden;
+    }
+
+    tbody {
+        @apply md:space-y-0 md:gap-2;
+    }
+}
+
+.hide-date-icon::-webkit-calendar-picker-indicator {
+    @apply absolute opacity-0 right-2 z-10 w-5 h-5 px-10 py-3;
+}

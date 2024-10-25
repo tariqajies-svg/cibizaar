@@ -1,0 +1,37 @@
+#html-body.contact-index-index {
+    .columns {
+        .column {
+            .form.contact {
+                @apply p-5 lg:p-15 lg:w-1/2 md:w-2/3;
+            }
+        }
+    }
+
+    .info {
+        @apply p-5 lg:p-15 self-start;
+
+        [data-content-type='row'] > div {
+            @apply p-0;
+        }
+
+        .round-icon {
+            @apply rounded-full bg-blue text-white w-12 h-12 flex items-center justify-center;
+        }
+
+        .pagebuilder-column-line {
+            @apply lg-max:flex-col lg-max:justify-center lg-max:w-full lg-max:items-center lg-max:text-center;
+
+            &:not(:first-child) {
+                @apply lg-max:mt-7;
+            }
+
+            .pagebuilder-column {
+                @apply lg-max:p-0 lg-max:m-0 lg-max:w-full lg-max:items-center ;
+
+                &:not(:first-child) > div:first-child {
+                    @apply lg-max:pb-3;
+                }
+            }
+        }
+    }
+}

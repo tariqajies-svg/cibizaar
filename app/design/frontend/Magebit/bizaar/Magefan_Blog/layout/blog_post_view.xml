@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="hyva_form_validation"/>
+    <body>
+        <referenceBlock name="page.main.title" remove="true"/>
+        <referenceBlock name="blog.post.nextprev" remove="true" />
+        <referenceContainer name="blog.post.comments" remove="true" />
+
+        <referenceBlock name="preload">
+            <block class="Magefan\Blog\Block\Post\View"
+                   name="blog.post.preload"
+                   template="Magefan_Blog::page/head/view/preload.phtml">
+            </block>
+        </referenceBlock>
+
+        <referenceContainer name="blog.post.bottom">
+            <block class="Magefan\Blog\Block\Post\View\Comments\Magefan"
+                   name="blog.post.comments.hyva"
+                   template="Magefan_Blog::post/view/comments/comments-default.phtml">
+
+                <block class="Magento\Framework\View\Element\Template"
+                    name="blog.post.comments.hyva.list"
+                    template="Magefan_Blog::post/view/comments/comments-list.phtml">
+                    <block name="reply_recaptcha_validation"
+                           template="Magento_ReCaptchaFrontendUi::js/script_token.phtml"/>
+                </block>
+
+                <block name="comment_recaptcha_validation"
+                       template="Magento_ReCaptchaFrontendUi::js/script_token.phtml"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

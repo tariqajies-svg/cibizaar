@@ -1,0 +1,19 @@
+<!--@subject {{trans "Invoice #%invoice_number credit limit updates" invoice_number=$invoice_number }} @-->
+<!--@vars {
+"var email":"Sender Email",
+"var name":"Sender Name",
+"var invoice_number":"Invoice Number",
+"var subject":"Invoice Number"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<div>
+    <p>{{trans "Dear, %name" name=$name}}</p>
+    <p>{{trans "Your invoice %invoice_number due date is over." invoice_number=$invoice_number}}</p>
+    <p>
+        {{trans "If you have already paid this invoice, please disregard this email. If you have any questions or concerns, please don't hesitate to reach out to us."}}
+    </p>
+</div>
+
+{{template config_path="design/email/footer_template"}}

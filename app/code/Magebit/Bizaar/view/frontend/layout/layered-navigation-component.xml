@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="after.body.start">
+            <block name="head.bizaar-scripts.init-toolbar" template="Magento_Catalog::product/list/js/init-toolbar.phtml"/>
+            <block name="head.bizaar-scripts.init-layered-navigation-item" template="Magento_Catalog::product/list/js/init-layered-navigation-item.phtml"/>
+            <block name="head.bizaar-scripts.init-smile-attribute" template="Magento_Catalog::product/list/js/init-smile-attribute.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

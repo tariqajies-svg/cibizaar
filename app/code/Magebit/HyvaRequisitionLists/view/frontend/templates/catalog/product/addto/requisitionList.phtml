@@ -1,0 +1,84 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+use Aheadworks\RequisitionLists\ViewModel\Catalog\Product\View\RequisitionListProvider;
+
+/** @var Wrapper $block */
+/** @var Escaper $escaper */
+
+/** @var RequisitionListProvider $viewModel */
+$viewModel = $block->getListViewModel();
+$isEnabled = $viewModel->getIsEnabled();
+$requisitionLists = $block->getSearchResults();
+$productId = $block->getProductId();
+$addToListUrl = $viewModel->getAddToListUrl();
+
+if (!$productId) {
+    return;
+}
+?>
+
+<script>
+    function initAddToRequisitionList<?= /** @noEscape */ (int) $productId ?>() {
+        return {
+            productPageFormId: 'product_addtocart_form<?= /** @noEscape */ $productId ? (int) $productId : '' ?>',
+            isLoading: false,
+            requisitionlist: {},
+            getData(data) {
+                if (data.requisitionlist) {
+                    this.requisitionlist = data.requisitionlist
+                }
+            },
+            setList (value) {
+                let formObject = document.getElementById(this.productPageFormId);
+                formObject.action = '<?= $escaper->escapeUrl($addToListUrl) ?>';
+                formObject.appendChild(this.setHiddenElementToForm(value));
+                formObject.submit();
+            },
+            setHiddenElementToForm (listId) {
+                let input = document.createElement("input");
+                input.setAttribute("type", "hidden");
+                input.setAttribute("name", "list_id");
+                input.setAttribute("value", listId);
+                return input;
+            }
+        }
+    }
+</script>
+
+<?php if ($isEnabled): ?>
+    <div
+        x-data="initAddToRequisitionList<?= /** @noEscape */ (int) $productId ?>()"
+        @private-content-loaded.window="getData($event.detail.data)"
+    >
+        <label for="requisitionLists<?= $escaper->escapeHtmlAttr($productId) ?>">
+            <span><?= $escaper->escapeHtml(__('Add to requisition list')) ?></span>
+        </label>
+        <select
+            id="requisitionLists<?= $escaper->escapeHtmlAttr($productId) ?>"
+            @change="setList($event.target.value)"
+        >
+            <option disabled selected value><?= $escaper->escapeHtml(__('Select list')) ?></option>
+                <template x-if="requisitionlist.lists?.length">
+                    <template x-for="list in requisitionlist.lists">
+                        <option :value="list.list_id" x-html="list.name"></option>
+                    </template>
+                </template>
+        </select>
+    </div>
+<?php endif; ?>

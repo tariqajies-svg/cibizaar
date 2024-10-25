@@ -1,0 +1,74 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magebit\Catalog\ViewModel\ProductListAttributes;
+use Magebit\Catalog\ViewModel\Stock;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var Product $product */
+$product = $block->getProduct();
+$stock = $viewModels->require(Stock::class);
+
+/** @var ProductListAttributes $productAttributesViewModel */
+$productAttributesViewModel = $viewModels->require(ProductListAttributes::class);
+$productAttributeList = $productAttributesViewModel->getProductAttributes($product);
+$stockData = $stock->getProductStock($product);
+$hideProductListAttributes = $block->getHideProductListAttributes();
+
+$hidePriceHelper = $this->helper('\Amasty\HidePrice\Helper\Data');
+?>
+<ul class="product-attribute-list clear">
+    <li>
+        <?php if ($product->isSaleable()): ?>
+            <span class="text-[#008700] stock-bullet"><?= $escaper->escapeHtml(__('In Stock')) ?></span>
+        <?php else: ?>
+            <span class="text-[#008700] stock-bullet availabel"><?= $escaper->escapeHtml(__('Available')) ?></span>
+        <?php endif; ?>
+    </li>
+    <!-- <?//php if ($sku = $product->getSku()): ?>
+        <li>
+            <span><?//= $escaper->escapeHtml(__('SKU')) ?>:</span>
+            <span class="text-navy font-bold"><?//= $escaper->escapeHtml($sku) ?></span>
+        </li>
+    <?//php endif; ?> -->
+    <?php if (!$hideProductListAttributes && $productAttributeList): ?>
+        <?php foreach ($productAttributeList as $productAttribute): ?>
+            <li>
+                <span><?= $escaper->escapeHtml($productAttribute['label']) ?>:</span>
+                <span class="text-navy font-bold"><?= $escaper->escapeHtml($productAttribute['value']) ?></span>
+            </li>
+        <?php endforeach; ?>
+    <?php endif; ?>
+    <?php if (!$hidePriceHelper->isNeedHideProduct($block->getProduct())): ?>
+        <?php if ((int)$product->getData('dispatch_messag')) { ?>
+            <li class="text-[#008700] text-[14px]">
+                <span><?= $escaper->escapeHtml(__('Ships')) ?></span>
+                <span class="font-bold"><?= $escaper->escapeHtml(Date('D, d M', strtotime('+'.(int)$product->getData('dispatch_messag').'day'))) ?></span>
+            </li>
+        <?php } ?>
+    <?php else: ?>
+        <div class="amasty-hide-price-plp">
+                <?= $hidePriceHelper->getNewPriceHtmlBox($block->getProduct()) ?>
+                </div>      
+        <?php endif; ?>
+</ul>

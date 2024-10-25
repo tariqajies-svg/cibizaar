@@ -1,0 +1,86 @@
+delivery:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/empty.html
+      title: Delivery
+      content_heading: Delivery
+      page_layout: 1column
+      is_active: 1
+payment:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/empty.html
+      title: Payment
+      content_heading: Payment
+      page_layout: 1column
+      is_active: 1
+warranty-and-returns:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/empty.html
+      title: Warranty and Returns
+      content_heading: Warranty and Returns
+      page_layout: 1column
+      is_active: 1
+return-policy:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/empty.html
+      title: Return Policy
+      content_heading: Return Policy
+      page_layout: 1column
+      is_active: 1
+privacy-policy:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/empty.html
+      title: Privacy Policy
+      content_heading: Privacy Policy
+      page_layout: 1column
+      is_active: 1
+terms-and-conditions:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/empty.html
+      title: Terms &amp; Conditions
+      content_heading: Terms &amp; Conditions
+      page_layout: 1column
+      is_active: 1
+faq:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/empty.html
+      title: FAQ
+      content_heading: FAQ
+      page_layout: 1column
+      is_active: 1
+sales-manager:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/empty.html
+      title: Sales manager
+      content_heading: Sales manager
+      page_layout: 1column
+      is_active: 1
+about-us:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/about-us.html
+      title: About us
+      page_layout: 1column
+      is_active: 1
+      version: 2
+home:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/home.phtml
+      title: Home Page
+      page_layout: 1column
+      is_active: 1
+no-route:
+  page:
+    -
+      source: app/etc/configurator/Pages/content/no-route.html
+      title: 404 Not Found
+      page_layout: 1column
+      is_active: 1

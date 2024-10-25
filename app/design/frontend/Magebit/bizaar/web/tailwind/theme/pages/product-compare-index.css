@@ -1,0 +1,87 @@
+.catalog-product_compare-index {
+    .compare-product-item:last-of-type {
+        .compare-actions {
+            @apply mr-0;
+        }
+    }
+
+    .compare-actions {
+        .btn > :not([hidden]) ~ :not([hidden]) {
+            @apply mx-0;
+        }
+    }
+
+    .compare-table {
+        th {
+            @apply text-navy font-bold text-sm;
+        }
+
+        td {
+            @apply font-semibold text-sm;
+        }
+
+        tbody {
+            @apply border-t;
+
+            tr {
+                @apply border-b;
+            }
+        }
+
+        th,
+        td {
+            @apply px-0;
+
+            &:not(:last-child) {
+                @apply pr-5;
+            }
+        }
+
+        th[scope='row'],
+        td:not(.table-actions) {
+            @apply py-7.25;
+        }
+
+        .list-counter {
+            @apply hidden;
+        }
+    }
+
+    [data-content-type='row'] > div {
+        @apply !p-0 !m-0;
+    }
+
+    @media print {
+        header,
+        footer,
+        .compare-print,
+        .page-top-header {
+            @apply hidden;
+        }
+
+        .compare-table {
+            tr {
+                @apply flex flex-col;
+            }
+
+            td,
+            th {
+                @apply !py-2;
+            }
+
+            td {
+                @apply flex;
+            }
+
+            .list-counter {
+                @apply block mr-1;
+            }
+        }
+    }
+}
+
+.add-to-compare {
+    > :not([hidden]) ~ :not([hidden]) {
+        @apply mx-0;
+    }
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+ /**
+ * This file is part of the Magebit_Analytics package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Dunkin
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <google>
+            <gtag>
+                <analytics4>
+                    <active>0</active>
+                    <is_luma>0</is_luma>
+                </analytics4>
+                <adwords>
+                    <active>0</active>
+                    <conversion_label>Thank you for shopping!</conversion_label>
+                </adwords>
+            </gtag>
+        </google>
+    </default>
+</config>

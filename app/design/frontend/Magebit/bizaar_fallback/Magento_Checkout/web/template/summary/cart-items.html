@@ -1,0 +1,48 @@
+<!--
+/**
+ * This file is part of the Magebit/bizaar_fallback design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit/bizaar_fallback
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+-->
+<div class="block items-in-cart" data-bind="mageInit: {'collapsible':{'openedState': 'active', 'active': true}}">
+    <div class="title" data-role="title">
+        <strong role="heading" aria-level="1">
+            <translate args="maxCartItemsToDisplay" if="maxCartItemsToDisplay < getCartLineItemsCount()"></translate>
+            <translate args="'of'" if="maxCartItemsToDisplay < getCartLineItemsCount()"></translate>
+            <span class="number" data-bind="text: getCartSummaryItemsCount().toLocaleString(window.LOCALE)"></span>
+            <translate args="'Item in Cart'" if="getCartSummaryItemsCount() === 1"></translate>
+            <translate args="'Items in Cart'" if="getCartSummaryItemsCount() > 1"></translate>
+        </strong>
+    </div>
+    <div class="content minicart-items" data-role="content">
+        <div class="minicart-items-wrapper">
+            <ol class="minicart-items">
+                <each args="items()">
+                    <li class="product-item">
+                        <div class="product">
+                            <each args="$parent.elems()" render=""></each>
+                        </div>
+                    </li>
+                </each>
+            </ol>
+        </div>
+    </div>
+    <div class="actions-toolbar" if="maxCartItemsToDisplay < getCartLineItemsCount()">
+        <div class="secondary">
+            <a class="action viewcart" data-bind="attr: {href: cartUrl}">
+                <span data-bind="i18n: 'View and Edit Cart'"></span>
+            </a>
+        </div>
+    </div>
+</div>

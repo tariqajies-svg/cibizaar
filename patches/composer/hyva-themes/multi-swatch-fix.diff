@@ -1,0 +1,19 @@
+diff --git a/vendor/hyva-themes/magento2-theme-module/src/ViewModel/SwatchRenderer.php b/vendor/hyva-themes/magento2-theme-module/src/ViewModel/SwatchRenderer.php
+index 0550e32..36771f0 100644
+--- a/vendor/hyva-themes/magento2-theme-module/src/ViewModel/SwatchRenderer.php
++++ b/vendor/hyva-themes/magento2-theme-module/src/ViewModel/SwatchRenderer.php
+@@ -75,6 +75,14 @@ class SwatchRenderer implements ArgumentInterface
+         $filterAttributes = $this->getUsedSwatchFilters($product);
+         ksort($filterAttributes);
+         $swatchCacheKey = implode('', map(function (string $code) use ($filterAttributes): string {
++
++            // Multi Select swatch support
++            if (is_array($filterAttributes[$code])) {
++                return implode('', map(function (string $value) use ($code): string {
++                    return "$code={$value}";
++                }, $filterAttributes[$code]));
++            }
++
+             return "$code={$filterAttributes[$code]}";
+         }, keys($filterAttributes)));
+

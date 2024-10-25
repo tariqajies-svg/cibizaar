@@ -1,0 +1,32 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function addAriaLabels() {
+            document.querySelectorAll('figure[data-content-type="image"] a').forEach(function (anchor) {
+                if (!anchor.hasAttribute('aria-label')) {
+                    var hrefValue = anchor.getAttribute('href');
+                    if (hrefValue) {
+                        anchor.setAttribute('aria-label', hrefValue);
+                    }
+                }
+            });
+
+            const bannerAnchors = document.querySelectorAll('.home-hero-banner a');
+            if (bannerAnchors.length > 0) {
+                bannerAnchors.forEach(function (anchor) {
+                    if (!anchor.hasAttribute('aria-label')) {
+                        var hrefValue = anchor.getAttribute('href');
+                        if (hrefValue) {
+                            anchor.setAttribute('aria-label', hrefValue);
+                        }
+                    }
+                });
+            }
+        }
+        addAriaLabels();
+        const observer = new MutationObserver(addAriaLabels);
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+</script>

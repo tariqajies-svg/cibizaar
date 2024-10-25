@@ -1,0 +1,90 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Aheadworks\Ca\ViewModel\Company\Customer;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Customer\Block\Account\Dashboard\Info;
+use Magento\Framework\Escaper;
+
+/** @var Info $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+$customerViewModel = $viewModels->require(Customer::class);
+?>
+<h2 class="mb-4.75 lg:mb-7.75 text-2xl font-semibold"><?= $escaper->escapeHtml(__('Account Information')) ?></h2>
+<div class="flex justify-between gap-y-1.75 mb-7.25 lg:gap-6 flex-col lg:flex-row lg:mb-12.5">
+    <div class="w-full lg:w-1/2">
+        <div class="flex p-4.75 lg:flex-row border border-gray-e6 rounded lg:p-7.75 gap-4 lg:gap-8">
+            <div
+                class="inline-flex items-center justify-center flex-shrink-0 w-[48px] h-[48px] mb-5.25 lg:mb-4.5
+                    rounded-full bg-blue text-secondary">
+                <i class="icon icon-profile text-white"></i>
+            </div>
+            <div class="flex-grow"><h5 class="mb-3.25 lg:mb-4.75">
+                    <span><?= $escaper->escapeHtml(__('Contact Information')) ?></span></h5>
+                <div class="mb-2.75 lg:mb-5">
+                    <span class="block mb-2">
+                       <?= $escaper->escapeHtml($block->getName()) ?>
+                    </span>
+                    <span class="block mb-2 break-all">
+                       <?= $escaper->escapeHtml($block->getCustomer()->getEmail()) ?>
+                    </span>
+                    <span class="block">
+                       <?= $escaper->escapeHtml($block->getCustomer()->getExtensionAttributes()->getCustomerTelephone() ?: '') ?>
+                    </span>
+                </div>
+                <div class="lg:flex lg:flex-wrap lg:gap-2">
+                    <a
+                        class="btn btn-secondary mb-1 lg:mb-0 lg:w-28 text-[#4A40F6] rounded-md border-[#4A40F6] hover:text-white hover:bg-[#0165FF] hover:border-[#0165FF]"
+                        href="<?= $escaper->escapeUrl($block->getUrl('customer/account/edit')) ?>">
+                        <span><?= $escaper->escapeHtml(__('Edit')) ?></span>
+                    </a>
+                    <a
+                        class="btn btn-secondary text-[#4A40F6] rounded-md border-[#4A40F6] hover:text-white hover:bg-[#0165FF] hover:border-[#0165FF]"
+                        href="<?= $escaper->escapeUrl($block->getChangePasswordUrl()) ?>" class="action change-password">
+                        <?= $escaper->escapeHtml(__('Change Password')) ?>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php if ($block->isNewsletterEnabled() && !$customerViewModel->getCurrentCompanyUser()): ?>
+        <div class="w-full lg:w-1/2">
+            <div class="flex  p-4.75 lg:flex-row border border-gray-e6 rounded lg:p-7.75 gap-4 lg:gap-8">
+                <div
+                    class="inline-flex items-center justify-center flex-shrink-0 w-[48px] h-[48px] mb-5.25 lg:mb-4.5
+                    rounded-full bg-blue text-secondary">
+                    <i class="icon icon-mail text-white"></i>
+                </div>
+                <div class="flex-grow"><h5 class="mb-3.25 lg:mb-4.75">
+                        <span><?= $escaper->escapeHtml(__('Newsletters')) ?></span></h5>
+                    <p class="mb-2.75 lg:mb-5">
+                        <?php if ($block->getIsSubscribed()): ?>
+                            <?= $escaper->escapeHtml(__('You are subscribed to "General Subscription".')) ?>
+                        <?php else: ?>
+                            <?= $escaper->escapeHtml(__('You aren\'t subscribed to our newsletter.')) ?>
+                        <?php endif; ?>
+                    </p>
+                    <a
+                        class="btn btn-secondary lg:w-28 text-[#4A40F6] rounded-md border-[#4A40F6] hover:text-white hover:bg-[#0165FF] hover:border-[#0165FF]" 
+                        href="<?= $escaper->escapeUrl($block->getUrl('newsletter/manage')) ?>">
+                        <span><?= $escaper->escapeHtml(__('Edit')) ?></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+    <?= $block->getChildHtml() ?>
+</div>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_PageBuilder package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_PageBuilder:etc/content_type.xsd">
+    <type name="slide">
+        <appearances>
+            <appearance name="poster"
+                        master_template="Magebit_PageBuilder/content-type/slide/poster/master">
+                <elements>
+                    <element name="main">
+                        <html name="html"/>
+                    </element>
+                    <element name="wrapper">
+                        <attribute name="background_preload" source="data-background-preload"/>
+                    </element>
+                </elements>
+                <converters>
+                    <converter component="Magebit_PageBuilder/js/content-type/slide/mass-converter/widget-directive" name="widget_directive">
+                        <config>
+                            <item name="html_variable" value="html"/>
+                        </config>
+                    </converter>
+                </converters>
+            </appearance>
+        </appearances>
+    </type>
+</config>

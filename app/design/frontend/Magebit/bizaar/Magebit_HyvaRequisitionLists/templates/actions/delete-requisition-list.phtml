@@ -1,0 +1,68 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Modal;
+use Magento\Framework\Escaper;
+use Magento\Ui\Block\Wrapper;
+
+/** @var Wrapper $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var Modal $modalViewModel */
+
+$viewModel = $block->getParentBlock()->getData('requisition_list_view_model');
+$modalViewModel = $viewModels->require(Modal::class);
+?>
+
+<?php $modal = $modalViewModel->createModal()->withContent(<<<END_OF_CONTENT
+                <div class="p-5 md:p-8 flex flex-row justify-between">
+                    <p>{$escaper->escapeHtml(__('Are you sure that you want to delete this Requisition List with all items?'))}</p>
+
+                </div>
+                <div class="p-5 md:p-8 flex gap-x-3">
+                   <button
+                        @click="isLoading = true, window.location.replace('{$escaper->escapeHtml($viewModel->getDeleteUrl())}')"
+                        type="button"
+                        class="btn btn-primary"
+                    >
+                        {$escaper->escapeHtml(__('Ok'))}
+                    </button>
+                    <button @click="hide" type="button" class="btn btn-secondary">
+                        {$escaper->escapeHtml(__('Cancel'))}
+                    </button>
+                      {$block->getBlockHtml('aw_requisition_list_item_listing.header.loading')}
+                </div>
+                END_OF_CONTENT
+)->positionBottom()
+    ->addContainerClass('pop-up', 'rounded-none')
+    ->addOverlayClass('backdrop')
+    ->addDialogClass('pop-up-dialog')
+    ->removeOverlayClass('bg-black')
+    ->removeContainerClass('rounded-lg')
+    ->removeDialogClass('rounded-lg', 'shadow-xl') ?>
+<div
+    class="text-center py-5.25"
+    x-data="{...hyva.modal(), isLoading: false}">
+    <button
+        @click="<?= $escaper->escapeHtmlAttr($modal->getShowJs())?>"
+        type="button"
+        class="link"
+    >
+        <?= $escaper->escapeHtml(__('Delete Requisition List')) ?>
+    </button>
+    <?= /** @noEscape */ $modal->withAriaLabel('delete-list') ?>
+</div>

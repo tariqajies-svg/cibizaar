@@ -1,0 +1,48 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+/**
+ * @var Totals $block
+ * @var Escaper $escaper
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Sales\Block\Order\Totals;
+
+?>
+<?php foreach ($block->getTotals() as $code => $total): ?>
+    <?php if ($total->getBlockName()): ?>
+        <?= $block->getChildHtml($total->getBlockName(), false) ?>
+    <?php else: ?>
+        <div <?= /* @noEscape */ $block->getLabelProperties() ?>
+            class="<?= $escaper->escapeHtmlAttr($total->getCode()) ?>">
+            <?php if ($total->getStrong()): ?>
+                <strong><?= $escaper->escapeHtml($total->getLabel()) ?></strong>
+            <?php else: ?>
+                <?= $escaper->escapeHtml($total->getLabel()) ?>
+            <?php endif ?>
+        </div>
+        <div <?= /* @noEscape */ $block->getValueProperties() ?>
+             class="<?= $escaper->escapeHtmlAttr($total->getCode()) ?>"
+             data-th="<?= $escaper->escapeHtmlAttr($total->getLabel()) ?>">
+            <?php if ($total->getStrong()): ?>
+                <strong><?= /* @noEscape */ $block->formatValue($total) ?></strong>
+            <?php else: ?>
+                <?= /* @noEscape */ $block->formatValue($total) ?>
+            <?php endif?>
+        </div>
+    <?php endif; ?>
+<?php endforeach?>

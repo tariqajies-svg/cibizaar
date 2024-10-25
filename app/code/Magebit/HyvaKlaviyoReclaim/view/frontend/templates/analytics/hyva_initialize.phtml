@@ -1,0 +1,67 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaKlaviyoReclaim package.
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+
+declare(strict_types=1);
+
+use Klaviyo\Reclaim\Block\Initialize;
+use Magento\Framework\Escaper;
+
+/** @var Initialize $block */
+/** @var Escaper $escaper */
+
+$klaviyoKey = $block->getPublicApiKey();
+?>
+<?php if ($block->isKlaviyoEnabled() && $klaviyoKey): ?>
+    <div x-data="initKlaviyoCustomerTracking()"
+         @private-content-loaded.window="sendCustomerDataToKlaviyo(event.detail.data)"></div>
+    <script>
+        function load() {
+            return new Promise(resolve => {
+                (events => {
+                    const loadKlaviyo = () => {
+                        events.forEach(type => window.removeEventListener(type, loadKlaviyo))
+                        const script = document.createElement('script');
+                        script.type = 'text/javascript';
+                        script.src = '<?= $escaper->escapeJs(sprintf(
+                            'https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=%s',
+                            $escaper->escapeHtml($klaviyoKey)
+                        )) ?>';
+                        script.defer = true;
+                        script.onload = resolve;
+                        document.head.appendChild(script);
+                    };
+                    events.forEach(type => window.addEventListener(type, loadKlaviyo, { once: true, passive: true }))
+                })(['touchstart', 'mouseover', 'wheel', 'scroll', 'keydown'])
+            });
+        }
+
+        function initKlaviyoCustomerTracking() {
+            return {
+                sendCustomerDataToKlaviyo(data) {
+                    load().then(() => {
+                        let _learnq = window._learnq || [];
+                        let customer = data.customer;
+
+                        if (customer.email) {
+                            _learnq.push([
+                                'identify', {
+                                    $email: customer.email,
+                                    $first_name: customer.firstname ? customer.firstname : '',
+                                    $last_name: customer.lastname ? customer.lastname : '',
+                                },
+                            ]);
+                        }
+                    });
+                },
+            };
+        }
+    </script>
+<?php endif; ?>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Sales package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Sales
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Sales\Block\Order\Totals">
+        <plugin name="Magebit_Sales_Block_Order_Totals" type="Magebit\Sales\Block\Order\Totals"/>
+    </type>
+    <preference for="Magento\Tax\Block\Sales\Order\Tax" type="Magebit\Sales\Order\Tax"/>
+    <preference for="Aheadworks\CreditLimit\Block\Payment\Info" type="Magebit\Sales\Block\CreditLimit\Payment\Info"/>
+    <type name="\Magento\Payment\Helper\Data">
+        <plugin name="magebit_sales_plugin_payment_helper_data"
+                type="Magebit\Sales\Plugin\Payment\Helper\Data"/>
+    </type>
+</config>

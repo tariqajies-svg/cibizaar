@@ -1,0 +1,65 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\Modal\ModalInterface;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+/** @var ModalInterface $modal */
+
+/**
+ * This is the default modal container template
+ * @see \Hyva\Theme\Model\Modal\ModalBuilderInterface
+ */
+
+/**
+ * The following list of classes is used by default for modal dialogs. They are included here so they are not purged.
+ *
+ * fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center text-left inline-block bg-white shadow-xl
+ * rounded-[5px] p-15 top-0 pt-1 inset-y-0 right-0 pr-1 inset-x-0 bottom-0 pb-1 left-0 pl-1 max-h-screen overflow-auto
+ */
+?>
+<div <?= $modal->isInitiallyHidden() ? 'x-cloak' : '' ?>
+    x-spread="overlay('<?= $escaper->escapeHtmlAttr($modal->getDialogRefName()) ?>')"
+    class="<?= /** @noEscape  */ $modal->getOverlayClasses() ?>">
+    <div class="<?= /** @noEscape  */ $modal->getContainerClasses() ?>">
+        <div x-ref="<?= $escaper->escapeHtmlAttr($modal->getDialogRefName()) ?>" role="dialog" aria-modal="true"
+             <?php if ($modal->isOverlayDisabled()): ?>x-no-overlay<?php endif; ?>
+            <?php if ($modal->getAriaLabel()): ?>
+                aria-label="<?= $escaper->escapeHtmlAttr($modal->getAriaLabel()) ?>"
+            <?php endif; ?>
+            <?php if ($modal->getAriaLabelledby()): ?>
+                aria-labelledby="<?= $escaper->escapeHtmlAttr($modal->getAriaLabelledby()) ?>"
+            <?php endif; ?>
+             class="relative <?= /** @noEscape  */ $modal->getDialogClasses() ?>">
+            <i @click="hide"
+               class="absolute text-gray icon-close top-0 right-0 p-3 lg:p-3.5 bg-gray-f2 rounded-bl-[5px]
+                      hover:cursor-pointer lg:hover:text-blue-darker"></i>
+            <?= $modal->getContentHtml() ?>
+        </div>
+    </div>
+</div>
+<?php if ($selectors = $modal->getFocusTrapExcludeSelectors()): ?>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        hyva.modal.excludeSelectorsFromFocusTrap(<?= /** @noEscape */ json_encode($selectors) ?>);
+    });
+</script>
+<?php endif; ?>

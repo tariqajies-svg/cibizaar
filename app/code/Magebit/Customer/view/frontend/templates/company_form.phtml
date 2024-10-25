@@ -1,0 +1,249 @@
+<?php
+/**
+ * This file is part of the Magebit_Customer package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\Aheadworks\ViewModel\Ca\Company\Form;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+$formViewModel = $viewModels->require(Form::class)
+?>
+<fieldset class="mt-5 lg:mt-10.75">
+    <legend class="mb-5 lg:mb-6.75 border-t pt-5.5 w-full lg:pt-12.5">
+        <h3>
+            <?= $escaper->escapeHtml(__('Company Information')) ?>
+        </h3>
+    </legend>
+    <div class="grid grid-cols-1 lg:gap-x-7 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+        <div class="field field-reserved required !mb-5 lg:!mb-7">
+            <label for="company-name" class="label"><?= $escaper->escapeHtml(__('Company Name (As per Trade License)')) ?></label>
+            <input name="company[name]"
+                   id="company-name"
+                   class="form-input required-entry"
+                   data-validate='{"required": true}' />
+        </div>
+        <div class="field field-reserved required !mb-5 lg:!mb-7" x-data="{value: ''}">
+            <label for="company-description" class="label"><?= $escaper->escapeHtml(__('What Best Describes Your Business?')) ?></label>
+            <select name="company_extend[description]"
+                   id="company-description"
+                    x-model="value"
+                    class="form-select required-entry"
+                   data-validate='{"required": true}'
+            >
+                <?php foreach ($formViewModel->getCompanyDescriptionOptions() as $option): ?>
+                    <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>"><?= $escaper->escapeHtml($option['label']) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <input x-show="value === '<?= $escaper->escapeJs(__('Other')) ?>'"
+                   name="company_extend[description_other]"
+                   class="form-input mt-2"
+                   data-validate='{"required": true}'
+            />
+        </div>
+        <div class="field field-reserved !mb-5 lg:!mb-7">
+            <label for="company-website" class="label"><?= $escaper->escapeHtml(__('Company Website')) ?></label>
+            <input name="company_extend[website]"
+                   class="form-input"
+                   id="company-website"
+                   data-validate='{"website": true}'/>
+        </div>
+        <div class="field field-reserved country required !mb-5 lg:!mb-7">
+            <label for="company-country" class="label">
+                <span>
+                    <?= $escaper->escapeHtml(__('Country of Company Registration')) ?>
+                </span>
+            </label>
+            <?php $countries = $block->getParentBlock()
+                ->getCountryCollection()
+                ->setForegroundCountries($block->getTopDestinations())
+                ->toOptionArray();
+            ?>
+            <select name="company[country_id]"
+                    id="company-country"
+                    title="Country"
+                    required="required"
+                    class="form-select required-entry"
+                    x-ref="country_id"
+                    @change="changeCountry($event.target)"
+            >
+                <?php foreach ($countries as $country): ?>
+                    <option name="<?= /** @noEscape */ $country['label'] ?>"
+                            value="<?= /** @noEscape */ $country['value'] ?>"
+                            data-is-zip-required="<?= (isset($country['is_zipcode_optional'])) ? '0' : '1' ?>"
+                            data-is-region-required="<?= (isset($country['is_region_required'])) ? '1' : '0' ?>"
+                        <?= ($block->getCountryId() ===  $country['value']) ? 'selected="selected"' : '' ?>
+                    >
+                        <?= /** @noEscape */ $country['label'] ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="flex flex-col checkbox-container">
+            <p class="text-base mb-5 lg:mb-6.25">
+                <?= $escaper->escapeHtml('Enter one or both options. At least one is mandatory.') ?></p>
+            <div class="field field-reserved !mb-5 lg:!mb-7">
+                <label for="company-tax-id" class="label"><?= $escaper->escapeHtml(__('Tax ID')) ?></label>
+                <input name="company[tax_id]"
+                       class="form-input"
+                       id="company-tax-id"
+                       data-validate='{"one-is-required": true}'/>
+            </div>
+            <div class="field field-reserved !mb-5 lg:!mb-7">
+                <label for="company-tln" class="label"><?= $escaper->escapeHtml(__('Trade License Number')) ?></label>
+                <input name="company_extend[tln]"
+                       class="form-input"
+                       id="company-tln"
+                       data-validate='{"one-is-required": true}'/>
+            </div>
+        </div>
+    </div>
+</fieldset>
+<fieldset class="mt-0 lg:mt-5.75">
+    <legend class="mb-5 lg:mb-6 border-t pt-5.5 w-full lg:pt-12.5">
+        <h3>
+            <?= $escaper->escapeHtml(__('Registered Address (as per Govt Documents)')) ?>
+        </h3>
+    </legend>
+    <div class="grid grid-cols-1 lg:gap-x-7 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+        <div class="field field-reserved required !mb-5 lg:!mb-7">
+            <label for="company-street" class="label"><?= $escaper->escapeHtml(__('Street Address')) ?></label>
+            <input name="company[street]"
+                   id="company-street"
+                   class="form-input required-entry"
+                   data-validate='{"required": true}' />
+        </div>
+        <div class="field field-reserved required !mb-5 lg:!mb-7">
+            <label for="company-city" class="label"><?= $escaper->escapeHtml(__('City')) ?></label>
+            <input name="company[city]"
+                   id="company-city"
+                   class="form-input required-entry"
+                   data-validate='{"required": true}' />
+        </div>
+        <div class="field field-reserved required !mb-5 lg:!mb-7"
+             x-cloak
+             x-show="(hasAvailableRegions() && isRegionRequired)"
+        >
+            <label class="label" for="company[region_id]">
+                <span><?= $escaper->escapeHtml(__('State/Province')) ?></span>
+            </label>
+            <div class="control">
+                <template x-if="hasAvailableRegions() && isRegionRequired">
+                    <select id="company[region_id]" name="company[region_id]"
+                            title="<?= $escaper->escapeHtml(__('State/Province')) ?>"
+                            class="form-select validate-select region_id"
+                            :required="isRegionRequired"
+                            x-ref="region_id"
+                            x-model="selectedRegion"
+                    >
+                        <option value=""><?= $escaper->escapeHtml(__('Please select a region, state or province.')) ?></option>
+                        <template x-for="regionId in Object.keys(availableRegions)">
+                            <option :value="regionId"
+                                    :name="availableRegions[regionId].name"
+                                    x-text="availableRegions[regionId].name"
+                                    :selected="selectedRegion === regionId"
+                            >
+                            </option>
+                        </template>
+                    </select>
+                </template>
+                <template x-if="!hasAvailableRegions()">
+                    <input type="text"
+                           id="region"
+                           name="company[region]"
+                           x-ref="region"
+                           value="<?= $escaper->escapeHtmlAttr($block->getRegion()) ?>"
+                           title="<?= $escaper->escapeHtml(__('State/Province')) ?>"
+                           class="form-input"
+                           :required="isRegionRequired"
+                    />
+                </template>
+            </div>
+        </div>
+        <div class="field field-reserved zip required !mb-5 lg:!mb-7">
+            <label for="zip" class="label"><span><?= $escaper->escapeHtml(__('ZIP/Postal Code')) ?></span></label>
+            <div class="control">
+                <input type="text"
+                       name="company[postcode]"
+                       title="<?= $escaper->escapeHtml(__('ZIP/Postal Code')) ?>"
+                       id="zip"
+                       data-validate='{"required": true}'
+                       class="form-input validate-zip-international">
+            </div>
+        </div>
+        <div x-data="window.bizaar.telephone()"
+             x-init="init()"
+             class="field field-reserved required !mb-5 lg:!mb-7">
+            <label for="company[telephone]" class="label">
+                <span>
+                    <?= $escaper->escapeHtml(__('Mobile Number')) ?>
+                </span>
+            </label>
+            <div class="control flex gap-2 relative">
+                <div>
+                    <input
+                        required
+                        type="text"
+                        autocomplete="off"
+                        title="<?= $escaper->escapeHtmlAttr(__('Phone Code')) ?>"
+                        name="code"
+                        @input="dropdownOpened = true"
+                        x-model="phoneCode"
+                        @click="dropdownOpened = true"
+                        class="form-input w-[106px] phone-code-selector"
+                        @click.away="dropdownOpened = false; validateCode()">
+                    <template x-if="dropdownOpened">
+                        <div class="absolute bg-white border overflow-y-auto max-h-[200px] z-10 mt-1 w-full shadow-lg">
+                            <template x-for="item of filteredOptions()">
+                                <div
+                                    class="cursor-pointer py-0.25 px-2.75"
+                                    @click="phoneCode = item.data.dial_code; dropdownOpened = false; generateFullNumber()"
+                                    x-text="item.data.flag + ' ' + item.data.dial_code + ' ' + item.data.name"></div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <input type="tel"
+                       name="phone"
+                       id="phone"
+                       required
+                       @input="generateFullNumber"
+                       x-model="phoneNumber"
+                       title="<?= $escaper->escapeHtmlAttr(__('Mobile Number')) ?>"
+                       class="form-input"
+                >
+                <input type="hidden"
+                       :value="fullNumber"
+                       name="company[telephone]"
+                       id="company[telephone]">
+            </div>
+        </div>
+    </div>
+</fieldset>
+<fieldset class="mt-0 lg:mt-5">
+    <legend class="mb-5 lg:mb-6.75 border-t pt-5.5 w-full lg:pt-12.5">
+        <h3>
+            <?= $escaper->escapeHtml(__('Company Administrator')) ?>
+        </h3>
+    </legend>
+    <div class="lg:grid lg:gap-x-7 lg:grid-cols-2">
+        <div class="field field-reserved">
+            <label for="designation" class="label"><?= $escaper->escapeHtml(__('Designation')) ?></label>
+            <input name="extension_attributes[aw_ca_company_user][job_title]"
+                   id="designation"
+                   class="form-input required-entry"/>
+        </div>
+    </div>
+</fieldset>

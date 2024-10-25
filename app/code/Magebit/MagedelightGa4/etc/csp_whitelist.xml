@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_GoogleTagManager package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="img-src">
+            <values>
+                <value id="magebit_magedelightga4_google_com" type="host">*.google.com</value>
+                <value id="magebit_magedelightga4_google_lv" type="host">*.google.lv</value>
+                <value id="magebit_magedelightga4_google_ae" type="host">*.google.ae</value>
+                <value id="magebit_magedelightga4_google_qa" type="host">*.google.com.qa</value>
+                <value id="magebit_magedelightga4_doubleclick" type="host">*.doubleclick.net</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="magebit_magedelightga4_google_com" type="host">*.google.com</value>
+                <value id="magebit_magedelightga4_google_lv" type="host">*.google.lv</value>
+                <value id="magebit_magedelightga4_google_ae" type="host">*.google.ae</value>
+                <value id="magebit_magedelightga4_google_qa" type="host">*.google.com.qa</value>
+                <value id="magebit_magedelightga4_doubleclick" type="host">*.doubleclick.net</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

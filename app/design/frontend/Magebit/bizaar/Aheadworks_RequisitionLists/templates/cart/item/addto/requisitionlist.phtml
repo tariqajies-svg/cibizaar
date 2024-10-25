@@ -1,0 +1,13 @@
+<?php
+// @codingStandardsIgnoreFile
+
+/** @var $block \Magento\Ui\Block\Wrapper */
+?>
+<?php
+    /** @var \Aheadworks\RequisitionLists\ViewModel\Catalog\Product\View\RequisitionListProvider $viewModel */
+    $viewModel = $block->getListViewModel();
+    $isEnabled = $block->isEnabled();
+    $isShowInCartPage = $block->isShowInCartPage();
+    $product = $block->getItem();
+?>
+

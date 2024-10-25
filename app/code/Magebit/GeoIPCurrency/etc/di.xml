@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * This file is part of the Magebit_GeoIPCurrency package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Setting cookie of GeoIP-currency, used to identify if currency already set -->
+    <!-- Example taken from vendor/magento/module-page-cache/etc/frontend/di.xml:26 -->
+    <type name="Magento\Framework\App\Response\Http">
+        <plugin name="Magebit_GeoIPCurrency_Plugin_Magento_Framework_App_Response_Http"
+                type="Magebit\GeoIPCurrency\Plugin\Magento\Framework\App\Response\Http"
+                sortOrder="10" disabled="false"/>
+    </type>
+</config>

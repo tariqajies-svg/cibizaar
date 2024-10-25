@@ -1,0 +1,227 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+$storeConfig = $viewModels->require(StoreConfig::class);
+$maxItemsToDisplay = $storeConfig->getStoreConfig('checkout/sidebar/max_items_display_count');
+
+/** @var HeroiconsOutline $heroIcons */
+$heroIcons = $viewModels->require(HeroiconsOutline::class);
+?>
+<script>
+    function initAmQuoteCartDrawer() {
+        return {
+            open: false,
+            isLoading: false,
+            quotecart: {},
+            maxItemsToDisplay: <?= (int)$maxItemsToDisplay ?>,
+            itemsCount: 0,
+            totalCartAmount: 0,
+            getData(data) {
+                if (data.quotecart) {
+                    this.quotecart = data.quotecart;
+                    this.itemsCount = data.quotecart.items && data.quotecart.items.length || 0;
+                    this.totalCartAmount = this.quotecart.summary_count;
+                    this.setQuoteItems();
+                }
+                this.isLoading = false;
+            },
+            toggleQuote(state) {
+                this.open = state;
+                const body = document.body
+                state ? body.style.overflowY = 'hidden' : body.style.overflowY = '';
+            },
+            quoteItems: [],
+            getItemCountTitle() {
+                return hyva.strf('(%0 <?= $escaper->escapeJs(__('of')) ?> %1)', this.maxItemsToDisplay, this.itemsCount)
+            },
+            setQuoteItems() {
+                this.quoteItems = this.quotecart.items && this.quotecart.items.sort((a, b) => b.item_id - a.item_id) || [];
+
+                if (this.maxItemsToDisplay > 0) {
+                    this.quoteItems = this.quoteItems.slice(0, parseInt(this.maxItemsToDisplay, 10));
+                }
+            },
+            deleteItemFromQuote(itemId) {
+                this.isLoading = true;
+
+                const formKey = hyva.getFormKey();
+                const postUrl = BASE_URL + 'amasty_quote/sidebar/removeItem/';
+
+                fetch(postUrl, {
+                    "headers": {
+                        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    },
+                    "body": "form_key=" + formKey + "&item_id=" + itemId,
+                    "method": "POST",
+                    "mode": "cors",
+                    "credentials": "include"
+                }).then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else if (response.ok) {
+                        return response.json();
+                    } else {
+                        window.dispatchMessages && window.dispatchMessages([{
+                            type: 'warning',
+                            text: '<?= $escaper->escapeJs(__('Could not remove item from quote.')) ?>'
+                        }]);
+                        this.isLoading = false;
+                    }
+                }).then(result => {
+                    window.dispatchMessages && window.dispatchMessages([{
+                        type: result.success ? 'success' : 'error',
+                        text: result.success
+                            ? '<?= $escaper->escapeJs(__('You removed the item.')) ?>'
+                            : result.error_message
+                    }], result.success ? 5000 : 0)
+                    window.dispatchEvent(new CustomEvent('reload-customer-section-data'));
+                });
+            }
+        }
+    }
+</script>
+<section id="quotecart-drawer"
+         x-data="initAmQuoteCartDrawer()"
+         @private-content-loaded.window="getData($event.detail.data)"
+         @toggle-amquote.window="toggleQuote(true)"
+         @keydown.window.escape="toggleQuote(false)"
+>
+    <template x-if="quotecart">
+        <div role="dialog"
+             aria-labelledby="cart-drawer-title"
+             aria-modal="true"
+             @click.away="toggleQuote(false)"
+             class="fixed inset-y-0 right-0 z-40 flex max-w-full">
+            <div class="backdrop"
+                 x-show="open"
+                 x-transition:enter="ease-in-out duration-500"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in-out duration-500"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click="toggleQuote(false)"
+                 aria-label="Close panel"></div>
+            <div class="relative w-screen max-w-md shadow-2xl"
+                 x-show="open"
+                 x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
+                 x-transition:enter-start="translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="translate-x-full"
+            >
+                <div
+                    x-show="open"
+                    x-transition:enter="ease-in-out duration-500"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in-out duration-500"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0" class="absolute top-0 right-0 flex">
+                    <i @click="toggleQuote(false)" aria-label="Close panel"
+                       class="text-gray icon-close top-0 right-0 p-3 lg:p-3.5 bg-gray-f2 rounded-bl-[5px]
+                              hover:cursor-pointer lg:hover:text-blue-darker"></i>
+                </div>
+                <div class="flex flex-col justify-between h-full bg-white shadow-xl">
+                    <?= $block->getChildHtml('quotecart-drawer.top'); ?>
+
+                    <header class="px-5 pt-4 lg:px-8 lg:pt-8 pb-4">
+                        <h2 id="cart-drawer-title" class="text-lg font-medium leading-7 text-gray-900">
+                            <span class="font-semibold"><?= $escaper->escapeHtml(__('Quote Summary')) ?></span>
+                            <span class="items-total text-xs"
+                                  x-show="maxItemsToDisplay && maxItemsToDisplay < itemsCount"
+                                  x-text="getItemCountTitle()"></span>
+                        </h2>
+                    </header>
+
+                    <?= $block->getChildHtml('quotecart-drawer.items.before'); ?>
+
+                    <div x-show="itemsCount" class="relative h-full flex flex-col px-4 overflow-y-auto bg-white lg:px-8 border-container">
+                        <template x-for="item in quoteItems">
+                            <div class="flex items-start py-4 lg:py-6 space-x-4 lg:space-x-6 border-t border-gray-e6">
+                                <a :href="item.product_url" class="flex items-center justify-center border border-gray-e6 w-20 h-20 rounded flex-shrink-0">
+                                    <img
+                                        :src="item.product_image.src"
+                                        :width="item.product_image.width"
+                                        :height="item.product_image.height"
+                                        loading="lazy"
+                                    />
+                                </a>
+                                <div class="w-3/4 space-y-2">
+                                    <div>
+                                        <p class="cart-pro-name font-normal text-sm text-black overflow-clip overflow-hidden">
+                                            <span x-html="item.qty"></span> x <span x-html="item.product_name"></span>
+                                        </p>
+                                        <p class="text-sm"><span x-html="item.product_sku"></span></p>
+                                    </div>
+                                    <template x-for="option in item.options">
+                                        <div class="pt-2">
+                                            <p class="font-semibold" x-text="option.label + ':'"></p>
+                                            <p class="text-secondary" x-html="option.value"></p>
+                                        </div>
+                                    </template>
+                                    <p><span x-html="item.product_price"></span></p>
+                                    <div class="flex pt-3">
+                                        <a :href="item.configure_url"
+                                           x-show="item.product_type !== 'grouped'"
+                                           class="btn btn-secondary btn-sq text-gray lg:hover:text-blue-darker
+                                                  active:text-navy lg:active:text-navy mr-1 lg:mr-2">
+                                                  <i class="icon-edit"></i>
+                                        </a>
+                                        <button class="inline-flex p-2 btn btn-sq btn-secondary"
+                                                @click="deleteItemFromQuote(item.item_id)">
+                                                <i class="icon-delete text"></i>
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <?= $block->getChildHtml('quotecart-drawer.totals.before'); ?>
+
+                    <div x-show="itemsCount" class="relative grid gap-6 px-4 py-6 bg-gray-f2 sm:gap-8 sm:px-6">
+                        <div class="w-full flex justify-between">
+                            <h4 class="text-gray font-bold"><?= $escaper->escapeHtml(__('Subtotal')) ?>:</h4>
+                            <h4 class="text-gray font-bold" x-html="quotecart.subtotal"></h4>
+                        </div>
+                        <div class="flex justify-center w-full">
+                            <a @click.prevent.stop="$dispatch('toggle-authentication',
+                                {url: '<?= $escaper->escapeUrl($block->getUrl('amasty_quote/cart')) ?>'});"
+                               href="<?= $escaper->escapeUrl($block->getUrl('amasty_quote/cart')) ?>"
+                               class="inline-flex btn btn-primary w-full">
+                                <?= $escaper->escapeHtml(__('My Quote Cart')) ?>
+                            </a>
+                        </div>
+                        <?= $block->getChildHtml('extra_actions') ?>
+                    </div>
+
+                    <template x-if="!itemsCount">
+                        <div class="relative px-4 py-6 bg-gray-f2 border-bs sm:px-6 border-container">
+                            <?= $escaper->escapeHtml(__('Quote is empty')) ?>
+                        </div>
+                    </template>
+
+                    <?= $block->getChildHtml('quotecart-drawer.bottom'); ?>
+                </div>
+            </div>
+            <?= $block->getChildHtml('loading') ?>
+        </div>
+    </template>
+</section>

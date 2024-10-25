@@ -1,0 +1,54 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaRequisitionLists package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaRequisitionLists
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+?>
+<h3 class="pop-up-header"><?= $escaper->escapeHtml(__('Create Requisition List')) ?></h3>
+<form x-data="{isLoading: false, ...hyva.formValidation($el)}"
+      action="<?= $escaper->escapeHtmlAttr($escaper->escapeUrl($block->getUrl($block->getFormAction()))) ?>"
+      @submit="onSubmit"
+      method="post">
+    <div class="field field-reserved required">
+        <label class="label" for="name"><?= $escaper->escapeHtml(__('Requisition List Name')) ?></label>
+        <input class="form-input field-reserved"
+               placeholder="<?= $escaper->escapeHtml(__('Requisition List Name')) ?>"
+               type="text"
+               id="name"
+               name="name"
+               data-validate='{"required": true}'
+               @change="onChange">
+    </div>
+    <div class="field field-reserved">
+        <label class="label" for="description"><?= $escaper->escapeHtml(__('Description')) ?></label>
+        <textarea class="form-input "
+                  placeholder="<?= $escaper->escapeHtml(__('Description')) ?>"
+                  type="text"
+                  id="description"
+                  name="description"
+                  rows="4"></textarea>
+    </div>
+    <input name="form_key" type="hidden" value="{$formKey}"/>
+    <button type="submit" class="btn btn-primary w-full mt-4 lg:mt-6">
+        <?= $escaper->escapeHtml(__('Save')) ?>
+    </button>
+</form>
+<a type="button" class="!text-center w-full mt-4 lg:mt-6" @click="hide">
+    <?= $escaper->escapeHtml(__('Cancel')) ?>
+</a>

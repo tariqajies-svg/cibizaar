@@ -1,0 +1,244 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magebit\HyvaAheadworksCa\Block\Company\Form;
+use Magento\Framework\Escaper;
+
+/** @var Form $block */
+/** @var Escaper $escaper */
+?>
+
+<script>
+    function initEditForm() {
+        return {
+            saveUrl: '',
+            isLoading: false,
+            fieldsets: {},
+            formData: {},
+
+            getComponentData: function () {
+                const JsLayout = JSON.parse('<?= $escaper->escapeJs($block->getJsLayout()) ?>');
+                const dictionaries = JsLayout.components.awCaCompanyProvider.dictionaries;
+                this.saveUrl = JsLayout.components.awCaCompanyProvider.clientConfig.urls.save;
+
+                // Collecting fields from xml file
+                this.fieldsets = Object.values(JsLayout.components.awCaForm.children).map(fieldset => {
+                    if (fieldset.children && fieldset.component === 'Magento_Ui/js/form/components/fieldset') {
+                        for (let i in fieldset.children) {
+
+                            if (fieldset.children[i].component) {
+                                // Prepare scope and values
+                                let dataScope = fieldset.children[i].dataScope.split('.'),
+                                    val = '';
+
+                                if (fieldset.dataScope.split('.').length === 2) {
+                                    dataScope.unshift(fieldset.dataScope.split('.')[1]);
+                                }
+
+                                // Give children a name
+                                fieldset.children[i].name = '';
+                                dataScope.forEach((slug, k) => {
+                                    fieldset.children[i].name += k === 0 ? slug : '[' + slug + ']';
+                                });
+
+                                // Populate with values
+                                fieldset.children[i].val = val;
+                                this.formData[fieldset.children[i].name] = val;
+
+                                // If element type is select - add options
+                                if (fieldset.children[i].elementTmpl === 'ui/form/element/select') {
+                                    if (dictionaries[fieldset.children[i].dataScope]) {
+                                        fieldset.children[i].options = dictionaries[fieldset.children[i].dataScope];
+                                    }
+                                }
+                            } else {
+                                // Delete empty elements
+                                delete fieldset.children[i];
+                            }
+                        }
+                        fieldset.children = Object.values(fieldset.children);
+                    }
+
+                    return fieldset;
+                });
+            },
+
+            // Sort field by sort order attribute
+            getSortingFields: function (fields) {
+                let fieldsValues = Object.values(fields);
+
+                fieldsValues.sort(function (a, b) {
+                    var keyA = new Date(parseInt(a.sortOrder)),
+                        keyB = new Date(parseInt(b.sortOrder));
+
+                    if (keyA < keyB) {
+                        return -1;
+                    }
+                    if (keyA > keyB) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                return fieldsValues;
+            },
+
+            // Change value
+            changeValue: function (event) {
+                this.formData[event.target.name] = event.target.value;
+            },
+
+            // Submit form
+            submitForm: function () {
+                this.isLoading = true;
+                const formKey = document.querySelector('input[name=form_key]').value;
+                const $form = document.getElementById('editform');
+                const dataForm = new FormData($form);
+                let data = {};
+                let request_data = '';
+
+                for (let [name, value] of dataForm) {
+                    data[name] = value;
+                }
+
+                for (let fieldName in data) {
+                    if (request_data) {
+                        request_data += '&'
+                    }
+                    request_data += fieldName + '=' + encodeURIComponent(data[fieldName]);
+                }
+
+                request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                fetch(this.saveUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: request_data
+                    }
+                ).then(response => {
+                        return response
+                    }
+                ).then(data => {
+                    this.isLoading = false;
+                    if (data.errors) {
+                        dispatchMessages([{
+                            type: 'error',
+                            text: data.message
+                        }], 5000);
+                    } else {
+                        window.location.href = data.url
+                    }
+                });
+            }
+        }
+    }
+</script>
+<section x-data="initEditForm()"
+         x-init="getComponentData()"
+         class="mt-2 md:mt-0">
+    <div class="block form">
+        <form id="editform"
+              method="post"
+              @submit.prevent="submitForm();"
+              class="w-full"
+        >
+            <div class="fieldset-wrapper">
+                <template x-for="[f, fieldset] of Object.entries(fieldsets)">
+                    <div class="fieldset-block">
+                        <template x-if="fieldset.template === 'Aheadworks_Ca/form/element/fieldset'">
+                            <fieldset class="fieldset border-b border-container-lighter pb-5 md:pb-10">
+                                <div class="fieldset-wrapper-title text-black font-normal text-xl">
+                                    <span x-html="fieldset.label"></span>
+                                </div>
+                                <div class="grid grid-cols-1 gap-x-5 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                                    <template x-for="field of getSortingFields(fieldset.children)">
+                                        <div class="field">
+                                            <div>
+                                                <label x-html="field.label" :for="field.name"></label>
+                                                <div class="control">
+                                                    <template x-if="field.elementTmpl === 'ui/form/element/select'">
+                                                        <select class="select w-full" :id="field.name"
+                                                                :name="field.name"
+                                                                x-bind:required="field.validation"
+                                                                x-model="formData[field.name]"
+                                                                x-on:change="changeValue($event)">
+                                                            <template
+                                                                    x-for="[k, option] of Object.entries(field.options)">
+                                                                <option
+                                                                        :title="option.label"
+                                                                        :key="option.value"
+                                                                        x-bind:selected="option.value === field.val || field.default"
+                                                                        :value="option.value"
+                                                                        x-html="option.label"
+                                                                ></option>
+                                                            </template>
+                                                        </select>
+                                                    </template>
+                                                    <template
+                                                            x-if="field.elementTmpl === 'Aheadworks_Ca/form/element/validated-email'">
+                                                        <input
+                                                                :readonly="field.disabled"
+                                                                class="form-input w-full"
+                                                                :id="field.name"
+                                                                :placeholder="field.placeholder"
+                                                                :value="field.val"
+                                                                :name="field.name"
+                                                                type="email"
+                                                                x-model="formData[field.name]"
+                                                                x-bind:required="field.validation"
+                                                                x-on:change="changeValue($event)"
+                                                        />
+                                                    </template>
+                                                    <div>
+                                                        <template x-if="!field.elementTmpl">
+                                                            <input
+                                                                    :readonly="field.disabled"
+                                                                    class="form-input w-full"
+                                                                    :id="field.name"
+                                                                    :placeholder="field.placeholder"
+                                                                    :value="field.val"
+                                                                    :name="field.name"
+                                                                    :x-ref="field.name"
+                                                                    x-model="formData[field.name]"
+                                                                    type="text"
+                                                                    x-bind:required="field.validation"
+                                                                    x-on:change="changeValue($event)"
+                                                            />
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </template>
+                                </div>
+                            </fieldset>
+                        </template>
+                        <template x-if="fieldset.component === 'Magento_Ui/js/form/components/button'">
+                            <div class="flex justify-center mt-5 md:mb-15 md:mt-10">
+                                <button type="submit"
+                                        class="inline-flex flex-shrink-0 xl:mt-0 btn btn-primary px-10 py-3 md:py-3.5 font-medium w-full md:w-auto">
+                                    <span x-html="fieldset.title"></span>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </form>
+    </div>
+</section>

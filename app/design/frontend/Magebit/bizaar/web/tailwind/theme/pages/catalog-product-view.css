@@ -1,0 +1,110 @@
+.catalog-product-view {
+    .page-main {
+        @apply mb-0 mt-2 lg:mt-2.75;
+    }
+
+    .columns {
+        @apply max-w-full p-0 m-0;
+    }
+
+    .page-title {
+        @apply text-xl;
+    }
+
+    .top-container {
+        @apply flex justify-between container w-full items-start lg:items-center flex-col lg:flex-row;
+
+        .breadcrumbs .container {
+            @apply p-0;
+        }
+    }
+
+    .product-info-wrapper {
+        @apply container mb-7 lg:mb-11.25;
+    }
+
+    [id='product_addtocart_form'] {
+        @apply m-0;
+    }
+
+    .product-info-actions {
+        button,
+        a,
+        .aw_rl-action {
+            @apply w-full h-12 lg:w-13 lg:h-13 lg:flex-shrink-0;
+        }
+    }
+
+    .product-atc-mobile {
+        @apply hidden fixed grid grid-cols-qty-atc-fixed bottom-0 transform -translate-x-5 bg-black w-full h-15 z-30;
+
+        box-shadow: 0 -5px 40px rgb(6 43 72 / 13%);
+
+        .product-view-qty {
+            input {
+                @apply h-15 rounded-none py-4.5 border-transparent invalid:border-error;
+            }
+
+            button {
+                @apply h-14.5;
+            }
+        }
+
+        button {
+            @apply rounded-none h-full;
+        }
+    }
+
+    .product-info-gallery {
+        .image-shadow::after {
+            @apply border-2 border-blue block -top-px -left-px absolute rounded w-[calc(100%+2px)] h-[calc(100%+2px)];
+
+            content: '';
+        }
+    }
+
+    .gallery-fullscreen {
+        .slider-template {
+            @apply mx-auto w-full max-w-[335px] lg:max-w-[496px];
+        }
+    }
+
+    .product-description-wrapper {
+        @apply text-gray text-sm max-w-none lg:text-base;
+
+        [data-content-type='row'],
+        [data-content-type='row'] > div {
+            @apply m-0 p-0;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        strong {
+            @apply text-navy;
+        }
+
+        h4 {
+            @apply font-bold my-1.75;
+        }
+
+        p {
+            @apply mb-4.25 lg:mb-6.5;
+        }
+    }
+
+    .upsell-products-wrapper {
+        & > .product-slider {
+            @apply border-t-0 pt-0;
+        }
+    }
+
+    .amxnotif-block {
+        .field-reserved:not(.field-error) {
+            @apply mb-0;
+        }
+    }
+}

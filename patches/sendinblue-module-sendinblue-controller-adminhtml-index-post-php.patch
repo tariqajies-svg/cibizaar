@@ -1,0 +1,13 @@
+--- /dev/null
++++ ../Controller/Adminhtml/index/Post.php
+@@ -156,8 +156,8 @@
+             if ($status == 1) {
+                 $apikey = trim($post['apikey']);
+                 //We remove all records that belongs to the old API
+-                $oldApiKey = trim($model->_getValueDefault->getValue('sendinblue/api_key_v3', $scopeInerface));
+-                if ($apikey != $oldApiKey) {
++                $oldApiKey = $model->_getValueDefault->getValue('sendinblue/api_key_v3', $scopeInerface);
++                if ($oldApiKey && $apikey != trim($oldApiKey)) {
+                     $model->resetDataBaseValue();
+                     $model->resetSmtpDetail();
+                 }

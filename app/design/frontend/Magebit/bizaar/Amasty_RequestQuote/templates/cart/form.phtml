@@ -1,0 +1,87 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Cart\Grid;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Cart\ItemOutput;
+use Magento\Framework\Escaper;
+
+/**  @var Grid $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Escaper $escaper */
+
+$cartItemOutputViewModel = $viewModels->require(ItemOutput::class);
+?>
+<?php $mergedCells = ($cartItemOutputViewModel->isItemPriceDisplayBoth() ? 2 : 1); ?>
+<?= $block->getChildHtml('form_before') ?>
+<form action="<?= $escaper->escapeUrl($block->getUrl('amasty_quote/cart/updatePost')) ?>"
+      x-data
+      @submit.prevent="hyva.postQuote($event.target)"
+      method="post"
+      id="amasty-quote-update"
+      class="form form-cart w-full float-left">
+    <?= $block->getBlockHtml('formkey') ?>
+    <div class="cart table-wrapper<?= $mergedCells == 2 ? ' detailed' : '' ?>">
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="cart-products-toolbar cart-products-toolbar-top toolbar">
+                <?= $block->getPagerHtml() ?>
+            </div>
+        <?php endif ?>
+        <table id="shopping-cart-table"
+               class="cart items data table w-full table-row-items">
+            <caption class="table-caption sr-only">
+                <?= $escaper->escapeHtml(__('Quote Items')) ?>
+            </caption>
+            <thead class="hidden lg:table-header-group">
+            <tr class="text-right">
+                <th class="col item text-left pt-4 px-4 pb-2" scope="col">
+                    <?= $escaper->escapeHtml(__('Product')) ?>
+                </th>
+                <th class="col price pt-4 px-4 pb-2 text-center" scope="col">
+                    <?= $escaper->escapeHtml(__('Price')) ?>
+                </th>
+                <th class="col qty pt-4 px-4 pb-2 text-center" scope="col">
+                    <?= $escaper->escapeHtml(__('Qty')) ?>
+                </th>
+                <th class="col subtotal pt-4 px-4 pb-2" scope="col">
+                    <?= $escaper->escapeHtml(__('Subtotal')) ?>
+                </th>
+            </tr>
+            </thead>
+            <?php foreach ($block->getItems() as $item): ?>
+                <?= $block->getItemHtml($item) ?>
+            <?php endforeach ?>
+        </table>
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="cart-products-toolbar cart-products-toolbar-bottom toolbar">
+                <?= $block->getPagerHtml() ?>
+            </div>
+        <?php endif ?>
+    </div>
+    <div class="cart actions flex flex-col sm:flex-row justify-between gap-4 items-center my-4 bg-xyz">
+        <button type="submit"
+                @click="$refs.updateCartAction.value = 'empty_cart'"
+                title="<?= $escaper->escapeHtml(__('Clear Quote')) ?>"
+                class="action clear-quote btn btn-primary btn-light md-max:w-full" id="empty_cart_button">
+            <span><?= $escaper->escapeHtml(__('Clear Quote')) ?></span>
+        </button>
+        <button type="submit"
+                @click="$refs.updateCartAction.value = 'update_qty'"
+                title="<?= $escaper->escapeHtml(__('Update Quote')) ?>"
+                class="action update btn btn-primary md-max:w-full">
+            <?= $escaper->escapeHtml(__('Update Quote')) ?>
+        </button>
+        <input x-ref="updateCartAction" type="hidden" value="" id="update_cart_action" name="update_cart_action"/>
+    </div>
+</form>
+<?= $block->getChildHtml('checkout.cart.order.actions') ?>
+<?= $block->getChildHtml('shopping.cart.table.after') ?>
+<script>
+    window.checkoutConfig = <?= /* @noEscape */ $block->getSerializedCheckoutConfig() ?>;
+    window.customerData = window.checkoutConfig.customerData;
+    window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+</script>

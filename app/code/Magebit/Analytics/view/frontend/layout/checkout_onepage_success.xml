@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_Analytics package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Dunkin
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block name="gtag.google.adwords" template="Magebit_Analytics::code.phtml"
+                   ifconfig="google/gtag/adwords/active">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Magebit\Analytics\ViewModel\Adwords</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

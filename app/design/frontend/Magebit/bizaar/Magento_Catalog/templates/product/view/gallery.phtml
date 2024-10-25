@@ -1,0 +1,520 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Slider;
+use Magento\Catalog\Block\Product\View\Gallery;
+use Magento\Catalog\Helper\Image;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Gallery $block */
+/** @var ViewModelRegistry $viewModels */
+/** @var Slider $sliderViewModel */
+
+$images = $block->getGalleryImages()->getItems();
+$mainImage = current(array_filter($images, function ($img) use ($block) {
+    return $block->isMainImage($img);
+}));
+
+if (!empty($images) && empty($mainImage)) {
+    $mainImage = $block->getGalleryImages()->getFirstItem();
+}
+
+/** @var Image $helper */
+$helper = $block->getData('imageHelper');
+$mainImageData = $mainImage ?
+    $mainImage->getData('medium_image_url') :
+    $helper->getDefaultPlaceholderUrl('image');
+
+$smallWidth = $block->getImageAttribute('product_page_image_small', 'width', 94);
+$smallHeight = $block->getImageAttribute('product_page_image_small', 'height', 94);
+$mediumWidth = $block->getImageAttribute('product_page_image_medium', 'width', 400);
+$mediumHeight = $block->getImageAttribute('product_page_image_medium', 'height', 400);
+
+$product = $block->getProduct();
+$productName = $product->getName();
+$sliderViewModel = $viewModels->require(Slider::class);
+$itemsTemplate   = 'Magento_Catalog::product/view/gallery/slider-item.phtml';
+$sliderTemplate   = 'Magento_Catalog::product/view/gallery/slider-template.phtml';
+
+?>
+
+<div id="gallery"
+     x-data="initGallery()"
+     x-init="initActive();"
+     x-spread="eventListeners"
+     class="product-info-gallery order-1 w-full md:h-auto md:row-span-2 xl:row-span-1 lg:col-span-4"
+>
+    <div :class="{
+            'gallery-fullscreen w-full h-full fixed block top-0 left-0 bg-white z-50 flex flex-col justify-center px-5': fullscreen
+        }"
+    >
+        <div x-show="fullscreen" class="absolute top-0 right-0 pr-0 z-30">
+            <button @click="tooglePopup()"
+                    type="button"
+                    class="hidden text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500
+                        transition ease-in-out duration-150"
+                    :class="{ 'hidden': !fullscreen, 'block': fullscreen }"
+                    aria-label="Close"
+            >
+                <i class="block text-gray icon-close top-0 right-0 p-3.5 bg-gray-f2 rounded-bl-[5px] hover:cursor-pointer
+                      lg:hover:text-blue-darker"></i>
+            </button>
+        </div>
+        <div class="relative self-center w-full"
+             x-transition:enter="ease-out duration-500"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+        >
+            <div class="relative">
+                <?php // if ($discountBlock = $block->getLayout()->getBlock('product.item.discount')): ?>
+                    <!-- <div x-show="!fullscreen" class="w-auto absolute top-5 left-5 z-10 lg:top-4.75 lg:left-4.75">
+                        <? //= $discountBlock->setProduct($product)->toHtml() ?>
+                    </div> -->
+                <?php // endif; ?>
+                <?php
+                /**
+                 * The first image is a placeholder that determines the
+                 * aspect ratio for the gallery. It will be hidden as
+                 * soon as JS is loaded, but will keep reserving the
+                 * necessary space in the layout for the other (absolute positioned)
+                 * images. Hence `opacity-0` instead of `x-show` or `hidden`
+                 */
+                ?>
+                <img
+                    srcset="<?= $escaper->escapeUrl($mainImage ? $mainImage->getData('small_mobile_image_url') : $mainImageData) ?> 318w,
+                            <?= $escaper->escapeUrl($mainImage ? $mainImage->getData('mobile_image_url') : $mainImageData) ?> 370w,
+                            <?= $escaper->escapeUrl($mainImage ? $mainImage->getData('tablet_image_url') : $mainImageData) ?> 340w,
+                            <?= $escaper->escapeUrl($mainImage ? $mainImage->getData('large_tablet_image_url') : $mainImageData) ?> 466w,
+                            <?= $escaper->escapeUrl($mainImage ? $mainImage->getData('small_desktop_image_url') : $mainImageData) ?> 391w,
+                            <?= $escaper->escapeUrl($mainImageData) ?> 473w"
+                    sizes="(max-width: 411px) 318px,
+                            (max-width: 767px) 370px,
+                            (max-width: 1023px) 340px,
+                            (max-width: 1279px) 466px,
+                            (max-width: 1535px) 391px,
+                            (min-width: 1536px) 473px"
+                    src="<?= $escaper->escapeUrl($mainImageData) ?>"
+                    alt="main product photo"
+                    title="<?= $escaper->escapeHtmlAttr($productName) ?>"
+                    class="object-contain object-center w-full h-auto max-h-screen-75 rounded"
+                    :class="'invisible', {'rounded': !fullscreen}"
+                    width="<?= /* @noEscape */ $mediumWidth ?>"
+                    height="<?= /* @noEscape */ $mediumHeight ?>"
+                    loading="eager"
+                    @click="tooglePopup()"
+                />
+                <template x-for="(image, index) in images" :key="index">
+                    <img
+                        :srcset="(image.small_mobile_img || image.img) + ' 318w, '
+                                + (image.mobile_img || image.img) + ' 370w, '
+                                + (image.tablet_img || image.img) + ' 340w, '
+                                + (image.large_tablet_img || image.img) + ' 466w, '
+                                + (image.small_desktop_img || image.img) + ' 391w, '
+                                + image.img + ' 473w'"
+                        sizes="(max-width: 411px) 318px,
+                               (max-width: 767px) 370px,
+                               (max-width: 1023px) 340px,
+                               (max-width: 1279px) 466px,
+                               (max-width: 1535px) 391px,
+                               473px"
+                        :src="fullscreen ? image.full : image.img"
+                        :alt="image.caption || '<?= $escaper->escapeJs($productName) ?>'"
+                        :title="image.caption || '<?= $escaper->escapeJs($productName) ?>'"
+                        @click="tooglePopup()"
+                        class="absolute inset-0 object-contain object-center w-full h-full m-auto max-h-screen-75 rounded"
+                        :class="{ 'cursor-pointer rounded': !fullscreen }"
+                        width="<?= /* @noEscape */ $mediumWidth ?>"
+                        height="<?= /* @noEscape */ $mediumHeight ?>"
+                        :loading="active!==index ? 'lazy' : 'eager'"
+                        x-show.transition.opacity.duration.500ms="active===index"
+                    />
+                </template>
+                <div class="absolute inset-0 hidden w-full h-full bg-white nonmobile"
+                     :class="{ 'hidden': activeVideoType !== 'youtube' }"
+                     x-show.transition.opacity.duration.500ms="
+                         images[active].type === 'video' && activeVideoType === 'youtube'
+                     "
+                >
+                    <div id="youtube-player" class="w-full h-full"></div>
+                </div>
+                <div class="absolute inset-0 hidden w-full h-full bg-white"
+                     :class="{ 'hidden': activeVideoType !== 'vimeo' }"
+                     x-show.transition.opacity.duration.500ms="
+                         images[active].type === 'video' && activeVideoType === 'vimeo'
+                     "
+                >
+                    <div id="vimeo-player" class="w-full h-full"></div>
+                </div>
+            </div>
+            <button
+                x-cloak
+                x-show="images.length > 1"
+                class="btn btn-round md-max:w-10 md-max:h-10 md-max:p-2.75 ml-4.75 absolute top-1/2 left-0 -translate-y-1/2"
+                @click="prevSlide()"
+            ><i class="icon icon-arrow-left"></i></button>
+            <button
+                x-cloak
+                x-show="images.length > 1"
+                class="btn btn-round md-max:w-10 md-max:h-10 md-max:p-2.75 mr-4.75 absolute top-1/2 right-0 -translate-y-1/2"
+                @click="nextSlide()"
+            ><i class="icon icon-arrow-right"></i></button>
+        </div>
+        <section
+            class="slider-template my-1 text-gray min-h-[72px] lg:mt-2 lg-max:max-w-full"
+            :class="{'fixed inset-x-0 bottom-0 w-[89.6%]' : fullscreen}"
+            @resize.window.debounce="calcPageSize(); $nextTick( function() { calcActive() })"
+        >
+            <div class="relative flex">
+                <template x-if="images.length > pageSize">
+                    <div class="flex items-center justify-center">
+                        <button
+                            aria-label="<?= $escaper->escapeHtml(__('Previous')) ?>"
+                            tabindex="-1"
+                            class="btn btn-round md-max:w-10 md-max:h-10 md-max:p-2.75 outline-none
+                                focus:outline-none"
+                            :class="{ 'bg-gray-f2 pointer-events-none' : active === 0 }"
+                            @click="prevSlide()">
+                            <i class="icon icon-arrow-left"></i>
+                        </button>
+                    </div>
+                </template>
+                <div class="relative w-full overflow-x-hidden
+            focus-within:ring-1 active:ring-0 ring-blue-500 ring-opacity-50">
+                    <div
+                        @scroll.debounce="calcActive"
+                        class="relative flex flex-nowrap w-full overflow-auto transition-all js_slides snap"
+                        x-ref="thumbnails"
+                    >
+                        <template x-for="(image, index) in images" :key="index">
+                            <div class="flex flex-shrink-0 js_slide w-1/4"
+                                 :class="{ 'w-[20.3%] lg:w-[20.97%]' : images.length <= pageSize }">
+                                <div
+                                    :class="{'border-blue image-shadow': index === active}"
+                                    class="relative mx-0.5 border border-gray-e6 rounded lg:mx-1 w-full"
+                                >
+                                    <img
+                                        class="self-center w-full h-auto rounded cursor-pointer"
+                                        @click="setActive(index)"
+                                        :src="image.thumb"
+                                        :alt="image.caption || '<?= $escaper->escapeJs($productName) ?>'"
+                                        :title="image.caption || '<?= $escaper->escapeJs($productName) ?>'"
+                                        width="<?= /* @noEscape */ $smallWidth ?>"
+                                        height="<?= /* @noEscape */ $smallHeight ?>"
+                                        :loading="index > 3 ? 'lazy' : 'eager'"
+                                    />
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <template x-if="images.length > pageSize">
+                    <div class="flex items-center justify-center">
+                        <button
+                            aria-label="<?= $escaper->escapeHtml(__('Next')) ?>"
+                            tabindex="-1"
+                            class="btn btn-round md-max:w-10 md-max:h-10 md-max:p-2.75 test-thumb-next outline-none focus:outline-none"
+
+                            @click="nextSlide()">
+                            <i class="icon icon-arrow-right"></i>
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    function initGallery () {
+        return {
+            "active": 0,
+            "videoData": {},
+            "activeVideoType": false,
+            "autoplayVideo": false,
+            "loopVideo": true,
+            "relatedVideos": false,
+            "vimeoPlayer": null,
+            "fullscreen": false,
+            "initialImages": <?= /* @noEscape */ $block->getGalleryImagesJson() ?>,
+            "images": <?= /* @noEscape */ $block->getGalleryImagesJson() ?>,
+            "appendOnReceiveImages": <?= $block->getVar(
+                'gallery_switch_strategy',
+                'Magento_ConfigurableProduct'
+            ) === 'append' ? 'true' : 'false' ?>,
+            activeSlide: 0,
+            getSlider() {
+                return this.$el.querySelector('.js_slides');
+            },
+            pageSize: 4,
+            pageFillers: 0,
+            tooglePopup() {
+                if(this.fullscreen) {
+                    this.fullscreen = false;
+                    document.body.classList.remove('overflow-hidden');
+                    return;
+                }
+
+                this.fullscreen = true;
+                document.body.classList.add('overflow-hidden');
+            },
+            receiveImages(images) {
+                if (this.appendOnReceiveImages) {
+                    const initialUrls = this.initialImages.map(image => image.full);
+                    const newImages = images.filter(image => ! initialUrls.includes(image.full));
+                    this.images = [].concat(this.initialImages, newImages);
+                    this.setActive(newImages.length ? this.initialImages.length : 0);
+                } else {
+                    this.images = images;
+                    this.setActive(0);
+                }
+            },
+            nextSlide: function () {
+                let active;
+                if (Number(this.active) === this.images.length - 1) {
+                    active = 0;
+                } else {
+                    active = Number(this.active) + 1;
+                }
+                this.setActive(active)
+                this.scrollTo(active);
+                this.scrollToThumbnail();
+            },
+            prevSlide: function () {
+                let active;
+                if (Number(this.active) === 0) {
+                    active = this.images.length - 1;
+                } else {
+                    active = Number(this.active) - 1;
+                }
+                this.setActive(active)
+                this.scrollTo(active);
+                this.scrollToThumbnail();
+            },
+            scrollToThumbnail() {
+                const thumbnailContainer = this.$refs.thumbnails;
+    const thumbnail = thumbnailContainer.children[this.active];
+    if (thumbnail) {
+        const containerWidth = thumbnailContainer.clientWidth;
+        const thumbnailWidth = thumbnail.clientWidth;
+        const thumbnailLeft = thumbnail.offsetLeft;
+
+        const scrollLeft = thumbnailLeft - (containerWidth / 2) + (thumbnailWidth / 2);
+        thumbnailContainer.scrollTo({
+            left: scrollLeft,
+            behavior: 'smooth'
+        });
+    }
+},
+            resetGallery() {
+                this.images = this.initialImages;
+                this.setActive(0);
+            },
+            initActive() {
+                let active = this.images.findIndex(function(image) {
+                    return image.isMain === true
+                });
+                if (active === -1) {
+                    active = 0;
+                }
+                this.setActive(active);
+                this.calcPageSize()
+            },
+            setActive(index) {
+                this.active = index;
+                if (window.youtubePlayer) {
+                    window.youtubePlayer.stopVideo();
+                }
+                if (this.vimeoPlayer) {
+                    this.vimeoPlayer.contentWindow.postMessage(JSON.stringify({"method": "pause"}), "*");
+                }
+                if (this.images[index].type === 'video') {
+                    this.activateVideo();
+                }
+                this.scrollTo(index);
+            },
+            activateVideo() {
+                const videoData = this.getVideoData();
+
+                if (!videoData) { return }
+
+                this.activeVideoType = videoData.type;
+
+                if (videoData.type === "youtube") {
+                    if (!window.youtubePlayer) {
+                        this.initYoutubeAPI(videoData);
+                    } else {
+                        window.youtubePlayer.loadVideoById(videoData.id);
+                    }
+
+                } else if (videoData.type === "vimeo") {
+                    this.initVimeoVideo(videoData);
+                }
+            },
+            getVideoData() {
+                const videoUrl = this.images[this.active] && this.images[this.active].videoUrl;
+
+                if (!videoUrl) { return }
+
+                let id,
+                    type,
+                    youtubeRegex,
+                    vimeoRegex,
+                    useYoutubeNoCookie = false;
+
+                if (videoUrl.match(/youtube\.com|youtu\.be|youtube-nocookie.com/)) {
+                    id = videoUrl.replace(/^\/(embed\/|v\/)?/, '').replace(/\/.*/, '');
+                    type = 'youtube';
+
+                    <?php // phpcs:ignore Generic.Files.LineLength.TooLong?>
+                    youtubeRegex = /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
+                    id = videoUrl.match(youtubeRegex)[1];
+
+                    if (videoUrl.match(/youtube-nocookie.com/)) {
+                        useYoutubeNoCookie = true;
+                    }
+                } else if (videoUrl.match(/vimeo\.com/)) {
+                    type = 'vimeo';
+                    vimeoRegex = new RegExp(['https?:\\/\\/(?:www\\.|player\\.)?vimeo.com\\/(?:channels\\/(?:\\w+\\/)',
+                        '?|groups\\/([^\\/]*)\\/videos\\/|album\\/(\\d+)\\/video\\/|video\\/|)(\\d+)(?:$|\\/|\\?)'
+                    ].join(''));
+                    id = videoUrl.match(vimeoRegex)[3];
+                }
+
+                return id ? {
+                    id: id, type: type, useYoutubeNoCookie: useYoutubeNoCookie
+                } : false;
+            },
+            initYoutubeAPI(videoData) {
+                if (document.getElementById('loadYoutubeAPI')) {
+                    return;
+                }
+                const params = {};
+                const loadYoutubeAPI = document.createElement('script');
+                loadYoutubeAPI.src = 'https://www.youtube.com/iframe_api';
+                loadYoutubeAPI.id = 'loadYoutubeAPI';
+                const firstScriptTag = document.getElementsByTagName('script')[0];
+                firstScriptTag.parentNode.insertBefore(loadYoutubeAPI, firstScriptTag);
+
+                const host = (videoData.useYoutubeNoCookie) ?
+                    'https://www.youtube-nocookie.com' :
+                    'https://www.youtube.com';
+
+                if (this.autoplayVideo) {
+                    params.autoplay = this.autoplayVideo;
+                }
+                if (!this.relatedVideos) {
+                    params.rel = 0;
+                }
+                const fireYoutubeAPI = document.createElement('script');
+                fireYoutubeAPI.innerHTML = `function onYouTubeIframeAPIReady() {
+                    window.youtubePlayer = new YT.Player('youtube-player', {
+                        host: '${host}',
+                        videoId: '${videoData.id}',
+                        playerVars: ${JSON.stringify(params)},
+                    });
+                }`;
+                firstScriptTag.parentNode.insertBefore(fireYoutubeAPI, firstScriptTag);
+            },
+            initVimeoVideo(videoData) {
+                let
+                    additionalParams = '',
+                    src;
+
+                const timestamp = new Date().getTime();
+                const vimeoContainer = document.getElementById("vimeo-player");
+                const videoId = videoData.id;
+
+                if (!vimeoContainer || !videoId) return;
+
+                if (this.autoplayVideo) {
+                    additionalParams += '&autoplay=1';
+                }
+
+                if (this.loopVideo) {
+                    additionalParams += '&loop=1';
+                }
+                src = 'https://player.vimeo.com/video/' +
+                    videoId + '?api=1&player_id=vimeo' +
+                    videoId +
+                    timestamp +
+                    additionalParams;
+                vimeoContainer.innerHTML =
+                    `<iframe id="${'vimeo' + videoId + timestamp}"
+                        src="${src}"
+                        width="640" height="360"
+                        webkitallowfullscreen
+                        mozallowfullscreen
+                        allowfullscreen
+                        referrerPolicy="origin"
+                        allow="autoplay"
+                        class="object-center w-full h-full object-fit"
+                     />`;
+
+                this.vimeoPlayer = vimeoContainer.childNodes[0];
+            },
+            scrollTo(idx) {
+                const slider = this.getSlider();
+                if (slider) {
+                    const slideWidth = slider.scrollWidth / (this.images.length + this.pageFillers);
+                    // slider.scrollLeft = Math.floor(slideWidth) * this.activeSlide;
+                    slider.scrollLeft = Math.floor(slideWidth) * idx;
+                    this.activeSlide = idx;
+                }
+            },
+            calcPageSize() {
+                const slider = this.getSlider();
+                if (slider) {
+                    const itemCount = this.images.length;
+                    this.pageFillers = (
+                        this.pageSize * Math.ceil(itemCount / this.pageSize)
+                    ) - itemCount;
+                }
+            },
+            calcActive() {
+                const slider = this.getSlider();
+                if (slider) {
+                    const sliderItems = this.images.length + this.pageFillers;
+                    const calculatedActiveSlide = slider.scrollLeft / (slider.scrollWidth / sliderItems);
+                    this.activeSlide = Math.round(calculatedActiveSlide / this.pageSize) * this.pageSize;
+                    // this.activeSlide = Math.round(calculatedActiveSlide);
+                }
+            },
+            eventListeners: {
+                ['@keydown.window.escape']() {
+                    this.fullscreen = false
+                },
+                ['@keydown.window.arrow-right']() {
+                    if (this.fullscreen) {
+                        this.nextSlide();
+                    }
+                },
+                ['@keydown.window.arrow-left']() {
+                    if (this.fullscreen) {
+                        this.prevSlide();
+                    }
+                },
+                ['@update-gallery.window'](event) {
+                    this.receiveImages(event.detail);
+                },
+                ['@reset-gallery.window'](event) {
+                    this.resetGallery();
+                }
+            }
+        }
+    }
+</script>

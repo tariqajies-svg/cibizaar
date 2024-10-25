@@ -1,0 +1,89 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Request a Quote Hyva Compatibility
+ */
+
+use Amasty\RequestQuote\Block\Account\Quote\Item\Renderer\Bundle;
+use Amasty\RequestQuote\Block\Account\Quote\Item\Renderer\Configurable;
+use Amasty\RequestQuote\Block\Account\Quote\Item\Renderer\Downloadable;
+use Amasty\RequestQuote\Block\Account\Quote\Item\Renderer\Grouped;
+use Amasty\RequestQuote\Block\Account\Quote\Item\Renderer\Simple;
+use Magento\Framework\Escaper;
+
+/** @var Bundle|Configurable|Downloadable|Grouped|Simple $block */
+/** @var Escaper $escaper */
+
+$item = $block->getItem();
+?>
+<div class="p-2 col-span-2">
+    <span class="font-semibold"><?= $escaper->escapeHtml($item->getName()) ?></span>
+    <div class="item-options mt-2">
+        <div class="text-sm flex">
+            <span><?= $escaper->escapeHtml(__('Sku')) ?>:</span>
+            <span class="text-sm ml-1"><?= $escaper->escapeHtml($item->getSku()) ?></span>
+        </div>
+        <?php if ($options = $block->getOptionList()): ?>
+            <?php foreach ($options as $option): ?>
+                <?php $formattedOptionValue = $block->getFormatedOptionValue($option) ?>
+                <div class="text-sm flex mt-3">
+                    <span><?= $escaper->escapeHtml($option['label']) ?>:</span>
+                    <?php if (isset($formattedOptionValue['full_view'])): ?>
+                        <span class="ml-1">
+                            <?= $escaper->escapeHtml($formattedOptionValue['full_view'], ['a']) ?>
+                        </span>
+                    <?php else: ?>
+                        <span class="ml-1">
+                            <?= $escaper->escapeHtml(strip_tags($formattedOptionValue['value'])) ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        <?php /* downloadable */ ?>
+        <?php if ($links = $block->getLinks()): ?>
+            <div class="item options my-2">
+                <p><?= $escaper->escapeHtml($block->getLinksTitle()) ?></p>
+                <?php foreach ($links->getPurchasedItems() as $link): ?>
+                    <p class="ml-1"><?= $escaper->escapeHtml($link->getLinkTitle()) ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <?php $addtInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+        <?php if ($addtInfoBlock): ?>
+            <?= $addtInfoBlock->setItem($item)->toHtml() ?>
+        <?php endif; ?>
+        <?= $escaper->escapeHtml($item->getDescription()) ?>
+    </div>
+    <?php $addtInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+    <?php if ($addtInfoBlock): ?>
+        <?= $addtInfoBlock->setItem($item)->toHtml() ?>
+    <?php endif; ?>
+</div>
+<div class="p-2 flex justify-between lg:block">
+    <p class="lg:hidden font-medium"><?= $escaper->escapeHtml(__('Original Price')) ?></p>
+    <?= $block->getOriginalPriceHtml($item) ?>
+</div>
+<div class="p-2 flex justify-between lg:block">
+    <p class="lg:hidden font-medium"><?= $escaper->escapeHtml(__('Requested Price')) ?></p>
+    <?= $block->getRequestedPriceHtml($item) ?>
+</div>
+<div class="p-2 flex justify-between lg:block">
+    <p class="lg:hidden font-medium"><?= $escaper->escapeHtml(__('Approved Price')) ?></p>
+    <?= /* @noEscape */ $block->getIsApprovedPriceShowed()
+        ? $block->getUnitPriceHtml($item)
+        : $escaper->escapeHtml(__('N/A')) ?>
+</div>
+<div class="p-2 flex justify-between lg:block">
+    <p class="lg:hidden font-medium"><?= $escaper->escapeHtml(__('Qty')) ?></p>
+    <?= $escaper->escapeHtml($block->getQty()) ?>
+</div>
+<div class="p-2 flex justify-between lg:block">
+    <p class="lg:hidden font-medium"><?= $escaper->escapeHtml(__('Discount Amount')) ?></p>
+    <span class="text-right"><?= $block->getDiscountPriceHtml($item) ?></span>
+</div>
+<div class="p-2 flex justify-between lg:block">
+    <p class="lg:hidden font-medium"><?= $escaper->escapeHtml(__('Subtotal')) ?></p>
+    <?= $block->getRowTotalHtml($item) ?>
+</div>

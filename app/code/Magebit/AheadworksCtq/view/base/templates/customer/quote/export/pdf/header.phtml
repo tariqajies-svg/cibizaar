@@ -1,0 +1,120 @@
+<?php
+/**
+ * This file is part of the Magebit_AheadworksCtq package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+
+use Aheadworks\Ctq\ViewModel\Customer\Export\Quote;
+use Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider;
+use Magento\Framework\Escaper;
+use Magento\Theme\Block\Html\Header\Logo;
+use Magebit\Bizaar\ViewModel\PdfHeader;
+
+/* @var Logo $block  */
+/* @var DataProvider $viewModel  */
+/* @var Quote $quoteViewModel  */
+/** @var Escaper $escaper */
+/** @var PdfHeader $headerViewModel */
+
+$viewModel = $block->getDataProviderViewModel();
+$viewModel->setMethodToLocateQuote($block->getMethodToLocateQuote());
+$quoteViewModel = $block->getQuoteViewModel();
+$quote = $viewModel->getQuote();
+$headerViewModel = $block->getHeaderViewModel();
+$billingAddress = $headerViewModel->getBillingAddress($quote);
+?>
+<div class="logo">
+    <img class="logo-image" src="<?= $escaper->escapeUrl($headerViewModel->getHeaderLogo()) ?>"
+         width="150"
+         height="100"
+    />
+    <p><?= $escaper->escapeHtml(__('Bizaar FZCO, S60901, Jebel Ali Freezone, Dubai United Arab Emirates')) ?></p>
+</div>
+<h1 class="title">
+    <span><?= $escaper->escapeHtml($quote->getName()) ?></span>
+</h1>
+
+<div class="export-date">
+    <span><?= $escaper->escapeHtml(__('Date of export: ')) ?><?= $escaper->escapeHtml($viewModel->getCurrentDate()) ?></span>
+</div>
+<table class="quote-details">
+    <tr>
+        <td class="td-title"><?= $escaper->escapeHtml(__('Quote #')) ?></td>
+        <td><?= $escaper->escapeHtml($quote->getId()) ?></td>
+        <?php if ($billingAddress): ?>
+            <td class="address-column td-title"><?= $escaper->escapeHtml(__('Billing address')) ?></td>
+        <?php endif; ?>
+    </tr>
+    <tr>
+        <td class="td-title"><?= $escaper->escapeHtml(__('Status')) ?></td>
+        <td><?= $escaper->escapeHtml($quoteViewModel->getStatusLabel($quote->getStatus())) ?></td>
+        <?php if ($billingAddress): ?>
+            <td class="address-column" rowspan="5"><?= /* @noEscape */ $billingAddress ?></td>
+        <?php endif; ?>
+    </tr>
+    <tr>
+        <td class="td-title"><?= $escaper->escapeHtml(__('Created')) ?></td>
+        <td><?= $escaper->escapeHtml($quoteViewModel->getCreatedAtFormatted($quote->getCreatedAt())) ?></td>
+    </tr>
+    <tr>
+        <td class="td-title"><?= $escaper->escapeHtml(__('Customer Name')) ?></td>
+        <td><?= $escaper->escapeHtml($quoteViewModel->getCustomerName($quote)) ?></td>
+    </tr>
+    <?php if ($quoteViewModel->getCompanyName($quote->getCustomerId())): ?>
+        <tr>
+            <td class="td-title"><?= $escaper->escapeHtml(__('Company Name')) ?></td>
+            <td><?= $escaper->escapeHtml($quoteViewModel->getCompanyName($quote->getCustomerId())) ?></td>
+        </tr>
+    <?php endif; ?>
+    <tr>
+        <td class="td-title"><?= $escaper->escapeHtml(__('Customer Email')) ?></td>
+        <td><?= $escaper->escapeHtml($quote->getCustomerEmail()) ?></td>
+    </tr>
+    <?= /* @noEscape */ $block->getChildHtml('extra.quote.column') ?>
+</table>
+
+<style type="text/css">
+    * {
+        font-family: 'Open Sans', sans-serif;
+    }
+    .logo {
+        text-align: left;
+    }
+    .address-column {
+        width: 50%;
+        padding-left: 20px;
+        border: 1px solid #E6E9EB;
+        vertical-align: top;
+    }
+    .address-column .td-title {
+        padding-bottom: 16px;
+    }
+    .logo-image {
+        height: auto;
+    }
+    .title {
+        text-align: center;
+        color: #062B48;
+    }
+    .export-date {
+        text-align: right;
+        color: #062B48;
+    }
+    .quote-details {
+        color: #000000;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+        border-top: 1px solid #E6E9EB;
+    }
+    .quote-details td {
+        padding: 5px;
+        border-bottom: 1px solid #E6E9EB;
+    }
+    .td-title {
+        color: #062B48;
+        font-weight: bold;
+    }
+</style>

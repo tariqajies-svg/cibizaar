@@ -1,0 +1,73 @@
+<?php
+/**
+ * This file is part of the Magebit_TwoFa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_TwoFa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\TwoFa\ViewModel\TwoFa;
+use Magento\Framework\Escaper;
+
+$twoFaViewModel = $viewModels->require(TwoFa::class);
+?>
+<div class="relative">
+    <?= /** @noEscape  */ $twoFaViewModel->getLoaderBlock()->toHtml() ?>
+    <div class="pop-up-header">
+        <h3><?= $escaper->escapeHtml(__('Authorization')) ?></h3>
+        <p><?= $escaper->escapeHtml(__('Choose how you would like to receive the confirmation code.'))?></p>
+    </div>
+    <template x-if="message">
+        <section id="messages">
+            <div class="messages">
+                <div class="message !justify-start" :class="{'success': message.success, 'error': !message.success}">
+                    <span x-html="message.text"></span>
+                </div>
+            </div>
+        </section>
+    </template>
+    <div class="grid">
+        <form x-ref="form" @submit.prevent="onFormSubmit">
+            <div class="field field-reserved">
+                <label class="label"><?= $escaper->escapeHtml(__('Method')) ?></label>
+                <select class="form-select" @change="onMethodChange()" x-model="selectedMethodCode" name="method">
+                    <template x-for="method of activeMethods">
+                        <option :value="method.value" x-text="method.label"></option>
+                    </template>
+                </select>
+            </div>
+            <div class="field field-reserved" x-cloak x-show="!isSelecting">
+                <label class="label"><?= $escaper->escapeHtml(__('Confirmation Code')) ?></label>
+                <input x-model="code" x-ref="codeInput" name="code" class="form-input"/>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary w-full" type="button" @click="selectMethod()" x-cloak x-show="isSelecting">
+                    <?= $escaper->escapeHtml(__('Select'))?>
+                </button>
+                <div class="flex gap-2" x-show="!isSelecting" x-cloak>
+                    <button class="btn btn-secondary flex-grow" type="button" @click="selectMethod()" :disabled="hasTimeLeft">
+                        <?= $escaper->escapeHtml(__('Re-Send')) ?>
+                        <span x-show="hasTimeLeft" x-cloak class="ml-1">
+                            (<span x-text="timeLeftString"></span>)
+                        </span>
+                    </button>
+                    <button class="btn btn-primary flex-grow" type="submit" x-cloak x-show="hasTimeLeft">
+                        <?= $escaper->escapeHtml(__('Submit')) ?>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

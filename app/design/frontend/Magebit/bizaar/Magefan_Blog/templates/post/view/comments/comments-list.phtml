@@ -1,0 +1,233 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\Escaper;
+use Hyva\Theme\ViewModel\ReCaptcha;
+
+/**
+ * Blog post comments template
+ *
+ * @var Template $block
+ * @var Escaper $escaper
+ *
+ */
+
+$parentBlock = $block->getParentBlock();
+
+$comments = $parentBlock->getCommentsCollection();
+$numberOfCommentsToDisplay = $parentBlock->getNumberOfComments();
+$session = $parentBlock->getCustomerSession();
+
+$canPost = $parentBlock->canPost();
+
+$commentsCount = count($comments);
+if ($commentsCount): ?>
+<div x-data="initCommentsList()" class="border-t pt-5 mt-5 lg:pt-8 lg:mt-8">
+    <form class="replycomment-form mb-3 p-5 lg:px-8"
+          action="<?= $escaper->escapeUrl($parentBlock->getFormUrl()) ?>"
+          method="post"
+          x-show="showReplyForm"
+          x-data="{...initCommentReplyForm(), ...hyva.formValidation($el)}"
+          x-ref="replyForm"
+          id="blogcommentreply"
+          @show-reply-form.window="handleShowReplyForm(event)"
+          @submit.prevent="submitForm()">
+
+        <?= /* @noEscape */ $block->getBlockHtml('formkey') ?>
+        <?= /* @noEscape */ $block->getBlockHtml(ReCaptcha::RECAPTCHA_INPUT_FIELD_BLOCK) ?>
+
+        <input type="hidden"
+               name="post_id"
+               value="<?= /* @noEscape */ (int)($parentBlock->getPost()->getId()) ?>"/>
+
+        <input type="hidden"
+               name="parent_id"
+               x-ref="parentId"
+               value="" />
+
+        <?php if ($canPost && !$session->getCustomerGroupId()): ?>
+            <div class="lr-hld flex flex-col lg:flex-row lg:gap-x-6">
+                <div class="field field-reserved name lg:w-1/2">
+                    <label class="label" for="replycomment-form-name">
+                        <span><?= $escaper->escapeHtml(__('Full Name')) ?></span>
+                    </label>
+                    <div class="control">
+                        <input name="author_nickname"
+                               class="form-input"
+                               value=""
+                               id="replycomment-form-name"
+                               type="text"
+                               data-validate='{"required": true}'
+                               title="<?= $escaper->escapeHtmlAttr(__('Full Name')) ?>"/>
+                    </div>
+                </div>
+                <div class="field field-reserved email lg:w-1/2">
+                    <label class="label" for="replycomment-form-email">
+                        <span><?= $escaper->escapeHtml(__('E-mail')) ?></span>
+                    </label>
+                    <div class="control">
+                        <input name="author_email"
+                               class="form-input"
+                               value=""
+                               id="replycomment-form-email"
+                               type="email"
+                               data-validate='{"required": true, "email": true}'
+                               title="<?= $escaper->escapeHtmlAttr(__('E-mail')) ?>"/>
+                    </div>
+                </div>
+            </div>
+            <div class="field field-reserved comment">
+                <label class="label" for="comment-form-comment">
+                    <span><?= $escaper->escapeHtml(__('Comment')) ?></span>
+                </label>
+                <div class="control">
+                    <textarea name="text"
+                              id="replycomment-form-comment"
+                              title="<?= $escaper->escapeHtmlAttr(__('Comment')) ?>"
+                              class="form-textarea w-full"
+                              cols="5"
+                              rows="5"
+                              data-validate='{"required":true}'
+                    ></textarea>
+                </div>
+            </div>
+            <div class="form-actions flex flex-col gap-y-3 lg:flex-row lg:gap-x-6 lg:gap-y-0">
+                <?php if ($canPost): ?>
+                    <button type="submit" class="action submit primary btn btn-primary w-full lg:w-auto"
+                            title="<?= $escaper->escapeHtmlAttr(__('Submit')) ?>">
+                        <span><?= $escaper->escapeHtml(__('Submit')) ?></span>
+                    </button>
+                <?php else: ?>
+                    <button type="button primary btn btn-primary w-full lg:w-auto"
+                            @click="window.location.replace('<?= $escaper->escapeUrl($parentBlock->getCustomerUrl()->getLoginUrl()) ?>')"
+                    <span><?= $escaper->escapeHtml(__('Sign In')) ?></span>
+                    </button>
+                <?php endif; ?>
+                <button type="button"
+                        @click="{showReplyForm = false, $refs.replyForm.reset()}"
+                        class="link font-bold text-center px-6 w-full lg:w-auto" >
+                    <?= $escaper->escapeHtml(__('Cancel')) ?>
+                </button>
+            </div>
+        <?php endif; ?>
+    </form>
+
+    <!-- comments list -->
+    <div class="c-comments pb-2 lg:pb-0">
+        <?php $i = 0 ?>
+        <?php foreach ($comments as $comment):
+            $i++;?>
+            <div :class="{ 'hidden': !showMoreComments && <?= /* @noEscape */ $i ?> > showLimit }">
+                <?= /* @noEscape */ $parentBlock->getCommentHtml($comment) ?>
+            </div>
+        <?php endforeach; ?>
+        <span x-show="commentsCount > showLimit"
+           @click="showMoreComments = !showMoreComments"
+           class="c-allcomments more-comments-action link cursor-pointer block mb-3">
+            <span x-html="showMoreComments ? 'Show less comments' : '...Show more comments'"></span>
+        </span>
+    </div>
+</div>
+<script>
+    function initCommentsList() {
+        return {
+            showLimit: <?= /* @noEscape */ $numberOfCommentsToDisplay ?>,
+            showMoreComments: false,
+            commentsCount: <?= /* @noEscape */ $commentsCount ?>
+        }
+    }
+</script>
+<script>
+    function initCommentReplyForm() {
+        return {
+            showReplyForm: false,
+            isLoading: false,
+            errors: 0,
+            submitForm: function () {
+                this.isLoading = true;
+
+                const $form = this.$refs.replyForm;
+                const formKey = $form.querySelector('input[name=form_key]').value;
+                const formUrl = $form.action;
+                const dataForm = new FormData($form);
+                let data = {};
+                let request_data = '';
+
+                this.validate().then(() => {
+                    <?= $block->getChildHtml('reply_recaptcha_validation'); ?>
+
+                    if (this.errors === 0) {
+                        for (let [name, value] of dataForm) {
+                            data[name] = value;
+                        }
+
+                        for (let fieldName in data) {
+                            if (request_data) {
+                                request_data += '&'
+                            }
+                            request_data += fieldName + '=' + encodeURIComponent(data[fieldName]);
+                        }
+
+                        request_data += '&formKey=' + encodeURIComponent(formKey);
+
+                        fetch(formUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: request_data
+                            }
+                        ).then(response => {
+                                return  response.text()
+                            }
+                        ).then((text) => {
+                            this.isLoading = false;
+                            $form.reset();
+
+                            let message = JSON.parse(text);
+
+                            window.dispatchMessages !== "undefined" && window.dispatchMessages([
+                                {
+                                    type: message.success ? 'success' : 'error',
+                                    text: message.message
+                                }
+                            ], 5000);
+                        });
+                    }
+                }).catch((invalid) => {
+                    this.isLoading = false;
+                    if (invalid.length > 0) {
+                        invalid[0].focus();
+                    }
+                });
+            },
+            handleShowReplyForm(event) {
+                let parentElement = event.detail.commentRef;
+                const parentId = event.detail.parentId;
+
+                const parentIdField = this.$refs.parentId;
+                parentIdField.value = parentId;
+
+                parentElement.append(this.$refs.replyForm);
+
+                this.showReplyForm = true;
+            }
+        }
+    }
+</script>
+<?php endif; ?>

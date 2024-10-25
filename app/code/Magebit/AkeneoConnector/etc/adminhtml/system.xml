@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_AkeneoConnector package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_BankTransfer
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="akeneo_connector">
+            <label>Akeneo Connector</label>
+            <tab>catalog</tab>
+            <resource>Akeneo_Connector::config_akeneo_connector</resource>
+            <group id="product">
+                <field id="media_gallery_variant" translate="label" type="text" sortOrder="95" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Akeneo Image Variants Attributes</label>
+                    <frontend_model>Akeneo\Connector\Block\Adminhtml\System\Config\Form\Field\Gallery</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>Enter all PIM attributes containing product VARIANT images. Other image attributes will be considered as COMMON and won't be used in product configurations</comment>
+                    <depends>
+                        <field id="media_enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

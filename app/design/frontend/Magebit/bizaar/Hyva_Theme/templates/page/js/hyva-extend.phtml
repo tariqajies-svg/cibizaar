@@ -1,0 +1,82 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaTheme package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\StoreConfig;
+
+/** @var ViewModelRegistry $viewModels */
+
+/** @var StoreConfig $storeConfig */
+$storeConfig = $viewModels->require(StoreConfig::class);
+$jsLocale = str_replace('_', '-', $storeConfig->getStoreConfig('general/locale/code'));
+?>
+<script>
+    'use strict';
+    (function( hyva, undefined ) {
+        hyva.addHover = (el) => {
+            el.style.height = el.offsetHeight + 'px';
+            el.classList.add('hover');
+        },
+        hyva.removeHover = (el) => {
+            el.style.height = null;
+            el.classList.remove('hover');
+        },
+        hyva.formatDate = (value, options) => {
+            return new Date(value).toLocaleDateString('<?= /** @noEscape  */ $jsLocale ?>', options);
+        },
+        hyva.formatDateAndTime = (value, withoutTime = false) => {
+            function convertOneDigit (number) {
+                return number.toString().padStart(2, '0');
+            }
+
+            let date;
+            /**
+             * Need to split date string into separate values to support iOS 15 and lower
+             * @see https://chrispennington.blog/blog/safari-does-not-show-new-date-from-javascript/
+             */
+            const splitValue = value.split(/[- :]/);
+            if (splitValue.length === 6) {
+                date = new Date(
+                    splitValue[0],
+                    splitValue[1] - 1,
+                    splitValue[2],
+                    splitValue[3],
+                    splitValue[4],
+                    splitValue[5],
+                );
+            } else {
+                date = new Date(value);
+            }
+
+            let newdate = convertOneDigit(date.getDate()) + '\/' + convertOneDigit(date.getMonth() + 1) + '\/' + date.getFullYear();
+
+            if (!withoutTime) {
+                let hours = date.getHours();
+                let minutes = date.getMinutes();
+                let seconds = date.getSeconds();
+                let ampm = hours >= 12 ? 'pm' : 'am';
+
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                let strTime = hours + ':' + convertOneDigit(minutes) + ':' + convertOneDigit(seconds) + ampm;
+
+                return newdate + ', <br>' + strTime;
+            }
+
+            return newdate;
+        }
+    }( window.hyva = window.hyva || {} ));
+</script>

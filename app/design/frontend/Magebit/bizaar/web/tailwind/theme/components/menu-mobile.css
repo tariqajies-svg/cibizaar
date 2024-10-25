@@ -1,0 +1,18 @@
+#menu-mobile {
+    .top-header-links-block {
+        div {
+            @apply p-0;
+        }
+
+        ul {
+            @apply flex-col space-x-0;
+
+            li {
+                @apply text-black container w-full pt-4 pb-3.75 border-b bg-white font-semibold;
+                a {
+                    @apply text-black w-full bg-white font-semibold;
+                }
+            }
+        }
+    }
+}

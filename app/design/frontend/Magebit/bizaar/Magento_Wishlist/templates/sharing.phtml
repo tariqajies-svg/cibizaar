@@ -1,0 +1,127 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Wishlist\Block\Customer\Sharing;
+
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/** @var Escaper $escaper */
+/** @var Sharing $block */
+?>
+<script>
+    function initShareWishlist() {
+        return {
+            errors: 0,
+            submitForm() {
+                this.validate()
+                    .then(() => {
+                        // Do not rename $form, the variable is expected to be declared in the child block output
+                        const $form = document.querySelector('#form-validate');
+
+                        if (this.errors === 0) {
+                            $form.submit();
+                        }
+                    }).catch((invalid) => {
+                    if (invalid.length > 0) {
+                        invalid[0].focus();
+                    }
+                });
+            }
+        }
+    }
+
+    window.onload = function WindowLoad(event) {
+        hyva.formValidation.addRule('share-emails', function(value, options, field, context) {
+            const validateEmailRegex = /^([a-z0-9,!\#\$%&'\*\+\/=\?\^_`\{\|\}~-]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z0-9,!\#\$%&'\*\+\/=\?\^_`\{\|\}~-]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*@([a-z0-9-]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z0-9-]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*\.(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]){2,})$/i;
+
+            if (!value.length) {
+                return '<?= $escaper->escapeJs(__('This field is required.')) ?>';
+            }
+
+            const emails = value.split(/[\s\n\,]+/g);
+
+            for (i = 0; i < emails.length; i++) {
+                if (!validateEmailRegex.test(emails[i].trim())) {
+                  return '<?= $escaper->escapeJs(__('Please enter valid email addresses, separated by commas. For example, johndoe@domain.com, johnsmith@domain.com.')) ?>';
+                }
+            }
+
+            if (emails.length > <?= (int)$block->getEmailSharingLimit() ?>) {
+                return '<?= $escaper->escapeJs(__('Maximum of %1 emails can be sent.', $block->getEmailSharingLimit())) ?>"';
+            }
+
+            return true;
+        });
+    }
+
+</script>
+<form class="form wishlist share"
+      x-data="{...initShareWishlist(), ...hyva.formValidation($el)}"
+      @submit.prevent="submitForm()"
+      action="<?= $escaper->escapeUrl($block->getSendUrl()) ?>"
+      id="form-validate"
+      method="post"
+>
+    <fieldset class="fieldset">
+        <?= $block->getBlockHtml('formkey') ?>
+        <h2 class="mb-4.75 lg:mb-8">
+            <?= $escaper->escapeHtml(__('Sharing Information')) ?>
+        </h2>
+        <div class="field emails required mb-6 lg:mb-7">
+            <label class="label"
+                   for="email_address">
+                <span>
+                    <?= $escaper->escapeHtml(__('Email addresses, separated by commas')) ?>
+                </span>
+            </label>
+            <div class="control">
+                <textarea name="emails"
+                          class="form-textarea"
+                          rows="3"
+                          id="email_address"
+                          data-validate='{"share-emails": true}'
+                          x-ref="emails"
+                ><?= /* @noEscape */ $block->getEnteredData('emails') ?></textarea>
+            </div>
+        </div>
+        <div class="field text">
+            <label class="label" for="message"><span><?= $escaper->escapeHtml(__('Message')) ?></span></label>
+            <div class="control">
+                <textarea
+                    id="message"
+                    name="message"
+                    rows="3"
+                    class="form-textarea"
+                    maxlength="<?= (int) $block->getTextSharingLimit() ?>"
+                ><?= /* @noEscape */ $block->getEnteredData('message') ?></textarea>
+            </div>
+        </div>
+    </fieldset>
+    <?= $block->getChildHtml('captcha'); ?>
+    <div class="actions-toolbar !mt-4.75 !pt-5 !border-t !border-solid lg:!mt-7.5 lg:!pt-8">
+            <button type="submit" title="<?= $escaper->escapeHtmlAttr(__('Share Wish List')) ?>"
+                    class="btn btn-primary w-full sm:w-auto">
+                <span><?= $escaper->escapeHtml(__('Share Wish List')) ?></span>
+            </button>
+        <div class="secondary">
+            <a class="action back"
+               href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>">
+                <span>
+                    <?= $escaper->escapeHtml(__('Back')) ?>
+                </span>
+            </a>
+        </div>
+    </div>
+</form>

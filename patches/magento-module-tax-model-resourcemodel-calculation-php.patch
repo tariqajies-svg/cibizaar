@@ -1,0 +1,23 @@
+--- /dev/null
++++ ../Model/ResourceModel/Calculation.php
+@@ -152,6 +152,10 @@
+                 $oneRate['rule_id'] = $rate['tax_calculation_rule_id'];
+             }
+ 
++            if (isset($rate['tax_calculation_rate_id'])) {
++                $oneRate['rate_id'] = $rate['tax_calculation_rate_id'];
++            }
++
+             if (isset($rate['hidden'])) {
+                 $row['hidden'] = $rate['hidden'];
+             }
+@@ -324,7 +328,8 @@
+                     'rate.tax_region_id',
+                     'rate.tax_postcode',
+                     'rate.tax_calculation_rate_id',
+-                    'rate.code'
++                    'rate.code',
++                    'rate.is_charge'
+                 ]
+             )->joinLeft(
+                 ['title_table' => $this->getTable('tax_calculation_rate_title')],

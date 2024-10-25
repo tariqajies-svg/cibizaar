@@ -1,0 +1,34 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCa package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCa
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+use Aheadworks\Ca\Block\ButtonWithCheckAcl;
+use Magento\Framework\Escaper;
+
+/** @var ButtonWithCheckAcl $block */
+/** @var Escaper $escaper */
+
+$title = $block->getTitle();
+?>
+<div class="flex mb-5 md:mb-10 items-center
+     <?= $title ? $escaper->escapeHtmlAttr('justify-between md:space-x-4') : $escaper->escapeHtmlAttr('justify-end') ?>">
+    <?php if ($title): ?>
+        <h2 class="text-black hidden md:block h-fit"><?= $escaper->escapeHtml($block->getTitle()) ?></h2>
+    <?php endif; ?>
+    <a href="<?= $escaper->escapeUrl($block->getUrl($block->getLink())) ?>"
+       class="action w-full md:w-fit no-underline px-10 <?= /* @noEscape */ $block->getAdditionalClasses() ?>">
+        <i class="icon icon-plus text-xs text-blue"></i>
+        <span><?= $escaper->escapeHtml($block->getLabel()) ?></span>
+    </a>
+</div>
+

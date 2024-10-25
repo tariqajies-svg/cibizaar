@@ -1,0 +1,28 @@
+.aw_quick_order-index-index {
+    .quick-order-content {
+        .no-colons::before {
+            @apply !hidden;
+        }
+
+        .toolbar-content-items .form {
+            @screen lg {
+                grid-template-columns: 447px 166px;
+            }
+        }
+
+        .qty-input::before {
+            @apply items-center;
+        }
+
+        .price-container,
+        .price-final_price .price.block {
+            @apply text-sm font-bold text-navy;
+        }
+    }
+
+    .swatch-attribute {
+        ul[id*='quick-order-configuration-form-'] {
+            @apply ml-4 absolute w-[150px] left-0;
+        }
+    }
+}

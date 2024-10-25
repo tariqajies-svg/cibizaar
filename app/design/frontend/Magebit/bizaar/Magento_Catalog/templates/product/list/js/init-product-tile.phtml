@@ -1,0 +1,29 @@
+<?php
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+?>
+<script>
+    "use strict";
+
+    (function () {
+        window.bizaar.initProductTile = function () {
+            return {
+                addHover(el) {
+                    el.style.height = el.offsetHeight + 'px';
+                    el.classList.add('hover');
+                    window.dispatchEvent(new CustomEvent('product-item-mouseenter', {detail: el}));
+                },
+                removeHover(el) {
+                    el.style.height = null;
+                    el.classList.remove('hover');
+                    window.dispatchEvent(new CustomEvent('product-item-mouseleave'));
+                },
+                ...hyva.ajaxActions()
+            }
+        }
+    })();
+</script>

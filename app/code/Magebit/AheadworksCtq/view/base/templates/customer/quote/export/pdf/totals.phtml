@@ -1,0 +1,54 @@
+<?php
+/**
+ * This file is part of the Magebit_AheadworksCtq package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+
+use Aheadworks\Ctq\ViewModel\Customer\Export\Quote\Total;
+use Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Quote\Model\Quote;
+
+/* @var $block Template */
+/* @var $viewModel DataProvider */
+/* @var $totalViewModel Total */
+/* @var $cart Quote */
+/** @var $escaper Escaper */
+
+$viewModel = $block->getDataProviderViewModel();
+$viewModel->setMethodToLocateQuote($block->getMethodToLocateQuote());
+$totalViewModel = $block->getTotalViewModel();
+$cart = $viewModel->getCart();
+?>
+<div class="block-title">
+    <span><?= $escaper->escapeHtml(__('Quote Totals')) ?></span>
+</div>
+<table class="totals">
+    <tbody>
+    <?= /* @noEscape */ $totalViewModel->renderTotals($cart) ?>
+    <?= /* @noEscape */ $totalViewModel->renderTotals($cart, 'footer') ?>
+    </tbody>
+</table>
+
+<style type="text/css">
+    .block-title {
+        margin: 2.5rem 0 0.5rem 0;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 24px;
+        color: #062B48;
+    }
+    .totals {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+        border-top: 1px solid #E6E9EB;
+    }
+    .totals td, .totals tr {
+        padding: 5px;
+        border-bottom: 1px solid #E6E9EB;
+    }
+</style>

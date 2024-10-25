@@ -1,0 +1,9 @@
+.swatch-attribute {
+    .swatch-attribute-options {
+        @apply flex flex-row flex-wrap;
+
+        .swatch-option {
+            @apply p-1 min-w-[33px] h-[33px] w-[33px] lg:min-w-[33px] lg:h-[33px] flex border rounded justify-center items-center box-content;
+        }
+    }
+}

@@ -1,0 +1,80 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+declare(strict_types=1);
+
+use Magento\Customer\Block\Form\Edit;
+use Magento\Framework\Escaper;
+
+/** @var Edit $block */
+/** @var Escaper $escaper */
+?>
+
+<script defer>
+    'use strict';
+    window.onload = function WindowLoad(event) {
+        hyva.formValidation.addRule('password', function(value, options, field, context) {
+            let counter = 0;
+            const passwordMinLength = '<?= $escaper->escapeJs($block->getMinimumPasswordLength()) ?>';
+            const passwordMinCharacterSets = '<?= $escaper->escapeJs($block->getRequiredCharacterClassesNumber()) ?>';
+            const result = value.length >= passwordMinLength;
+
+            if (result === false) {
+                const errorMessage = '<?= $escaper->escapeJs(__('Minimum length of this field must be equal or greater than %1 symbols. Leading and trailing spaces will be ignored.')) ?>';
+                return errorMessage.replace('%1', passwordMinLength)
+            }
+
+            if (value.match(/\d+/)) {
+                counter++;
+            }
+
+            if (value.match(/[a-z]+/)) {
+                counter++;
+            }
+
+            if (value.match(/[A-Z]+/)) {
+                counter++;
+            }
+
+            if (value.match(/[^a-zA-Z0-9]+/)) {
+                counter++;
+            }
+
+            if (counter < passwordMinCharacterSets) {
+                const errorMessage = '<?= $escaper->escapeJs(
+                    __('Minimum of different classes of characters in password is %1. Classes of characters: Lower Case, Upper Case, Digits, Special Characters.')
+                ) ?>';
+                return errorMessage.replace('%1', passwordMinCharacterSets)
+            }
+
+            return true;
+        });
+        hyva.formValidation.addRule('number', function(value, options, field, context) {
+            return value === '' || /^\d+$/.test(value) ? true : '<?= $escaper->escapeJs(__('Only numbers allowed.')) ?>';
+        });
+        hyva.formValidation.addRule('phone-number', function(value, options, field, context) {
+            return value === '' || /^(\+\d{1,3}[- ]?)?\d+$/.test(value) ? true : '<?= $escaper->escapeJs(__('Please specify a valid phone number')) ?>.';
+        });
+        hyva.formValidation.addRule('website', function(value, options, field, context) {
+            return value === '' || /^((https?|ftp|smtp):\/\/)?(www.)?[a-z0-9]+\.[a-z]+(\/[a-zA-Z0-9#]+\/?)*$/
+                    .test(value) ? true : '<?= $escaper->escapeJs(__('Please add valid website')) ?>.';
+        });
+        hyva.formValidation.addRule('password-match', function(value, options, field, context) {
+            const passwordField = context.fields['password'].element;
+            if (value !== passwordField.value) {
+                return '<?= $escaper->escapeJs(__('Your password confirmation must match your password.')) ?>';
+            }
+            return true;
+        });
+    }
+</script>

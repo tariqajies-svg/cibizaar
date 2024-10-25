@@ -1,0 +1,119 @@
+@layer components {
+    .link-color {
+        @apply text-[#4A40F6];
+    }
+    .text-nine {
+        @apply text-[9px];
+    }
+    .btn {
+        @apply flex py-2.75 px-9.75 text-sm font-bold border rounded items-center justify-center text-center space-x-3
+            hover:cursor-pointer;
+
+        &.btn-sm {
+            @apply py-1.75;
+        }
+
+        &.btn-sq {
+            @apply w-10 h-10 lg:w-11 lg:h-11 space-x-0 px-2.75 py-1.25 lg:px-3.25 lg:py-1.75;
+
+            &.btn-primary-dark {
+                @apply p-3 lg:p-3.5;
+            }
+        }
+
+        @screen lg {
+            @apply text-base;
+        }
+
+        &.disabled,
+        &:disabled {
+            @apply bg-gray-f2 border-gray-e6 text-gray cursor-default pointer-events-none;
+        }
+
+        [class^='icon-'],
+        [class*=' icon-'] {
+            @apply text-inherit;
+        }
+    }
+    .btn-primary {
+        @apply bg-[#4A40F6] border-[#4A40F6] text-white;
+
+        @screen lg {
+            &.hover,
+            &:hover {
+                @apply bg-blue-darker border-blue-darker;
+            }
+        }
+
+        &.active,
+        &:active {
+            @apply bg-navy border-navy;
+        }
+
+        &-dark {
+            @apply bg-white/10 text-sm text-white border-0 px-8.5 py-3 lg:py-3.5;
+
+            [class^='icon-'],
+            [class*=' icon-'] {
+                @apply text-white/40 text-base leading-4;
+            }
+
+            @screen lg {
+                &.hover,
+                &:hover {
+                    @apply bg-white/30;
+
+                    [class^='icon-'],
+                    [class*=' icon-'] {
+                        @apply text-inherit;
+                    }
+                }
+            }
+
+            &.active,
+            &:active {
+                @apply bg-white/20;
+
+                [class^='icon-'],
+                [class*=' icon-'] {
+                    @apply text-inherit;
+                }
+            }
+        }
+    }
+
+    .btn-secondary {
+        @apply bg-white text-blue border;
+
+        @screen lg {
+            &.hover,
+            &:hover {
+                @apply bg-gray-f2 text-blue-darker;
+            }
+        }
+
+        &.active,
+        &:active {
+            @apply bg-white text-navy;
+        }
+    }
+
+    .btn-round {
+        @apply bg-white text-gray border rounded-full p-3.25 w-11 h-11;
+
+        @screen lg {
+            &.hover,
+            &:hover {
+                @apply bg-gray-f2 text-blue-darker;
+            }
+        }
+
+        &.active,
+        &:active {
+            @apply bg-white text-navy;
+        }
+    }
+    .btn-light {
+        @apply bg-[#F3F2FF] border text-[#4A40F6] border-solid border-[#4A40F6] hover:text-white hover:bg-blue-darker;
+    }
+}

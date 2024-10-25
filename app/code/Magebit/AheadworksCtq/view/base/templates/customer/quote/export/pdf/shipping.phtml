@@ -1,0 +1,70 @@
+<?php
+/**
+ * This file is part of the Magebit_AheadworksCtq package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+
+use Aheadworks\Ctq\ViewModel\Customer\Export\Quote\Shipping;
+use Aheadworks\Ctq\ViewModel\Customer\Quote\DataProvider;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magento\Quote\Model\Quote;
+
+/* @var $block Template */
+/* @var $viewModel DataProvider */
+/* @var $shippingViewModel Shipping */
+/* @var $cart Quote */
+/** @var $escaper Escaper */
+
+$viewModel = $block->getDataProviderViewModel();
+$viewModel->setMethodToLocateQuote($block->getMethodToLocateQuote());
+$shippingViewModel = $block->getShippingViewModel();
+$cart = $viewModel->getCart();
+?>
+<?php if ($shippingViewModel->isShippingInfoSpecified($cart)): ?>
+    <div class="block-title">
+        <span><?= $escaper->escapeHtml(__('Shipping Information')) ?></span>
+    </div>
+    <div class="shipping-information">
+        <div class="section shipping-address">
+            <span class="title"><?= $escaper->escapeHtml(__('Shipping Address')) ?></span>
+            <div class="address">
+                <?= /* @noEscape */ $shippingViewModel->getFormattedAddress($cart) ?>
+            </div>
+        </div>
+        <?php if ($shippingViewModel->getFormattedShippingMethod($cart)): ?>
+            <div class="section shipping-method">
+                <span class="title"><?= $escaper->escapeHtml(__('Shipping Method')) ?></span>
+                <div class="description">
+                    <?= /* @noEscape */ $shippingViewModel->getFormattedShippingMethod($cart) ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <style type="text/css">
+        .block-title {
+            margin: 2.5rem 0 0.5rem 0;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 24px;
+            color: #062B48;
+        }
+        .section .title {
+            font-weight: bold;
+        }
+        .section {
+            display: inline-block;
+        }
+        .section.shipping-address {
+            float: left;
+            width: 50%;
+        }
+        .section.shipping-method {
+            float: right;
+            width: 50%;
+        }
+    </style>
+<?php endif; ?>

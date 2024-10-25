@@ -1,0 +1,44 @@
+<?php
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+?>
+<script>
+    "use strict";
+
+    (function () {
+        window.bizaar.initToListButton = function (options) {
+            return {
+                isCompanyUser: options.isCompanyUser,
+                showWishlist: false,
+                isPrivateContentLoaded: false,
+                getData(data) {
+                    if (this.isPrivateContentLoaded) {
+                        return;
+                    }
+
+                    if (!data) {
+                        const private_content_key = 'mage-cache-storage';
+                        const browserStorage = hyva.getBrowserStorage();
+                        if (!browserStorage || !browserStorage[private_content_key]) {
+                            return;
+                        }
+                        data = JSON.parse(browserStorage[private_content_key]);
+                    }
+
+                    if (data) {
+                        this.isPrivateContentLoaded = true;
+                    }
+
+                    if (data['company-user']) {
+                        this.isCompanyUser = data['company-user'].isCompanyUser;
+                    }
+                    this.showWishlist = options.showWishlist && !this.isCompanyUser;
+                }
+            }
+        }
+    })();
+</script>

@@ -1,0 +1,36 @@
+<?php
+/**
+ * This file is part of the Magebit_MagefanBlog package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_MagefanBlog
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\Slider;
+use Magebit\MagefanBlog\Block\Widget\RecentPostsSlider;
+
+/**
+ * @var RecentPostsSlider $block
+ * @var ViewModelRegistry $viewModels
+ * @var Slider $sliderViewModel
+ */
+
+$sliderViewModel = $viewModels->require(Slider::class);
+$items = $block->getPostCollection();
+?>
+<?=
+$sliderViewModel->getSliderForItems(
+    'Magebit_MagefanBlog::recent-slider-item.phtml',
+    $items,
+    'Magebit_MagefanBlog::recent-blog-posts-slider.phtml'
+)->toHtml()
+?>

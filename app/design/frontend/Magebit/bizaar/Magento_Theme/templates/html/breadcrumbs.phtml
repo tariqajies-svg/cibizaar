@@ -1,0 +1,63 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Theme\Block\Html\Breadcrumbs;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var Breadcrumbs $block */
+/** @var array $crumbs */
+?>
+<?php if ($crumbs && is_array($crumbs)): ?>
+<?php
+if(array_key_exists('product',$crumbs)) {
+    $product_crumbs = $crumbs['product'];
+    $product_crumbs['last'] = true;
+    unset($crumbs['product']);
+    $crumbs[array_key_last($crumbs)]['last'] = false;
+    $crumbs['product'] = $product_crumbs;
+} ?>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <div class="container">
+        <ol class="items clear pt-4 flex flex-wrap text-[#99A0A4] text-xs font-light">
+            <?php foreach ($crumbs as $crumbName => $crumbInfo): ?>
+                <li class="item items-center flex <?= $escaper->escapeHtmlAttr($crumbName) ?>">
+                <?php if ($crumbInfo['link']): ?>
+                    <a href="<?= $escaper->escapeUrl($crumbInfo['link']) ?>"
+                        class="clear"
+                        title="<?= $escaper->escapeHtmlAttr($crumbInfo['title']) ?>"
+                    ><?= $escaper->escapeHtml($crumbInfo['label']) ?></a>
+                <?php elseif ($crumbInfo['last']): ?>
+                    <span class="clear pointer-events-none font-medium text-black"
+                        aria-current="page"
+                    ><?= $escaper->escapeHtml($crumbInfo['label']) ?></span>
+                <?php else: ?>
+                    <span>
+                        <?= $escaper->escapeHtml($crumbInfo['label']) ?>
+                    </span>
+                <?php endif; ?>
+                <?php if (!$crumbInfo['last']): ?>
+                    <span aria-hidden="true" class="separator flex items-center px-1.25 lg:px-2.25">
+                        <i class="icon-arrow-down -rotate-90 text-xs"></i>
+                    </span>
+                <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+
+</nav>
+<?php endif; ?>

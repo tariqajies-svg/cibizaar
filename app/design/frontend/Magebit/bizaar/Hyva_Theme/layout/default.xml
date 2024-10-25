@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaTheme package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="head.additional">
+            <block  before="-" name="preload" template="Hyva_Theme::page/head/preload.phtml" />
+        </referenceBlock>
+        <referenceContainer name="after.body.start">
+            <block name="hyva-extend" template="Hyva_Theme::page/js/hyva-extend.phtml" after="head.hyva-scripts"/>
+        </referenceContainer>
+        <referenceContainer name="page.messages"
+                            htmlClass="page messages sticky z-30 top-[92px] lg:top-[61px]">
+        </referenceContainer>
+    </body>
+</page>

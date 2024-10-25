@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Created By : Rohan Hapani
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+
+        <columns name="sales_order_columns">
+
+                <actionsColumn name="actions" class="SkyExLabel\Slabel\Ui\Component\Listing\Column\ViewAction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                    <item name="viewUrlPath" xsi:type="string">sales/order/view</item>
+                    <item name="urlEntityParamName" xsi:type="string">order_id</item>
+                </item>
+            </argument>
+        </actionsColumn>
+
+
+
+
+
+        
+
+        <column name="skyex_awb">
+ <argument name="data" xsi:type="array">
+ <item name="config" xsi:type="array">
+ <item name="filter" xsi:type="string">text</item>
+ <item name="label" xsi:type="string" translate="true">SkyEx AWB</item>
+ </item>
+ </argument>
+ </column>
+
+ 
+<!-- <column name="skyex_label">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">skyex label</item>
+                </item>
+            </argument>
+        </column> -->
+
+    </columns>
+
+
+
+    <listingToolbar name="listing_top">
+            <massaction name="listing_massaction">
+                <!-- <action name="order_delete">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="type" xsi:type="string">order_delete</item>
+                            <item name="label" xsi:type="string" translate="true">Delete1</item>
+                            <item name="url" xsi:type="url" path="blog/order/massDelete"/>
+                            <item name="confirm" xsi:type="array">
+                                <item name="title" xsi:type="string" translate="true">Delete Order(s)</item>
+                                <item name="message" xsi:type="string" translate="true">Are you sure you want to delete selected items?</item>
+                            </item>
+                        </item>
+                    </argument>
+                </action> -->
+
+                <action name="mass_push">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="type" xsi:type="string">mass_push</item>
+                            <item name="label" xsi:type="string" translate="true">Push to SkyEx</item>
+                            <item name="url" xsi:type="url" path="blog/order/massPush"/>
+                            <item name="confirm" xsi:type="array">
+                                <item name="title" xsi:type="string" translate="true">Push to SkyEx</item>
+                                <item name="message" xsi:type="string" translate="true">Are you sure you want to Push selected items to SkyEx?</item>
+                            </item>
+                        </item>
+                    </argument>
+                </action>
+
+
+                <action name="sky_mass_pdf">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="type" xsi:type="string">sky_mass_pdf</item>
+                            <item name="label" xsi:type="string" translate="true">Download SkyEx Label</item>
+                            <item name="url" xsi:type="url" path="blog/order/massSkyexpdf"/>
+                            <item name="confirm" xsi:type="array">
+                                <item name="title" xsi:type="string" translate="true">Download SkyEx Label</item>
+                                <item name="message" xsi:type="string" translate="true">Are you sure you want to download SkyEx label for selected items?</item>
+                            </item>
+                        </item>
+                    </argument>
+                </action>
+
+            </massaction>
+    </listingToolbar>
+
+
+</listing>

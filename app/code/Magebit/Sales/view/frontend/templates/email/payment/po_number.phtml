@@ -1,0 +1,30 @@
+<?php
+/**
+ * This file is part of the Magebit_Sales package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_Sales
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2024 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Magebit\Sales\Block\Email\Payment\PoNumber;
+use Magento\Framework\Escaper;
+
+/** @var Escaper $escaper */
+/** @var PoNumber $block */
+?>
+<h3 style="font-family: &quot;Open Sans&quot;,sans-serif; color: #062b48; font-weight: 700; font-size: 16px; line-height: 24px; margin-top: 0; margin-bottom: 12px;">
+    <?= $escaper->escapeHtml(__('PO number')) ?>
+</h3>
+<dl class="payment-method" style="margin-top: 0; margin-bottom: 10px;">
+    <dt class="title" style="margin-bottom: 5px; margin-top: 0; font-weight: 400;">
+        <?= $escaper->escapeHtml($block->getPoNumber()) ?>
+    </dt>
+</dl>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_PaymentFee package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.cart.totals">
+            <!--
+                The rendering order of these children is set in Magento Admin:
+                Stores > Configuration > Sales > Sales > Checkout Totals Sort Order
+            -->
+            <block name="payment_fee" template="Magebit_PaymentFee::php-cart/totals/payment_fee.phtml"/>
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,31 @@
+{
+    "sparsh_attachments": {
+        "column": {
+            "attachment_id": true,
+            "title": true,
+            "attach_file": true,
+            "creation_time": true,
+            "update_time": true,
+            "sort_order": true,
+            "is_active": true
+        },
+        "index": {
+            "SPARSH_ATTACHMENTS_TITLE": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sparsh_product_attachment": {
+        "column": {
+            "entity_id": true,
+            "attachment_id": true,
+            "product_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_979465A1053BC80851FAFE724023D8C3": true,
+            "SPARSH_PRD_ATTACHMENT_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true
+        }
+    }
+}

@@ -1,0 +1,311 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\StoreConfig;
+use Magebit\HyvaTheme\Controller\Menu\Index;
+use Magebit\HyvaTheme\ViewModel\BrandsNavigation;
+use Magento\Checkout\Block\Cart\Sidebar;
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Magebit\HyvaTheme\ViewModel\Navigation;
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var StoreConfig $storeConfig */
+$storeConfig = $viewModels->require(StoreConfig::class);
+/** @var Navigation $navigation */
+$navigation = $viewModels->require(Navigation::class);
+$brandsNavigation = $viewModels->require(BrandsNavigation::class);
+
+$showMiniCart = $storeConfig->getStoreConfig(Sidebar::XML_PATH_CHECKOUT_SIDEBAR_DISPLAY);
+$mainCategoryId = $navigation->getMainCategoryId();
+$brandsCategoryId = $brandsNavigation->getBrandsCategoryId();
+$ajaxMenuUniqueId = uniqid('ajax_menu');
+?>
+<script>
+    function initHeader () {
+        return {
+            searchOpen: false,
+            menuOpen: false,
+            cart: {},
+            menuLoaded: false,
+            menuOpenCallback: null,
+            isLoading: false,
+            cartTitle: [
+                '<?= $escaper->escapeJs(__('Cart')) ?>',
+                '<?= $escaper->escapeJs(__('Cart Is Empty')) ?>'
+            ],
+            ...hyva.modal({'dialog': 'desktop-menu'}),
+            showCatalogMenu() {
+                let debounceLoader;
+                if (!this.menuLoaded) {
+                    debounceLoader = setTimeout(() => {this.isLoading = true}, 150);
+                    this.menuOpenCallback = this.showCatalogMenu;
+                    return;
+                }
+                clearTimeout(debounceLoader);
+                this.isLoading = false;
+                this.$refs.catalogMenuButton.style.zIndex = '100';
+                this.show('desktop-menu');
+            },
+            hideCatalogMenu() {
+                if (!this[this.isOpenProp('desktop-menu')]) {
+                    return;
+                }
+                this.$refs.catalogMenuButton.style.zIndex = 'initial';
+                this.hide('desktop-menu');
+            },
+            showMobileMenu() {
+                let debounceLoader;
+                if (!this.menuLoaded) {
+                    debounceLoader = setTimeout(() => {this.isLoading = true}, 150);
+                    this.menuOpenCallback = this.showMobileMenu;
+                    return;
+                }
+                clearTimeout(debounceLoader);
+                this.isLoading = false;
+                this.openMobileMenu();
+            },
+            getData(data) {
+                if (data.cart) { this.cart = data.cart }
+            },
+            async toggleCart() {
+                if (window.innerWidth > 768) {
+                    /* toggle when private content is loaded */
+                    if (document.readyState !== 'interactive' && this.cart.items.length) {
+                        window.dispatchEvent(new CustomEvent('toggle-cart'))
+                    }
+                } else {
+                    window.location.replace('<?= $escaper->escapeUrl($block->getUrl('checkout/cart/index')) ?>')
+                }
+            },
+            initEvents() {
+                (events => {
+                    const initLoadMenuEvent = () => {
+                        events.forEach(type => window.removeEventListener(type, initLoadMenuEvent))
+                        this.loadMenu();
+                    };
+                    events.forEach(type => window.addEventListener(type, initLoadMenuEvent, {once: true, passive: true}))
+                })(['touchstart', 'mouseover', 'wheel', 'scroll', 'keydown'])
+            },
+            loadMenu() {
+                fetch('<?= $escaper->escapeJs($escaper->escapeUrl($block->getUrl('theme/menu/index', [Index::AJAX_MENU_UNIQUE_ID => $ajaxMenuUniqueId]))) ?>',
+                ).then(response => {
+                        return response.text();
+                    },
+                ).then(data => {
+                    hyva.replaceDomElement('#<?= /** @noEscape */ $ajaxMenuUniqueId ?>',  data);
+                    this.menuLoaded = true;
+                    if (this.menuOpenCallback) {
+                        this.$nextTick(() => {
+                            this.menuOpenCallback()
+                        });
+                    }
+                }).catch(function(err) {
+                    console.warn('Cannot load menu.', err);
+                });
+            },
+            openMobileMenu() {
+                document.body.style.position = 'fixed';
+                document.body.classList.remove('fixed');
+                this.mobile.open = true;
+            },
+            closeMobileMenu() {
+                document.body.style.position = '';
+                document.body.classList.remove('fixed');
+                this.mobile.open = false;
+                this.mobile.mobilePanelActiveId = null;
+                this.mobile.mobilePanelActiveRoot= null;
+                this.mobile.setActiveMenu(this.$refs['menu-mobile']);
+            },
+            ucFirst(s) {
+                return s.substr(0, 1).toUpperCase() + s.substr(1);
+            },
+            isOpenProp(dialogName) {
+                return 'is' + this.ucFirst(dialogName) + 'Open';
+            },
+            mobile: {
+                mobilePanelActiveId: null,
+                mobilePanelActiveRoot: null,
+                open: false,
+                openTree: [],
+                wishlistCount: null,
+                brandFilterAttribute: 'manufacturer',
+                selectedBrandUrl: '',
+                openCatalogue() {
+                    this.openTree = [];
+                    this.mobilePanelActiveId = null;
+                    this.mobilePanelActiveRoot = '<?= (int)$mainCategoryId ?>';
+                },
+                openBrands() {
+                    this.openTree = [];
+                    this.mobilePanelActiveId = null;
+                    this.mobilePanelActiveRoot = '<?= (int)$brandsCategoryId ?>';
+                },
+                openPanel(id, name) {
+                    this.mobilePanelActiveId = id;
+                    this.openTree.push({'id': id, 'name': name});
+                },
+                goBack() {
+                    this.openTree.pop();
+                    this.mobilePanelActiveId = this.openTree.length ? this.openTree[this.openTree.length - 1].id : null;
+                },
+                setActiveMenu(menuNode) {
+                    Array.from(menuNode.querySelectorAll('a')).filter(link => {
+                        let currentLink = window.location.href.split('?')[0];
+                        let nodeLink = link.href;
+                        if (currentLink.charAt(currentLink.length - 1) === '/') currentLink = currentLink.slice(0, -1);
+                        if (nodeLink.charAt(nodeLink.length - 1) === '/') nodeLink = nodeLink.slice(0, -1);
+                        return nodeLink === currentLink;
+                    }).map(item => {
+                        item.classList.add('active');
+                        item.dataset.brand && this.openBrands();
+                        item.dataset.catalogue && this.openCatalogue();
+
+                        if (item.closest('div.level-0') && item.closest('div.level-0').querySelector('div.link')) {
+                            let item0 = item.closest('div.level-0').querySelector('div.link');
+                            item0.classList.add('active');
+                            this.openPanel(item0.dataset.id, item0.innerText);
+                        }
+
+                        if (item.closest('div.level-1') && item.closest('div.level-1').querySelector('div.link')) {
+                            let item1 = item.closest('div.level-1').querySelector('div.link');
+                            item1.classList.add('active');
+                            this.openPanel(item1.dataset.id, item1.innerText);
+                        }
+                    });
+                },
+                receiveWishlistData(data) {
+                    if (data.wishlist?.counter) {
+                        this.wishlistCount = data.wishlist.counter.match(/\d+/g);
+                    }
+                },
+                buildCategoryUrl(urlKeysArray) {
+                    return this.selectedBrandUrl.replace('<?= $escaper->escapeUrl($navigation->getCategoryUrlSuffix()) ?>', '')
+                        + '/' + urlKeysArray.join('/')
+                        + '<?= $escaper->escapeUrl($navigation->getCategoryUrlSuffix()) ?>';
+                }
+            }
+        }
+    }
+    function initCompareHeader() {
+        return {
+            compareProducts: null,
+            itemCount: 0,
+            receiveCompareData(data) {
+                if (data['compare-products']) {
+                    this.compareProducts = data['compare-products'];
+                    this.itemCount = this.compareProducts.count;
+                }
+            }
+        }
+    }
+</script>
+<div x-data="{ showBar: false }">
+<div id="header"
+        class="header-middle relative w-full bg-[#F7F7F9] md:bg-white py-3 lg:py-0 mb-3 lg:mb-0"
+       :class="{ 'sticky-header' : showBar }" 
+     x-data="initHeader()"
+     x-init="initEvents()"
+     @keydown.window.escape="searchOpen = false;"
+     @private-content-loaded.window="getData(event.detail.data)"
+     @close-desktop-menu.window="hideCatalogMenu()"
+     @scroll.window="showBar = (window.pageYOffset > 70) ? true : false"
+>
+    <div class="container flex flex-wrap lg:flex-nowrap gap-x-0 md:gap-x-6 items-center justify-between w-full">
+
+        <!--Logo-->
+        <?= $block->getChildHtml('logo'); ?>
+
+        <!--Main Navigation-->
+        
+        <div class="flex w-full lg:max-w-[526px] flex-shrink-1 order-4 lg:order-2 mt-3 lg:mt-0">
+            <!--Main Navigation Button-->
+            <button x-ref="catalogMenuButton" @click="showCatalogMenu" class="btn btn-primary flex-shrink-0 hidden lg:flex lg:mr-5">
+                <i class="icon-menu-2"></i>
+                <span class="hidden xl:block">Product Catalogue</span>
+                <i class="icon-dropdown hidden xl:block"></i>
+            </button>
+            
+            <!--Search-->
+            <button @click="showMobileMenu"
+                class="mr-5 flex items-center justify-center cursor-pointer no-underline lg:hidden"
+                aria-label="<?= $escaper->escapeHtml(__('Menu')) ?>">
+                <i class="icon-menu text-[20px]"></i>
+            </button>
+            <?= $block->getChildHtml('header-search'); ?>
+        </div>
+
+        <div class="flex items-center order-3 gap-x-3 md:gap-x-6">
+            <!--Currency-->
+            <!-- <?//php echo $this->getLayout()->createBlock("Magento\Framework\View\Element\Template")->setTemplate("Magento_Theme::html/switcher.phtml")->toHtml() ?> -->
+            <!--VAT-->
+            <!-- <div class="switch">
+                <div class="b">
+                    <input type="checkbox" value="" class="a">
+                    <div class="v before:transition-all">
+                        <span class="c">no</span>
+                        <span class="d">with</span>
+                    </div>
+                </div>
+                <span>VAT</span>
+            </div> -->
+            <!--Cart Icon-->
+            <a id="menu-cart-icon"
+               <?php if ($showMiniCart): ?>@click.prevent.stop="toggleCart()"<?php endif ?>
+               class="header-icon cart-icon clear flex"
+               :class="cart.items && !cart.items.length
+                   ? 'pointer-event-none cursor-default'
+                   : ''"
+               :title="cart.items && cart.items.length ? cartTitle[0] : cartTitle[1]"
+               href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart/index')) ?>"
+            >
+                <i class="relative icon-cart text-lg lg:text-xl mx-auto">
+                    <span class="poppins-font counter absolute top-0 right-0 min-w-5 h-5 text-nine font-semibold px-1 text-center text-white uppercase transform rounded-full bg-red-600 border-2 flex border-white items-center justify-center block invisible"
+                          :class="{ 'invisible': !cart.summary_count }"
+                          x-text="cart.summary_count"></span>
+                </i>
+                <span class="text"><?php echo __('My Cart') ?></span>
+            </a>
+            <!--Customer Icon & Dropdown-->
+            <a href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>"
+               class="header-icon account clear no-underline"
+               title="<?= $escaper->escapeHtml(__('My Account')) ?>">
+                <i class="icon-account text-lg lg:text-xl"></i>
+                <span class="text"><?php echo __('My Account') ?></span>
+            </a>
+        </div>
+    </div>
+
+    <!--Main Navigation-->
+    <div x-cloak x-show="menuLoaded">
+        <div id="<?= /** @noEscape */ $ajaxMenuUniqueId ?>"></div>
+    </div>
+    <div x-cloak>
+        <?= $block->getChildHtml('topmenu_generic_loading') ?>
+    </div>
+    
+    <!--Cart Drawer-->
+    <?= $block->getChildHtml('cart-drawer'); ?>
+
+    <!--Authentication Pop-Up-->
+    <?= $block->getChildHtml('authentication-popup'); ?>
+</div>
+
+</div>

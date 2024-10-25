@@ -1,0 +1,88 @@
+<?php
+/**
+ * This file is part of the Magebit_Bizaar package.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+/**
+ * @var Template $block
+ * @var Escaper $escaper
+ */
+?>
+
+<script>
+    (function () {
+        (events => {
+            const loadMyLibrary = () => {
+                events.forEach(type => window.removeEventListener(type, loadMyLibrary));
+                whatsUpp();
+            };
+            events.forEach(type => window.addEventListener(type, loadMyLibrary, {once: true, passive: true}));
+        })(['touchstart', 'mouseover', 'wheel', 'scroll', 'keydown']);
+
+        const whatsUpp = () => {
+            var bobWhatsappLogo = document.createElement('IMG');
+            bobWhatsappLogo.src = 'https://whatsapp-widget.s3.ap-south-1.amazonaws.com/wa-logo-120.png';
+            bobWhatsappLogo.width = '60';
+            bobWhatsappLogo.height = '60';
+            bobWhatsappLogo.style.opacity = 'inherit';
+            const tempPlaceHolder = 'Hi';
+            var bobUrlWithText =
+                encodeURIComponent(
+                    `https://${window.location.hostname}${window.location.pathname}\n\nHi Bizaar Team, in need of your team's expertise.`);
+            var bobUrlWithoutText = `Hi Bizaar Team, in need of your team's expertise.`;
+            var bobWhatsappElement = document.createElement('a');
+            bobWhatsappElement.appendChild(bobWhatsappLogo);
+            bobWhatsappElement.title = 'Chat with us on WhatsApp';
+            bobWhatsappElement.href = `https://wa.me/971585790025?text=${bobUrlWithoutText}`;
+            bobWhatsappElement.style.zIndex = 100000000;
+            bobWhatsappElement.style.position = 'fixed';
+            bobWhatsappElement.style.bottom = '0px';
+            bobWhatsappElement.style.right = '0px';
+            bobWhatsappElement.style.padding = '10px';
+            bobWhatsappElement.style.opacity = '1.0 !important';
+            var clientName = 'bizaar';
+            document.body.appendChild(bobWhatsappElement);
+            bobWhatsappElement.target = '_blank';
+            bobWhatsappElement.onclick = () => {
+                updateCount('WHATSAPP_REDIRECTION');
+            };
+
+            function updateCount(eventName) {
+                var newPrimaryHashKey = 'obj_name:' + generateRowId(4);
+                const payload = {
+                    id: clientName + newPrimaryHashKey,
+                    clientName: clientName,
+                    dateTime: new Date().toUTCString(),
+                    eventName: eventName,
+                };
+
+                fetch('https://n7ze0y2wwa.execute-api.ap-south-1.amazonaws.com/default/', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                })
+                .then((data) => data.json())
+                .then((data) => {})
+                .catch((error) => {});
+            }
+
+            function generateRowId(shardId /* range 0-64 for shard/slot */) {
+                var CUSTOMEPOCH = 1300000000000;
+                var ts = new Date().getTime() - CUSTOMEPOCH; // limit to recent
+                var randid = Math.floor(Math.random() * 512);
+                ts = ts * 64; // bit-shift << 6
+                ts = ts + shardId;
+                return ts * 512 + randid;
+            }
+        }
+    })();
+</script>

@@ -1,0 +1,72 @@
+<?php
+/**
+ * This file is part of the Magebit_HyvaAheadworksCtq package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+
+declare(strict_types=1);
+
+use Aheadworks\Ctq\Block\Customer\Quote\Edit\Totals;
+
+/** @var Totals $block */
+
+$cart = $block->getDataProviderViewModel()->getCart();
+$items = $cart->getAllVisibleItems();
+$quote = $block->getDataProviderViewModel()->getQuote();
+$hasItems = count($items) > 0;
+$taxRate = $hasItems ? $items[0]->getData("tax_percent") : '';
+$totalExcludingVAT = $hasItems ? $quote->getQuoteTotal() : '';
+$totalWithTax = $hasItems ? round($totalExcludingVAT * (1 + $taxRate / 100)) : '';
+$totalTAX = $hasItems ? $totalWithTax - $totalExcludingVAT : '';
+$currencySymbol = $hasItems ? $block->getQuoteTotalsViewModel()->getSymbol() ?? '' : '';
+
+?>
+<?php if ($hasItems): ?>
+<script>
+    function initTotals() {
+        const checkoutConfig = JSON.parse(<?= /** @noEscape */ json_encode($block->getCheckoutConfig()) ?>);
+        function getFormattedSegments() {
+            return checkoutConfig.totalsData.total_segments.map(segment => {
+                switch (segment.code) {
+                    case 'subtotal':
+                        segment.value = checkoutConfig.totalsData.base_subtotal;
+                        break;
+                    case 'shipping':
+                        segment.value = checkoutConfig.totalsData.base_shipping_incl_tax;
+                        break;
+                    case 'tax':
+                        segment.value = checkoutConfig.totalsData.base_subtotal_incl_tax - checkoutConfig.totalsData.base_subtotal;
+                        break;
+                    case 'grand_total':
+                        segment = {...segment, ...{strong: true}}
+                        break;
+                    case 'amasty_extrafee':
+                        return [];
+                }
+                return segment;
+            }).flat();
+        }
+        return  {
+            totalSegments: getFormattedSegments()
+        }
+    }
+</script>
+<div class="aw-ctq__quote-totals-block flex justify-end" x-data="initTotals()">
+    <div class="quote-totals border-gray">
+        <template x-for="segment in totalSegments">
+            <div class="totals-row" :class="segment?.strong && 'grand'">
+                <span class="totals-label" x-text="segment.title"></span>
+                <span class="totals-value" x-text="hyva.formatPrice(segment.value)"></span>
+            </div>
+        </template>
+    </div>
+</div>
+<?php endif; ?>

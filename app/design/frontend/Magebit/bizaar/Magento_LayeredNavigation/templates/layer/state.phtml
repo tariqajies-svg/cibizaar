@@ -1,0 +1,63 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Hyva\Theme\ViewModel\HeroiconsOutline;
+use Magento\Framework\Escaper;
+use Magento\LayeredNavigation\Block\Navigation\State;
+
+/** @var State $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+/** @var HeroiconsOutline $heroicons */
+$heroicons = $viewModels->require(HeroiconsOutline::class);
+?>
+<?php $filters = $block->getActiveFilters() ?>
+<?php if (!empty($filters)): ?>
+<div class="filter-current" x-data="{ open: true }">
+    <div class="filter-options-title flex justify-between items-center cursor-pointer pt-0 md:pt-5 pb-5"
+         @click="open = !open">
+        <strong class="title text-black text-[18px] leading-6 font-semibold"><?= $escaper->escapeHtml(__('Active filtering')) ?></strong>
+        <i class="active:text-[#959595]" :class="open ? 'icon-minus text-[#959595]' : 'icon-plus text-blue'"></i>
+    </div>
+    <div class="items space-y-1 lg:space-y-2 py-5 pt-0" x-show="open">
+        <?php foreach ($filters as $filter): ?>
+            <div class="item flex items-center">
+                <div>
+                    <span class="filter-label font-bold"><?= $escaper->escapeHtml(__($filter->getName())) ?>:</span>
+                    <span class="filter-value font-bold text-navy">
+                        <?= $escaper->escapeHtml($block->stripTags($filter->getLabel())) ?>
+                    </span>
+                </div>
+                <span class="pl-2">
+                    <a class="link block action remove no-underline leading-none"
+                       href="<?= $escaper->escapeUrl($filter->getRemoveUrl()) ?>"
+                       title="<?= /* @noEscape */ $escaper->escapeHtmlAttr(__('Remove This Item')) ?>">
+                        <i class="icon-close text-[#959595] hover:text-inherit active:text-inherit"></i>
+                    </a>
+                </span>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php if ($block->getLayer()->getState()->getFilters()): ?>
+        <div class="block-actions filter-actions py-5 pt-0">
+            <a href="<?= $escaper->escapeUrl($block->getClearUrl()) ?>"
+               class="btn btn-sm btn-primary btn-light block text-sm font-semibold"><?= $escaper->escapeHtml(__('Clear All Filters')) ?></a>
+        </div>
+    <?php endif; ?>
+</div>
+<?php endif; ?>

@@ -1,0 +1,104 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+/* @var $block Item */
+/* @var $escaper Escaper */
+/* @var ViewModelRegistry $viewModels */
+/* @var Pricing $priceFormatter */
+
+use Aheadworks\Ctq\Api\Data\CartItemInterface;
+use Aheadworks\Ctq\Block\Customer\Quote\Edit\Item;
+use Aheadworks\Ctq\Model\Source\Quote\Negotiation\DiscountType;
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magebit\HyvaAheadworksCtq\ViewModel\Pricing;
+use Magento\Framework\Escaper;
+
+$priceFormatter = $viewModels->require(Pricing::class);
+
+$item = $block->getItem();
+$itemProduct = $item->getProduct();
+$stockItem = $itemProduct->getExtensionAttributes()->getStockItem();
+$itemOptions = $block->getViewModel()->getOptionList($item);
+$itemId = $item->getId();
+$quote = $item->getQuote()->getExtensionAttributes()->getAwCtqQuote();
+$quoteHasNegotiatedAmount = $quote->getNegotiatedDiscountValue() > 0;
+$showDiscountedPriceCol = $quoteHasNegotiatedAmount && $quote->getNegotiatedDiscountType() === DiscountType::PROPOSED_PRICE
+
+?>
+<tr>
+    <td class="col name flex flex-col justify-center" data-th="<?= $escaper->escapeHtml(__('Product Name')) ?>">
+        <div class="item-name"><?= $escaper->escapeHtml($itemProduct->getName()) ?></div>
+        <div class="item-options">
+            <div class="item-option sku">
+                <span class="option-label"><?= $escaper->escapeHtml(__('SKU')) ?>:</span>
+                <span class="option-value"><?= /* @noEscape */ $itemProduct->getSku() ?></span>
+            </div>
+        <?php if ($itemOptions): ?>
+                <?php foreach ($itemOptions as $itemOption): ?>
+                    <?php $formattedOptionValue = $block->getViewModel()->getFormattedOptionValue($itemOption) ?>
+                    <div class="item-option">
+                        <span class="option-label"><?= $escaper->escapeHtml($itemOption['label']) ?>:</span>
+                        <span class="option-value">
+                            <?php if (isset($formattedOptionValue['full_view'])): ?>
+                                <?= /* @noEscape */ $formattedOptionValue['full_view'] ?>
+                            <?php else: ?>
+                                <?= $escaper->escapeHtml($formattedOptionValue['value'], ['span']) ?>
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+        <?php endif; ?>
+        </div>
+        <?php if ($block->getViewModel() && $block->getIsExport()): ?>
+            <div class="product-item-photo">
+                <?= /* @noEscape */ $block->getViewModel()->getProductImageHtml($item, 'product_thumbnail_image') ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($messages = $block->getViewModel()->getMessages($item)): ?>
+            <?php foreach ($messages as $message): ?>
+                <div class="item message <?= /* @noEscape */ $message['type'] ?>">
+                    <div><?= $escaper->escapeHtml($message['text']) ?></div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </td>
+    <td class="col price !align-middle" data-th="<?= $escaper->escapeHtml(__('Price')) ?>">
+        <?= /* @noEscape */ $block->getUnitPriceHtml($item) ?>
+    </td>
+    <?php if ($showDiscountedPriceCol): ?>
+        <td class="col price !align-middle" data-th="<?= $escaper->escapeHtml(__('Negotiated Price')) ?>">
+            <span class="price"><?= /* @noEscape */ $priceFormatter->getFormattedPrice($item->getPrice() - $item->getData(CartItemInterface::AW_CTQ_AMOUNT)) ?></span>
+        </td>
+    <?php endif ?>
+    <td class="col qty !align-middle" data-th="<?= $escaper->escapeHtml(__('Qty')) ?>">
+        <?php if ($block->getIsEdit()): ?>
+            <div class="control qty field field-preserved !mb-0">
+                <input name="cart[<?= /* @noEscape */ $item->getId() ?>][qty]"
+                       value="<?= /* @noEscape */ $block->getQty() ?>"
+                       type="number"
+                       size="4"
+                       title="<?= $escaper->escapeHtml(__('Qty')) ?>"
+                       class="form-input input-text qty w-auto"
+                       data-validate="{required:true, 'zero-or-greather-and-equal-to-one': true, 'validate-zero-or-greater':true <?= !$stockItem->getIsQtyDecimal() ? ', integer:true' : '' ?>}"/>
+            </div>
+        <?php else: ?>
+            <?= /* @noEscape */ $block->getQty() ?>
+        <?php endif; ?>
+    </td>
+    <td class="col subtotal !align-middle" data-th="<?= $escaper->escapeHtml(__('Subtotal')) ?>">
+        <?= /* @noEscape */ $block->getRowTotalHtml($item) ?>
+    </td>
+</tr>

@@ -1,0 +1,36 @@
+.checkout-onepage-success {
+    .page-title {
+        @apply lg-max:mt-[17px];
+    }
+    .page-wrapper {
+        @apply min-h-full;
+      }
+    .page-main {
+        @apply lg-max:mt-3;
+
+        .container {
+            @apply mb-4.75;
+        }
+    }
+
+    .checkout-success {
+        @apply lg:mb-[20px];
+    }
+
+    .print-btn {
+        @apply mt-0;
+        @apply md:ml-2 lg:mt-0;
+    }
+
+    .shop-btn,
+    .print-btn {
+        @apply w-full;
+        @apply md:w-auto; 
+    }
+    .print-btn:hover svg path {
+        @apply fill-[#fff];
+      }
+      .set-id-bg {
+        @apply bg-[#f7f7f7];
+      }
+}

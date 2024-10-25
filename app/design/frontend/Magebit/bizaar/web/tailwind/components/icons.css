@@ -1,0 +1,266 @@
+/* stylelint-disable declaration-colon-newline-after */
+
+/* stylelint-disable font-family-no-missing-generic-family-keyword */
+
+/* stylelint-disable number-max-precision */
+@font-face {
+    font-family: icomoon;
+    src: url('../fonts/icomoon/icomoon.eot?uv48jq');
+    src: url('../fonts/icomoon/icomoon.eot?uv48jq#iefix') format('embedded-opentype'),
+        url('../fonts/icomoon/icomoon.woff2?uv48jq') format('woff2'),
+        url('../fonts/icomoon/icomoon.ttf?uv48jq') format('truetype'),
+        url('../fonts/icomoon/icomoon.woff?uv48jq') format('woff'),
+        url('../fonts/icomoon/icomoon.svg?uv48jq#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+[class^='icon-'],
+[class*=' icon-'],
+[class^='before-icon-']::before,
+[class*=' before-icon-']::before {
+
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: icomoon !important;
+    speak: never;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    @apply text-base leading-4;
+}
+
+.icon-account::before {
+    content: '\e900';
+}
+
+.icon-cart::before {
+    content: '\e901';
+}
+
+.icon-menu::before {
+    content: '\e902';
+}
+
+.icon-delivery::before {
+    content: '\e903';
+}
+
+.icon-support::before {
+    content: '\e904';
+}
+
+.icon-money-back::before {
+    content: '\e905';
+}
+
+.icon-shopping-bag::before {
+    content: '\e906';
+}
+
+.icon-menu-2::before {
+    content: '\e907';
+}
+
+.icon-dropdown::before {
+    content: '\e908';
+}
+
+.icon-cart-mini::before {
+    content: '\e909';
+}
+
+.icon-mail::before {
+    content: '\e90a';
+}
+
+.icon-phone::before {
+    content: '\e90b';
+}
+
+.icon-clock::before {
+    content: '\e90c';
+}
+
+.icon-linkedin::before {
+    content: '\e90d';
+}
+
+.icon-facebook::before {
+    content: '\e90e';
+}
+
+.icon-twitter::before {
+    content: '\e90f';
+}
+
+.icon-instagram::before {
+    content: '\e910';
+}
+
+.icon-pin::before {
+    content: '\e911';
+}
+
+.icon-search::before {
+    content: '\e912';
+}
+
+.icon-arrow-left::before,
+.before-icon-arrow-left::before {
+    content: '\e913';
+}
+
+.icon-arrow-right::before {
+    content: '\e914';
+}
+
+.icon-save::before {
+    content: '\e915';
+}
+
+.icon-compare::before {
+    content: '\e916';
+}
+
+.icon-minus::before {
+    content: '\e917';
+}
+
+.icon-plus::before {
+    content: '\e918';
+}
+
+.icon-checkmark::before {
+    content: '\e919';
+}
+
+.icon-close::before {
+    content: '\e91a';
+}
+
+.icon-discount::before {
+    content: '\e91b';
+}
+
+.icon-attachment::before {
+    content: '\e91c';
+}
+
+.icon-error::before {
+    content: '\e91d';
+}
+
+.icon-checkmark-ellipse::before {
+    content: '\e91e';
+}
+
+.icon-warning::before {
+    content: '\e91f';
+}
+
+.icon-info::before {
+    content: '\e920';
+}
+
+.icon-out-of-stock::before {
+    content: '\e921';
+}
+
+.icon-reload::before {
+    content: '\e922';
+}
+
+.icon-eye::before {
+    content: '\e923';
+}
+
+.icon-printer::before {
+    content: '\e924';
+}
+
+.icon-calendar::before {
+    content: '\e925';
+}
+
+.icon-sort-up::before {
+    content: '\e928';
+}
+
+.icon-sort-down::before {
+    content: '\e929';
+}
+
+.icon-profile::before {
+    content: '\e92a';
+}
+
+.icon-edit::before {
+    content: '\e926';
+}
+
+.icon-delete::before {
+    content: '\e927';
+}
+
+.icon-visa {
+    background-image: url('../images/ic_visa.svg');
+}
+
+.icon-mastercard {
+    background-image: url('../images/ic_mastercard.svg');
+}
+
+.icon-discover {
+    background-image: url('../images/ic_discover.svg');
+}
+
+.icon-american-express {
+    background-image: url('../images/ic_american-express.svg');
+}
+
+.icon-visa,
+.icon-mastercard,
+.icon-discover,
+.icon-american-express {
+    @apply block h-6 bg-no-repeat;
+}
+
+.icon-file::before {
+    content: '\e92c';
+}
+
+.icon-heart::before {
+    content: '\e92d';
+}
+
+.icon-rss::before {
+    content: '\e92e';
+}
+
+.icon-call::before {
+    content: '\e92f';
+}
+.icon-msg::before {
+    content: '\e930';
+}
+.icon-quote::before {
+    content: '\e931';
+}
+
+.icon-list:before {
+    content: "\e933";
+}
+.icon-grid:before {
+    content: "\e932";
+}
+.icon-arrow-down:before {
+    content: "\e934";
+}

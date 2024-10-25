@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_AdditionalCharge package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_AdditionalCharge
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Shipping\Model\Shipping">
+        <plugin name="Magebit_AdditionalCharge::ShippingPlugin" type="Magebit\AdditionalCharge\Plugin\ShippingPlugin" />
+    </type>
+
+    <preference for="Magento\Tax\Block\Adminhtml\Rate\Form"
+                type="Magebit\AdditionalCharge\Block\Adminhtml\Rate\Form"/>
+    <type name="Magento\Tax\Model\Calculation\Rate\Converter">
+        <plugin name="Magebit_AdditionalCharge::TaxRateSavePlugin" type="Magebit\AdditionalCharge\Plugin\ConverterPlugin" />
+    </type>
+
+    <preference for="Magento\Tax\Model\ResourceModel\Calculation"
+                type="Magebit\AdditionalCharge\Model\ResourceModel\Calculation"/>
+</config>

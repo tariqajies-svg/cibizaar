@@ -1,0 +1,61 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this package
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+use Magento\Catalog\Block\Product\View;
+
+/** @var View $block */
+
+$product = $block->getProduct();
+?>
+<section class="product-info-wrapper">
+    <div class="flex gap-5 lg:gap-6 md:flex-row flex-col items-start">
+        <div class="grid lg:grid-cols-9 gap-5 xl:gap-10 order-first w-full md:order-last border roundedonefour p-6">
+            <?= $block->getChildHtml('product.media') ?>
+            <?= $block->getChildHtml('product.info') ?>
+        </div>
+        <?php /* Right section */ ?>
+        <div class="pdp-right-section order-2 md:order-last border roundedonefour max-w-52 p-3 lg:p-5 w-full">
+            <?php if($manufacturer_logo = $product->getResource()->getAttribute('manufacturer')->getFrontend()->getValue($product)) { 
+$manufacturer_logo = str_replace(' ', '_', $manufacturer_logo);
+                ?>
+            <img class="mx-auto mb-5" src="<?php echo $block->getBaseUrl().'media/wysiwyg/pdp/'.$manufacturer_logo.'_od.svg' ?>" alt="<?php echo $product->getResource()->getAttribute('manufacturer')->getFrontend()->getValue($product); ?>">
+        <?php } ?>
+            <?php echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('pdp-expert-team-support')->toHtml();?>
+        </div>
+    </div>
+</section>
+<section class="upsell-products-wrapper">
+    <?= $block->getChildHtml('upsell') ?>
+</section>
+<section class="product-options-wrapper">
+    <?= $block->getChildHtml('product_options_wrapper_bottom') ?>
+</section>
+
+<?= $block->getChildHtml('product.info.details'); ?>
+
+<section>
+    <div id="reviewspdp" class="container">
+        <?= $block->getChildHtml('review_list') ?>
+        <?= $block->getChildHtml('review_form') ?>
+    </div>
+</section>
+<section class="bg-gray-f2">
+    <?= $block->getChildHtml('related') ?>
+    
+</section>

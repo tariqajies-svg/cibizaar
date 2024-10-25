@@ -1,0 +1,34 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar theme.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2023 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Sales\Block\Order\View;
+
+/** @var View $block  */
+/** @var Escaper $escaper */
+?>
+
+<?php $history = $block->getOrder()->getVisibleStatusHistory() ?>
+<?php if (!empty($history)): ?>
+    <div x-data="{}" class="my-6">
+        <div><?= $escaper->escapeHtml(__('About Your Order')) ?></div>
+        <?php foreach ($history as $historyItem): ?>
+            <div class="my-3 pl-3 py-1 border-l-2 border-blue">
+                <p x-text="hyva.formatDate('<?= $escaper->escapeHtmlAttr($historyItem->getCreatedAt()) ?>')">
+                </p>
+                <p><?= $escaper->escapeHtml($historyItem->getComment()) ?></p>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>

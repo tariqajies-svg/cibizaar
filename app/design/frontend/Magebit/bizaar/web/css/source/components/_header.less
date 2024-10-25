@@ -1,0 +1,124 @@
+/**
+ * This file is part of the Magebit/bizaar_fallback design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit/bizaar
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+& when (@media-common = true) {
+    .page-layout-checkout {
+        .page-header {
+            border-bottom: 0;
+        }
+
+        .header.content {
+            padding: 0;
+            box-shadow: 0 5px 40px fade(@color-navy, 10%);
+
+            #checkout-header {
+                display: grid;
+                align-items: center;
+                grid-template-columns: 1fr 130px 1fr;
+                padding: 20px;
+
+                .header-button {
+                    &:active {
+                        color: @color-navy;
+                        text-decoration: none;
+                    }
+
+                    .button-text {
+                        display: none;
+                    }
+                }
+
+                .logo {
+                    // max-width: unset;
+                    margin: 0 !important;
+
+                    img {
+                        height: 28px;
+                        width: 100%;
+                        max-width: unset;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .page-layout-checkout {
+        .header.content {
+            max-width: unset;
+            margin: 0;
+            width: 100%;
+
+            #checkout-header {
+                grid-template-columns: 1fr 185px 1fr;
+                padding: 36px 20px;
+                max-width: 1600px;
+                margin-left: auto;
+                margin-right: auto;
+                box-sizing: border-box;
+
+                .header-button {
+                    font-weight: 700;
+                    width: fit-content;
+                    display: flex;
+                    align-items: center;
+                    column-gap: 7px;
+                    position: relative;
+
+                    &::after {
+                        content: '';
+                        display: none;
+                        position: absolute;
+                        height: 1px;
+                        top: 83%;
+                        width: 100%;
+                    }
+
+                    &:active {
+                        text-decoration: none;
+                        color: @color-navy;
+
+                        &::after {
+                            display: block;
+                            background: @color-navy;
+                        }
+                    }
+
+                    &:hover {
+                        text-decoration: none;
+
+                        &::after {
+                            display: block;
+                            background: @color-blue-darker;
+                        }
+                    }
+
+                    .button-text {
+                        display: block;
+                    }
+                }
+
+                .logo {
+                    img {
+                        height: 40px;
+                    }
+                }
+            }
+        }
+    }
+}
+

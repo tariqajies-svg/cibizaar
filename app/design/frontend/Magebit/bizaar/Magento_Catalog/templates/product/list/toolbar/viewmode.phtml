@@ -1,0 +1,65 @@
+<?php
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes 2020-present. All rights reserved.
+ * This product is licensed per Magento install
+ * See https://hyva.io/license
+ */
+
+declare(strict_types=1);
+
+use Hyva\Theme\Model\ViewModelRegistry;
+use Magento\Catalog\Block\Product\ProductList\Toolbar;
+use Magento\Framework\Escaper;
+
+/** @var Toolbar $block */
+/** @var Escaper $escaper */
+/** @var ViewModelRegistry $viewModels */
+
+// phpcs:disable Generic.Files.LineLength
+?>
+
+<?php if ($block->isEnabledViewSwitcher()): ?>
+    <?php $modes = $block->getModes(); ?>
+    <?php if ($modes && count($modes) > 1): ?>
+        <nav
+            class="modes flex justify-center gap-x-2.5"
+            aria-label="<?= $escaper->escapeHtmlAttr(__('Products view mode')) ?>"
+        >
+            <style>
+                .modes-mode.mode-grid:before {
+                    /* background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>'); */
+                    content: '\e932';
+                    font-family: icomoon;
+                }
+
+                .modes-mode.mode-list:before {
+                    /* background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>'); */
+                    content: '\e933';
+                    font-family: icomoon;
+                }
+            </style>
+            <?php foreach ($block->getModes() as $code => $label): ?>
+                <button
+                    type="button"
+                    class="p-1 rounded-md border border-gray-300 bg-white text-xl leading-5 modes-mode w-10 h-10 mode-<?= $escaper->escapeHtmlAttr(strtolower($code)) ?> <?= ($block->isModeActive($code)) ? 'active' : 'bg-[#f7f7f7] hover:opacity-100' ?>"
+                    title="<?= $escaper->escapeHtmlAttr($label) ?>"
+                    <?php if ($block->isModeActive($code)): ?>
+                        disabled
+                    <?php else: ?>
+                        @click.prevent="changeUrl(
+                            'product_list_mode',
+                            '<?= $escaper->escapeHtmlAttr(strtolower($code)) ?>',
+                            options.modeDefault
+                        )"
+                    <?php endif; ?>
+                    data-role="mode-switcher"
+                    data-value="<?= $escaper->escapeHtmlAttr(strtolower($code)) ?>"
+                    aria-label="<?= $escaper->escapeHtmlAttr(__('Products view mode - %1', $label)) ?>"
+                ></button>
+            <?php endforeach; ?>
+        </nav>
+    <?php else: ?>
+        <div class="modes w-20 order-1 col-span-1 sm:col-span-2 md:col-span-1 lg:col-span-2"></div>
+    <?php endif; ?>
+<?php endif; ?>

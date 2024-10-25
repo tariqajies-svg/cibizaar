@@ -1,0 +1,37 @@
+<div class="phone-container">
+    <div id="codeContainer" class="phone-code-container">
+        <input type="text"
+               name="code"
+               id="phoneCode"
+               class="phone-code-input"
+               data-bind="
+                    value: phoneCode,
+                    valueUpdate: 'input',
+                    click: function() {dropdownOpened(true)}">
+        <!-- ko if: dropdownOpened -->
+        <div class="phone-code-suggestions">
+            <!-- ko foreach: { data: filteredOptions(), as: 'item'}  -->
+            <div class="item"
+                 data-bind="
+                text: item.data.flag + ' ' + item.data.dial_code + ' ' + item.data.name,
+                click: function() {
+                    $parent.phoneCode(data.dial_code);
+                    $parent.dropdownOpened(false);
+                    $parent.generateFullNumber()}"></div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <input class="phone-number-input" type="text" name="phone" data-bind="
+        value: phoneNumber,
+        valueUpdate: 'input',
+        attr: {
+            'aria-describedby': noticeId,
+            id: uid + 'B'
+        },
+        event: {
+            input: generateFullNumber
+        }">
+    <input type="hidden" name="telephone" data-bind="value: value, attr: { id: uid + 'C' }">
+</div>

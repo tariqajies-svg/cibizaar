@@ -1,0 +1,62 @@
+<?php
+/**
+ * This file is part of the Magebit/bizaar design package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade to newer
+ * versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author Magebit <info@magebit.com>
+ * @license MIT
+ */
+
+declare(strict_types=1);
+
+use Magento\Catalog\Helper\Data;
+use Magento\Framework\Escaper;
+use Smile\ElasticsuiteCatalog\Block\Navigation\FilterRenderer;
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundHelper
+
+/** @var FilterRenderer $block */
+/** @var Escaper $escaper */
+/** @var array $filterItems */
+/** @var Data $catalogHelper */
+
+$catalogHelper = $this->helper(Data::class);
+$uniqueId   = '_' . uniqid();
+?>
+
+<ol class="items lg:space-y-1" x-data="window.bizaar.initLayeredNavigationItem(
+    {
+        count: <?= /** @noEscape */ (int) count($filterItems) ?>
+    })">
+    <?php foreach ($filterItems as $i => $filterItem): ?>
+        <li class="item leading-6 lg:leading-7" :class="{ 'hidden': !showMore && <?= (int)$i + 1 ?> > showLimit }">
+            <?php if ($filterItem->getCount() > 0): ?>
+                <a class="clear flex items-center text-black lg:hover:text-navy" href="<?= $escaper->escapeUrl($filterItem->getUrl()) ?>">
+                    <?php if ($this->isMultipleSelectEnabled()): ?>
+                        <input type="checkbox" onclick="this.parentNode.click();" <?php if ($filterItem->getIsSelected()): ?>checked<?php endif; ?> />
+                    <?php endif; ?>
+                    <?= /* @noEscape*/ $filterItem->getLabel() ?>
+                    <?php if ($catalogHelper->shouldDisplayProductCountOnLayer()): ?>
+                        <span class="font-normal">(<?= /* @noEscape*/ $filterItem->getCount()?>)</span>
+                    <?php endif; ?>
+                </a>
+            <?php else: ?>
+                <?= /* @noEscape*/ $filterItem->getLabel() ?>
+                <?php if ($catalogHelper->shouldDisplayProductCountOnLayer()): ?>
+                    <span class="font-normal">(<?= /* @noEscape*/ $filterItem->getCount()?>)</span>
+                <?php endif; ?>
+            <?php endif; ?>
+        </li>
+    <?php endforeach ?>
+        <li class="leading-6 lg:leading-7" x-show="count > showLimit">
+            <span class="link no-underline flex items-center font-semibold cursor-pointer" @click="showMore = !showMore">
+                <i class="pr-2 text-sm" :class="showMore ? 'icon-minus' : 'icon-plus'"></i>
+                <span x-html="showMore ? 'Show less' : 'Show more'"></span>
+            </span>
+        </li>
+</ol>

@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * This file is part of the Magebit_HyvaAheadworksCreditLimit package.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magebit_HyvaAheadworksCreditLimit
+ * to newer versions in the future.
+ *
+ * @copyright Copyright (c) 2022 Magebit, Ltd. (https://magebit.com/)
+ * @author    Magebit <info@magebit.com>
+ * @license   MIT
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Aheadworks\CreditLimit\Block\Customer\TotalList" name="aw-cl.customer.top_total_list"
+                   template="Magebit_HyvaAheadworksCreditLimit::customer/top-total-list.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Magebit\HyvaAheadworksCreditLimit\ViewModel\Pricing</argument>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="types" xsi:type="array"/>
+                        <item name="components" xsi:type="array">
+                            <item name="aw_cl_top_totals_data_provider" xsi:type="array">
+                                <item name="component" xsi:type="string">uiElement</item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+            <block class="Aheadworks\CreditLimit\Block\Customer\BalanceUpdate" name="aw-cl.customer.balance.update">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Aheadworks\CreditLimit\ViewModel\Customer\PaymentForm</argument>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="types" xsi:type="array"/>
+                        <item name="components" xsi:type="array">
+                            <item name="aw_cl_payment_form" xsi:type="array">
+                                <item name="component" xsi:type="string">Aheadworks_CreditLimit/js/ui/form/form</item>
+                                <item name="deps" xsi:type="array">
+                                    <item name="0" xsi:type="string">aw_cl_payment_form_provider</item>
+                                </item>
+                                <item name="children" xsi:type="array">
+                                    <item name="balance-update" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/fieldset</item>
+                                        <item name="label" xsi:type="string"></item>
+                                        <item name="template" xsi:type="string">Aheadworks_CreditLimit/ui/form/element/fieldset</item>
+                                        <item name="dataScope" xsi:type="string">data</item>
+                                        <item name="sortOrder" xsi:type="number">10</item>
+                                        <item name="additionalClasses" xsi:type="string">balance-update-fields</item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="amount_input" xsi:type="array">
+                                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                                                <item name="dataScope" xsi:type="string">amount</item>
+                                                <item name="provider" xsi:type="string">aw_cl_payment_form_provider</item>
+                                                <item name="template" xsi:type="string">ui/form/field</item>
+                                                <item name="label" xsi:type="string" translate="true">Enter the amount</item>
+                                                <item name="additionalClasses" xsi:type="string">amount</item>
+                                                <item name="validation" xsi:type="array">
+                                                    <item name="required-entry" xsi:type="boolean">true</item>
+                                                    <item name="validate-number" xsi:type="boolean">true</item>
+                                                    <item name="validate-zero-or-greater" xsi:type="boolean">true</item>
+                                                </item>
+                                                <item name="sortOrder" xsi:type="number">10</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                    <item name="pay_button" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_Ui/js/form/components/button</item>
+                                        <item name="provider" xsi:type="string">aw_cl_payment_form_provider</item>
+                                        <item name="title" xsi:type="string" translate="true">Make a payment</item>
+                                        <item name="sortOrder" xsi:type="number">20</item>
+                                        <item name="buttonClasses" xsi:type="string">action primary pay</item>
+                                        <item name="actions" xsi:type="array">
+                                            <item name="0" xsi:type="array">
+                                                <item name="targetName" xsi:type="string">aw_cl_payment_form</item>
+                                                <item name="actionName" xsi:type="string">save</item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                            <item name="aw_cl_payment_form_provider" xsi:type="array">
+                                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+                                <item name="clientConfig" xsi:type="array">
+                                    <item name="urls" xsi:type="array">
+                                        <item name="save" xsi:type="url" path="aw_credit_limit/balance/makePayment"/>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+            <block class="Aheadworks\CreditLimit\Block\Customer\BalanceHistory\Listing"
+                   name="aw_cl.balance_history.listing"
+                   template="Magebit_HyvaAheadworksCreditLimit::customer/balance-history/listing.phtml"
+                   cacheable="false">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Magebit\HyvaAheadworksCreditLimit\ViewModel\Customer</argument>
+                </arguments>
+                <block name="loading" template="Hyva_Theme::ui/loading.phtml"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>
