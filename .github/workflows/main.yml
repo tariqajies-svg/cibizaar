@@ -16,7 +16,7 @@ env:
 
 jobs:
   php_static_analysis:
-    runs-on: bateel-dev
+    runs-on: bizaarci
     steps:
       - name: Checkout Target repository
         uses: actions/checkout@v3
