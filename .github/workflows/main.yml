@@ -3,7 +3,7 @@ name: Code Analysis and Security Assessment
 on:
   pull_request:
     branches:
-      - bizaar_ci
+      - development
 
 defaults:
   run:
