@@ -16,7 +16,7 @@ env:
 
 jobs:
   php_static_analysis:
-    runs-on: bizaarci
+    runs-on: bateel-dev
     steps:
       - name: Checkout Target repository
         uses: actions/checkout@v3
@@ -26,10 +26,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-      - name: Print branch names
-        run: |
-          echo "Source branch: ${{ github.head_ref }}"
-          echo "Destination branch: ${{ github.base_ref }}"
       - name: Set CHANGED_FILES
         run: |
           cd $GITHUB_WORKSPACE
