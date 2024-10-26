@@ -28,8 +28,9 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Set CHANGED_FILES
         run: |
-          cd /var/www/html/bizaarci/cibizaar
-          echo 'pwd'
+          cd $GITHUB_WORKSPACE
+          echo 'Current directory after cd $GITHUB_WORKSPACE:'
+          pwd  # Confirming the current directory
           changedFiles=$(git diff --name-only --diff-filter=ACMRT origin/${{ env.CHANGE_TARGET }}...origin/${{ env.CHANGE_BRANCH }})
           if [ ! -z "$changedFiles" ]; then
           CHANGED_FILES=$(echo "$changedFiles" | awk '{printf " --files %s", $0}')
