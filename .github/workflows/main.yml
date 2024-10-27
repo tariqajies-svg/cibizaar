@@ -37,7 +37,7 @@ jobs:
           git config --global --add include.path /tmp/git-config/config
       - name: Set CHANGED_FILES
         run: |
-          cd $WORKSPACE
+          cd $GITHUB_WORKSPACE
           echo 'pwd'
           changedFiles=$(git diff --name-only --diff-filter=ACMRT origin/${{ env.CHANGE_TARGET }}...origin/${{ env.CHANGE_BRANCH }})
           if [ ! -z "$changedFiles" ]; then
