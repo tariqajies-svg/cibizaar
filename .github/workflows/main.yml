@@ -7,11 +7,12 @@ on:
 
 defaults:
   run:
-    working-directory: /var/www/html/bizaarci/webroot  # Custom workspace directory
+    working-directory: /var/www/html/bizaarci/webroot
 
 env:
   CHANGE_BRANCH: ${{ github.event.pull_request.head.ref }}
   CHANGE_TARGET: ${{ github.event.pull_request.base.ref }}
+
 
 jobs:
   php_static_analysis:
@@ -20,18 +21,25 @@ jobs:
       - name: Checkout Target repository
         uses: actions/checkout@v3
         with:
-          path: /var/www/html/bizaarci/webroot  # Custom workspace path for the repo
-
+          ref: ${{ github.event.pull_request.base.ref }}
+      - name: Checkout Source repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Print branch names
+        run: |
+          echo "Source branch: ${{ github.head_ref }}"
+          echo "Destination branch: ${{ github.base_ref }}"
       - name: Set CHANGED_FILES
         run: |
-          echo "Current working directory:"
-          pwd  # Confirm the current directory
+          cd $GITHUB_WORKSPACE
+          echo 'pwd'
           changedFiles=$(git diff --name-only --diff-filter=ACMRT origin/${{ env.CHANGE_TARGET }}...origin/${{ env.CHANGE_BRANCH }})
-          if [ -n "$changedFiles" ]; then
-            CHANGED_FILES=$(echo "$changedFiles" | awk '{printf " --files %s", $0}')
-            echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
+          if [ ! -z "$changedFiles" ]; then
+          CHANGED_FILES=$(echo "$changedFiles" | awk '{printf " --files %s", $0}')
+          echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
           else
             echo "No changed files in the pull request"
             echo "CHANGED_FILES=" >> $GITHUB_ENV
           fi
-          echo "Changed files: $CHANGED_FILES"
+          echo $CHANGED_FILES
