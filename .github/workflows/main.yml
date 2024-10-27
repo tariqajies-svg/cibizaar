@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: /var/www/html/bizaarci/cibizaar
+    working-directory: /var/www/html/bizaarci/webroot
 
 env:
   CHANGE_BRANCH: ${{ github.event.pull_request.head.ref }}
