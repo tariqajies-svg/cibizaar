@@ -17,3 +17,4 @@ declare(strict_types=1);
 use Magento\Framework\Component\ComponentRegistrar;
 
 ComponentRegistrar::register(ComponentRegistrar::MODULE, 'Magebit_AdditionalCharge', __DIR__);
+#123545565
