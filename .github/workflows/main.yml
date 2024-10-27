@@ -7,48 +7,52 @@ on:
 
 defaults:
   run:
-    working-directory: /var/www/html/bizaarci/actions-runner/_work/cibizaar/cibizaar
+    working-directory: /var/www/html/bizaarci/webroot
 
 env:
   CHANGE_BRANCH: ${{ github.event.pull_request.head.ref }}
   CHANGE_TARGET: ${{ github.event.pull_request.base.ref }}
 
+
 jobs:
   php_static_analysis:
     runs-on: bizaarci
     steps:
-      - name: Checkout Target Repository
+      - name: Checkout Target repository
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.base.ref }}
-      
-      - name: Checkout Source Repository
+      - name: Checkout Source repository
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-      
       - name: Set CHANGED_FILES
         run: |
           cd $GITHUB_WORKSPACE
           echo 'Current directory after cd $GITHUB_WORKSPACE:'
           pwd  # Confirming the current directory
-          git fetch origin ${{ env.CHANGE_TARGET }} ${{ env.CHANGE_BRANCH }}
           changedFiles=$(git diff --name-only --diff-filter=ACMRT origin/${{ env.CHANGE_TARGET }}...origin/${{ env.CHANGE_BRANCH }})
-          if [ -n "$changedFiles" ]; then
-            CHANGED_FILES=$(echo "$changedFiles" | awk '{printf " --files %s", $0}')
-            echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
+          if [ ! -z "$changedFiles" ]; then
+          CHANGED_FILES=$(echo "$changedFiles" | awk '{printf " --files %s", $0}')
+          echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
           else
             echo "No changed files in the pull request"
             echo "CHANGED_FILES=" >> $GITHUB_ENV
           fi
           echo $CHANGED_FILES
-      
+      - name: Checkout the BRANCHES
+        run: |
+          git fetch origin ${{ env.CHANGE_TARGET }}
+          git fetch origin ${{ env.CHANGE_BRANCH }}
+          git checkout ${{ env.CHANGE_BRANCH }}
+          git pull origin ${{ env.CHANGE_BRANCH }}
+
       - name: Composer Validation & Install
         run: |
           composer validate --ansi
           composer install --ansi --prefer-dist --no-suggest
 
-      - name: Set Batch Size for ESLint
+      - name: Set Batch Size
         if: always()
         run: |
           changedFiles=($CHANGED_FILES)
@@ -71,15 +75,15 @@ jobs:
           changedFilesSpace=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ')
           vendor/bin/phpcs --standard=HyvaThemes $changedFilesSpace -s
 
-      - name: Validate Luma Theme
+      - name: Validate luma theme
         if: always()
         run: |
           changedFilesSpace=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ')
           vendor/bin/phpcs $changedFilesSpace --standard=Magento2 -s
-
+          
       - name: Mess Detector
         if: always()
         run: |
           changedFilesComma=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ' ',' | sed 's/^,//')
-          echo "Changed files for Mess Detector: $changedFilesComma"
+          echo $changedFilesComma
           vendor/bin/phpmd $changedFilesComma ansi ./dev/tests/static/testsuite/Magento/Test/Php/_files/phpmd/ruleset.xml
