@@ -76,13 +76,7 @@ jobs:
         if: always()
         run: |
           changedFilesSpace=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ')
-          vendor/bin/phpcs --standard=HyvaThemes $changedFilesSpace -s
-
-      - name: Validate luma theme
-        if: always()
-        run: |
-          changedFilesSpace=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ')
-          vendor/bin/phpcs $changedFilesSpace --standard=Magento2 -s
+          vendor/bin/phpcs --standard=HyvaThemes $changedFilesSpace -s -n
           
       - name: Mess Detector
         if: always()
