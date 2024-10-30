@@ -84,5 +84,4 @@ jobs:
         run: |
           changedFilesComma=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ' ',' | sed 's/^,//')
           echo $changedFilesComma
-          vendor/bin/phpmd $changedFilesComma ansi ./dev/tests/static/testsuite/Magento/Test/Php/_files/phpmd/ruleset.xml    
-          
+          vendor/bin/phpmd $changedFilesComma ansi ./dev/tests/static/testsuite/Magento/Test/Php/_files/phpmd/ruleset.xml
