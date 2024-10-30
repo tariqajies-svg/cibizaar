@@ -49,4 +49,40 @@ jobs:
         run: |
           composer validate --ansi
           composer install --ansi --prefer-dist --no-suggest
+
+       - name: Set Batch Size
+        if: always()
+        run: |
+          changedFiles=($CHANGED_FILES)
+          batch_size=20
+          for ((i=0; i<${#changedFiles[@]}; i+=batch_size)); do
+            batch=()
+            for file in "${changedFiles[@]:i:batch_size}"; do
+              if [[ $file == *.js ]]; then
+                batch+=("$file")
+              fi
+            done
+            if [ ${#batch[@]} -gt 0 ]; then
+              npm run eslint "${batch[@]}"
+            fi
+          done
+
+      - name: Code Sniffer
+        if: always()
+        run: |
+          changedFilesSpace=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ')
+          vendor/bin/phpcs --standard=HyvaThemes $changedFilesSpace -s
+
+      - name: Validate luma theme
+        if: always()
+        run: |
+          changedFilesSpace=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ')
+          vendor/bin/phpcs $changedFilesSpace --standard=Magento2 -s
+          
+      - name: Mess Detector
+        if: always()
+        run: |
+          changedFilesComma=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ' ',' | sed 's/^,//')
+          echo $changedFilesComma
+          vendor/bin/phpmd $changedFilesComma ansi ./dev/tests/static/testsuite/Magento/Test/Php/_files/phpmd/ruleset.xml    
           
