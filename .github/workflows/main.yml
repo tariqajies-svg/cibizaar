@@ -38,3 +38,15 @@ jobs:
             echo "CHANGED_FILES=" >> $GITHUB_ENV
           fi
           echo $CHANGED_FILES
+      - name: Checkout the BRANCHES
+        run: |
+          git fetch origin ${{ env.CHANGE_TARGET }}
+          git fetch origin ${{ env.CHANGE_BRANCH }}
+          git checkout ${{ env.CHANGE_BRANCH }}
+          git pull origin ${{ env.CHANGE_BRANCH }}
+
+      - name: Composer Validation & Install
+        run: |
+          composer validate --ansi
+          composer install --ansi --prefer-dist --no-suggest
+          
