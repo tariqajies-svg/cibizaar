@@ -50,7 +50,7 @@ jobs:
           composer validate --ansi
           composer install --ansi --prefer-dist --no-suggest
 
-       - name: Set Batch Size
+      - name: Set Batch Size
         if: always()
         run: |
           changedFiles=($CHANGED_FILES)
