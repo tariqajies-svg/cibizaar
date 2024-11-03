@@ -34,7 +34,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           echo 'pwd'
-          changedFiles=$(git diff --name-only --diff-filter=ACMRT origin/${{ env.CHANGE_TARGET }}...origin/${{ env.CHANGE_BRANCH }})
+          changedFiles=$(git diff --name-only --diff-filter=ACMRT origin/${{ env.CHANGE_TARGET }}..origin/${{ env.CHANGE_BRANCH }})
           if [ ! -z "$changedFiles" ]; then
           CHANGED_FILES=$(echo "$changedFiles" | awk '{printf " --files %s", $0}')
           echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
@@ -58,6 +58,7 @@ jobs:
       - name: Set Batch Size
         if: always()
         run: |
+          npm install eslint --save-dev
           changedFiles=($CHANGED_FILES)
           batch_size=20
           for ((i=0; i<${#changedFiles[@]}; i+=batch_size)); do
@@ -76,13 +77,13 @@ jobs:
         if: always()
         run: |
           changedFilesSpace=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ')
-          vendor/bin/phpcs --standard=HyvaThemes $changedFilesSpace -s
+          vendor/bin/phpcs --standard=HyvaThemes $changedFilesSpace -s -n
 
       - name: Validate luma theme
         if: always()
         run: |
           changedFilesSpace=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ')
-          vendor/bin/phpcs $changedFilesSpace --standard=Magento2 -s
+          vendor/bin/phpcs $changedFilesSpace --standard=Magento2 -s -n
           
       - name: Mess Detector
         if: always()
@@ -90,4 +91,3 @@ jobs:
           changedFilesComma=$(echo "$CHANGED_FILES" | sed 's/--files//g' | tr -s ' ' ',' | sed 's/^,//')
           echo $changedFilesComma
           vendor/bin/phpmd $changedFilesComma ansi ./dev/tests/static/testsuite/Magento/Test/Php/_files/phpmd/ruleset.xml
-
