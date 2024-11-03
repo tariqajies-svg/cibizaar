@@ -58,6 +58,7 @@ jobs:
       - name: Set Batch Size
         if: always()
         run: |
+          npm install eslint --save-dev
           changedFiles=($CHANGED_FILES)
           batch_size=20
           for ((i=0; i<${#changedFiles[@]}; i+=batch_size)); do
